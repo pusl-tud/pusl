@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BootstrapApplication {
 
 	public static void main(String[] args) {
-		//pipeline test
+		//another pipeline test
 		SpringApplication.run(BootstrapApplication.class, args);
 	}
 
