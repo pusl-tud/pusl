@@ -24,5 +24,11 @@ pipeline {
                 }
             }
         }
+
+        stage ('Deploy') {
+            steps {
+                sh 'cp target/.war /home/tomcat/apache-tomcat-9.0.29/webapps/ROOT.war'
+            }
+        }
     }
 }
