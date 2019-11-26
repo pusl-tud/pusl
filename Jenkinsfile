@@ -25,6 +25,12 @@ pipeline {
             }
         }
 
+        stage ('Production Build') {
+            steps {
+                sh 'mvn clean package -Pproduction'
+            }
+        }
+
         stage ('Deploy') {
             steps {
                 sh 'cp target/*.war /home/tomcat/apache-tomcat-9.0.29/webapps/ROOT.war'
