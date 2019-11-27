@@ -10,7 +10,7 @@ public class DemoView extends VerticalLayout {
     private static final long serialVersionUID = 1L;
 
     public DemoView() {
-        add(new Text("CI funktioniert!"));
+        add(new Text("Datenbank funktioniert!"));
     }
 
 }

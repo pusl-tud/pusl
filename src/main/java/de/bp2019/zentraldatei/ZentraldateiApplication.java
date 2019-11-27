@@ -4,11 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BootstrapApplication {
+public class ZentraldateiApplication {
 
 	public static void main(String[] args) {
-		//another pipeline test
-		SpringApplication.run(BootstrapApplication.class, args);
+		SpringApplication.run(ZentraldateiApplication.class, args);
 	}
 
 }
