@@ -1,6 +1,7 @@
 package de.bp2019.zentraldatei.model;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+import de.bp2019.zentraldatei.enums.UserType;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  */
 
 @Document
-class User{
+public class User{
 	
 	private String firstName;
 	private String lastName;

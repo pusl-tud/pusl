@@ -9,7 +9,7 @@ import java.util.List;
  */
 
 @Document
-class ModuleInstance{
+public class ModuleInstance{
 	
 	private ModuleScheme scheme;
 	private List<ExerciseInstance> exercises;

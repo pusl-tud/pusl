@@ -11,7 +11,7 @@ import java.util.ArrayList;
  */
 
 @Document
-class ExerciseInstance{
+public class ExerciseInstance{
 	
 	private ExerciseScheme scheme;
 	private ArrayList<Grade> grades;

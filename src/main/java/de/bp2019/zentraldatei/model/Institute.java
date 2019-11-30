@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Encapsulates an instute as a class for ease of handling
  */
 @Document
-class Institute{
+public class Institute{
 	
 	private String name;
 	

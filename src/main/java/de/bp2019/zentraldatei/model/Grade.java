@@ -7,7 +7,7 @@ import java.util.Date;
  * A class to model a single grade entry. Consists of a matriculation number, a grade and a hand in date
  */
 @Document
-class Grade{
+ public class Grade{
 	
 	//Grade is stored as a string to enable non-numeric entries
 	private int matrNumber;

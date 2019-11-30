@@ -11,7 +11,7 @@ import java.util.Date;
  * a list of exerciseSchemes a grade calcuation rule an a list of privileged users
  */
 @Document
-class ModuleScheme{
+public class ModuleScheme{
 	
 	//the calculation rule is stored as a string and later parsed
 	private String name;

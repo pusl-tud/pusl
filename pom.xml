@@ -58,6 +58,7 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
       <scope>compile</scope>
     </dependency>
+
   </dependencies>
   <dependencyManagement>
     <dependencies>

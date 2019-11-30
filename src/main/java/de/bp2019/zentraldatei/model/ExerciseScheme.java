@@ -10,7 +10,7 @@ import java.util.Date;
  */
 
 @Document
-class ExerciseScheme{
+public class ExerciseScheme{
 	
 	private String name;
 	private boolean isNumeric;
