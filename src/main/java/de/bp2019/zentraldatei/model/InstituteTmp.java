@@ -10,4 +10,8 @@ public class InstituteTmp {
     public void setName(String name) {
         this.name = name;
     }
+
+    public InstituteTmp(String name) {
+        this.name = name;
+    }
 }
