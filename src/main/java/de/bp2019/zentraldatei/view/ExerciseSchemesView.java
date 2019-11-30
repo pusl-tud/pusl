@@ -45,7 +45,7 @@ public class ExerciseSchemesView extends VerticalLayout {
 
 
         FormLayout form = new FormLayout();
-        Binder<ExerciseScheme> binder = new Binder();
+        Binder<ExerciseScheme> binder = new Binder<>();
 
         ExerciseScheme exerciseSchemeBeingEdited = new ExerciseScheme();
 
@@ -63,7 +63,7 @@ public class ExerciseSchemesView extends VerticalLayout {
         Checkbox isNumeric = new Checkbox("Mit Note");
         form.add(isNumeric);
 
-        MultiselectComboBox<User> hasAccess = new MultiselectComboBox<User>("Zugriff erlauben");
+        MultiselectComboBox<User> hasAccess = new MultiselectComboBox<>("Zugriff erlauben");
         hasAccess.setItems(users);
         hasAccess.setItemLabelGenerator(User::toString);
         form.add(hasAccess);
