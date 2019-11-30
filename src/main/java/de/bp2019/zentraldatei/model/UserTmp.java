@@ -17,6 +17,10 @@ public class UserTmp {
         HiWi
     }
 
+    public String getFullName() {
+        return surname + " " + lastname;
+    }
+
     public String getSurname() {
         return surname;
     }
@@ -66,5 +70,15 @@ public class UserTmp {
     }
 
     public UserTmp() {
+    }
+
+    public UserTmp(String surname, String lastname, String eMail, String password, UserType type,
+            List<InstituteTmp> institutes) {
+        this.surname = surname;
+        this.lastname = lastname;
+        this.eMail = eMail;
+        this.password = password;
+        this.type = type;
+        this.institutes = institutes;
     }
 }
