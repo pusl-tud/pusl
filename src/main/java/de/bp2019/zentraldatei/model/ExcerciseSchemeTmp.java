@@ -3,7 +3,11 @@ package de.bp2019.zentraldatei.model;
 import java.time.LocalTime;
 import java.util.List;
 
-public class ExcerciseSchemeTmp {
+import de.bp2019.zentraldatei.view.components.DefaultFactory;
+import de.bp2019.zentraldatei.view.components.ICustomListItem;
+
+
+public class ExcerciseSchemeTmp implements ICustomListItem{
     private String name;
     private boolean isNumeric;
     private List<String> tokens;
@@ -11,6 +15,7 @@ public class ExcerciseSchemeTmp {
     private LocalTime finishDate;
     private List<UserTmp> hasAccess;
 
+    @Override
     public String getName() {
         return name;
     }
@@ -60,6 +65,25 @@ public class ExcerciseSchemeTmp {
     }
 
     public ExcerciseSchemeTmp() {
+    }
+
+    public ExcerciseSchemeTmp(String name, boolean isNumeric, List<String> tokens, LocalTime startDate,
+            LocalTime finishDate, List<UserTmp> hasAccess) {
+        this.name = name;
+        this.isNumeric = isNumeric;
+        this.tokens = tokens;
+        this.startDate = startDate;
+        this.finishDate = finishDate;
+        this.hasAccess = hasAccess;
+    }
+
+    public static class ExcerciseSchemeDefaultFactory implements DefaultFactory<ExcerciseSchemeTmp> {
+
+        @Override
+        public ExcerciseSchemeTmp createDefaultInstance() {
+            return new ExcerciseSchemeTmp("Neues Prüfungsschema", true, null, LocalTime.now(), null, null);
+        }
+ 
     }
 
 }
