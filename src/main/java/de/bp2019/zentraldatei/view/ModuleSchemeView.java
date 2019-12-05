@@ -135,7 +135,6 @@ public class ModuleSchemeView extends Div implements HasUrlParameter<String> {
                 binder.bind(hasAccess, ModuleScheme::getHasAccess, ModuleScheme::setHasAccess);
 
                 binder.bind(calculationRule, ModuleScheme::getCalculationRule, ModuleScheme::setCalculationRule);
-
                 TextArea id = new TextArea();
                 binder.bind(id, ModuleScheme::getId, ModuleScheme::setId);
 
