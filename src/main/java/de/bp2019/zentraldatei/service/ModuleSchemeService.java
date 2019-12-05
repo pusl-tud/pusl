@@ -1,9 +1,11 @@
 package de.bp2019.zentraldatei.service;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -148,5 +150,27 @@ public class ModuleSchemeService {
     public List<ModuleScheme> getAllModuleSchemes() {
         // TODO: Implement Authentication
         return allModuleSchemes;
+    }
+
+    public void addModuleScheme(ModuleScheme moduleScheme){
+        // TODO: Data Validation
+
+        moduleScheme.setId(getNewId());
+        allModuleSchemes.add(moduleScheme);
+    }
+
+    public void updateModuleScheme(ModuleScheme moduleScheme){
+        // TODO: Data Validation
+        LOGGER.info(moduleScheme.getId());
+        allModuleSchemes.removeIf(item -> item.getId().equals(moduleScheme.getId()));
+        allModuleSchemes.add(moduleScheme);
+    }
+
+    private String getNewId(){
+        // TODO: Implement correct Id generation
+
+        byte[] array = new byte[7];
+        new Random().nextBytes(array);
+        return new String(array, Charset.forName("UTF-8"));
     }
 }
