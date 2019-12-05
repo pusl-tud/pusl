@@ -6,14 +6,16 @@ import de.bp2019.zentraldatei.enums.UserType;
 
 import java.util.List;
 
-
-/* A class to model a useser. Consists of a  first and last name, an E-mail adress, a password,
- *a list of institutes the user belongs to, and the user type
+/**
+ * A class to model a useser. Consists of a first and last name, an E-mail
+ * adress, a password, a list of institutes the user belongs to, and the user
+ * type
+ * 
+ * @author Alex Späth
  */
-
 @Document
-public class User{
-	
+public class User {
+
 	@Id
 	private String id;
 	private String firstName;
@@ -22,8 +24,9 @@ public class User{
 	private String password;
 	private List<Institute> institutes;
 	private UserType type;
-	
-	public User(String firstName, String lastName, String eMail, String password, List<Institute> institutes, UserType type) {
+
+	public User(String firstName, String lastName, String eMail, String password, List<Institute> institutes,
+			UserType type) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.eMail = eMail;
@@ -31,55 +34,55 @@ public class User{
 		this.institutes = institutes;
 		this.type = type;
 	}
-	
+
 	public String getId() {
-	    return id;
-	  }
-	
+		return id;
+	}
+
 	public String getFirstName() {
 		return firstName;
 	}
-	
+
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
-	
+
 	public String getLastName() {
 		return lastName;
 	}
-	
+
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
-	
+
 	public String getEMail() {
 		return eMail;
 	}
-	
+
 	public void setEMail(String eMail) {
 		this.eMail = eMail;
 	}
-	
+
 	public String getPassword() {
 		return password;
 	}
-	
+
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	public List<Institute> getInstitutes(){
+
+	public List<Institute> getInstitutes() {
 		return institutes;
 	}
-	
-	public void setInstitutes(List<Institute> institutes){
+
+	public void setInstitutes(List<Institute> institutes) {
 		this.institutes = institutes;
 	}
-	
+
 	public UserType getType() {
 		return type;
 	}
-	
+
 	public void setType(UserType type) {
 		this.type = type;
 	}

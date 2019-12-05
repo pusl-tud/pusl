@@ -1,40 +1,36 @@
 package de.bp2019.zentraldatei.model;
 
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.util.List;
 
-import java.util.ArrayList;
-
-
-
-/*
- * A class to model a instance of an exercise. consists of a exerciseScheme and a list of grades
+/**
+ * A class to model a instance of an exercise. consists of a exerciseScheme and
+ * a list of grades
+ * 
+ * @author Alex Späth
  */
+public class ExerciseInstance {
 
-
-public class ExerciseInstance{
-	
 	private ExerciseScheme scheme;
-	private ArrayList<Grade> grades;
-	
-	public ExerciseInstance(ExerciseScheme scheme, ArrayList<Grade> grades) {
+	private List<Grade> grades;
+
+	public ExerciseInstance(ExerciseScheme scheme, List<Grade> grades) {
 		this.scheme = scheme;
 		this.grades = grades;
 	}
-	
-	public ExerciseScheme getScheme(ExerciseScheme scheme) {
+
+	public ExerciseScheme getScheme() {
 		return scheme;
 	}
-	
-	public void setScheme() {
+
+	public void setScheme(ExerciseScheme scheme) {
 		this.scheme = scheme;
 	}
-	
-	
-	public ArrayList<Grade> getGrades(){
+
+	public List<Grade> getGrades() {
 		return grades;
 	}
 
-	public void setGrades(ArrayList<Grade> grades){
+	public void setGrades(List<Grade> grades) {
 		this.grades = grades;
 	}
 }
