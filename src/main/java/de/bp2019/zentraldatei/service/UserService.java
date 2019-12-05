@@ -21,7 +21,7 @@ public class UserService {
     List<User> allUsers;
 
     public UserService() {
-        LOGGER.debug("Started  creation of InstituteService");
+        LOGGER.debug("Started creation of InstituteService");
 
         /* Platzhalter Code da noch keine echten Repositories existieren */
         allUsers = new ArrayList<User>();

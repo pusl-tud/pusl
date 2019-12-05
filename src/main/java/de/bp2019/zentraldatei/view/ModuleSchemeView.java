@@ -1,13 +1,24 @@
 package de.bp2019.zentraldatei.view;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import com.vaadin.flow.component.grid.dnd.GridDropLocation;
+import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -25,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
+import de.bp2019.zentraldatei.model.ExcerciseScheme;
 import de.bp2019.zentraldatei.model.Institute;
 import de.bp2019.zentraldatei.model.ModuleScheme;
 import de.bp2019.zentraldatei.model.User;
@@ -43,12 +55,16 @@ public class ModuleSchemeView extends Div implements HasUrlParameter<String> {
         private static final long serialVersionUID = 1L;
         private static final Logger LOGGER = LoggerFactory.getLogger(ModuleSchemeView.class);
 
-        ModuleSchemeService moduleSchemeService;
+        private ModuleSchemeService moduleSchemeService;
 
-        /** The object that will be edited */
-        private ModuleScheme moduleSchemeBeingEdited;
+        private Grid<ExcerciseScheme> excerciseSchemes;
+        private ExcerciseScheme draggedItem;
+        private List<ExcerciseScheme> gridItems;
+
         /** Binder to bind the form Data to an Object */
-        Binder<ModuleScheme> binder;
+        private Binder<ModuleScheme> binder;
+
+        private boolean isNewEntity;
 
         public ModuleSchemeView(@Autowired InstituteService instituteService, @Autowired UserService userService,
                         @Autowired ModuleSchemeService moduleSchemeService) {
@@ -61,7 +77,6 @@ public class ModuleSchemeView extends Div implements HasUrlParameter<String> {
                 layoutWithBinder.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("10em", 2));
                 layoutWithBinder.setWidth("35em");
                 layoutWithBinder.getStyle().set("marginLeft", "1em");
-
 
                 binder = new Binder<>();
 
@@ -78,28 +93,20 @@ public class ModuleSchemeView extends Div implements HasUrlParameter<String> {
                 institutes.setItemLabelGenerator(Institute::getName);
                 layoutWithBinder.add(institutes, 2);
 
-                // DatePicker startDate = new DatePicker();
-                // startDate.setValue(LocalDate.now());
-                // startDate.setLabel("Beginnt am");
-                // layoutWithBinder.add(startDate);
-
-                // DatePicker finishDate = new DatePicker();
-                // finishDate.setValue(LocalDate.now());
-                // finishDate.setLabel("Endet am");
-                // layoutWithBinder.add(finishDate);
-
                 MultiselectComboBox<User> hasAccess = new MultiselectComboBox<User>();
                 hasAccess.setLabel("Hat Zugriff");
                 hasAccess.setItems(userService.getAllUsers());
                 hasAccess.setItemLabelGenerator(User::getFullName);
                 layoutWithBinder.add(hasAccess, 2);
 
-                // CustomListComponent<ExcerciseScheme> excerciseSchemes = new
-                // CustomListComponent<ExcerciseScheme>(
-                // new ExcerciseScheme.ExcerciseSchemeDefaultFactory());
-                // excerciseSchemes.setLabel("Prüfungsschemas");
-                // excerciseSchemes.setButtonText("Prüfungsschema hinzufügen");
-                // layoutWithBinder.add(excerciseSchemes, 2);
+                excerciseSchemes = new Grid<>();
+                gridItems = new ArrayList<ExcerciseScheme>();
+                excerciseSchemes.setItems(gridItems);
+                excerciseSchemes.addColumn(ExcerciseScheme::getName).setHeader("Prüfungsschemas");
+                excerciseSchemes.setSelectionMode(SelectionMode.NONE);
+                excerciseSchemes.setRowsDraggable(true);
+                excerciseSchemes.setHeight("15em");
+                layoutWithBinder.add(excerciseSchemes, 2);
 
                 TextArea calculationRule = new TextArea();
                 calculationRule.setValueChangeMode(ValueChangeMode.EAGER);
@@ -107,12 +114,12 @@ public class ModuleSchemeView extends Div implements HasUrlParameter<String> {
                 calculationRule.setPlaceholder("Platzhalter");
                 layoutWithBinder.add(calculationRule, 2);
 
-                Button save = new Button("Save");
-                Button reset = new Button("Reset");
+                Button save = new Button("Speichern");
+                save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-                HorizontalLayout actions = new HorizontalLayout();
-                actions.add(save, reset);
-                save.getStyle().set("marginRight", "10px");
+                VerticalLayout actions = new VerticalLayout();
+                actions.add(save);
+                actions.setHorizontalComponentAlignment(Alignment.END, save);
                 layoutWithBinder.add(actions, 2);
 
                 /* -- Data Binding and validation -- */
@@ -128,11 +135,26 @@ public class ModuleSchemeView extends Div implements HasUrlParameter<String> {
                 binder.bind(hasAccess, ModuleScheme::getHasAccess, ModuleScheme::setHasAccess);
 
                 binder.bind(calculationRule, ModuleScheme::getCalculationRule, ModuleScheme::setCalculationRule);
-                
+                TextArea id = new TextArea();
+                binder.bind(id, ModuleScheme::getId, ModuleScheme::setId);
+
                 /* -- Click Listeners for the Buttons -- */
                 save.addClickListener(event -> {
-                        if (binder.writeBeanIfValid(moduleSchemeBeingEdited)) {
-                                LOGGER.info("Saved bean values: " + moduleSchemeBeingEdited);
+                        ModuleScheme formData = new ModuleScheme();
+                        if (binder.writeBeanIfValid(formData)) {
+                                if (isNewEntity) {
+                                        moduleSchemeService.addModuleScheme(formData);
+                                        Dialog dialog = new Dialog();
+                                        dialog.add(new Text("Veranstaltungsschema erfolgreich erstellt oder so..."));
+                                        dialog.open();
+                                        UI.getCurrent().navigate("moduleSchemes");
+                                }else{
+                                        moduleSchemeService.updateModuleScheme(formData);
+                                        Dialog dialog = new Dialog();
+                                        dialog.add(new Text("Veranstaltungsschema erfolgreich verändert oder so..."));
+                                        dialog.open();
+                                        UI.getCurrent().navigate("moduleSchemes");
+                                }
                         } else {
                                 BinderValidationStatus<ModuleScheme> validate = binder.validate();
                                 String errorText = validate.getFieldValidationStatuses().stream()
@@ -142,11 +164,27 @@ public class ModuleSchemeView extends Div implements HasUrlParameter<String> {
                                 LOGGER.info("There are errors: " + errorText);
                         }
                 });
-                reset.addClickListener(event -> {
-                        /* clear fields by setting null */
-                        binder.readBean(null);
+
+                excerciseSchemes.addDragStartListener(event -> {
+                        draggedItem = event.getDraggedItems().get(0);
+                        excerciseSchemes.setDropMode(GridDropMode.BETWEEN);
                 });
 
+                excerciseSchemes.addDragEndListener(event -> {
+                        draggedItem = null;
+                        excerciseSchemes.setDropMode(null);
+                });
+
+                excerciseSchemes.addDropListener(event -> {
+                        ExcerciseScheme dropOverItem = event.getDropTargetItem().get();
+                        if (!dropOverItem.equals(draggedItem)) {
+                                gridItems.remove(draggedItem);
+                                int dropIndex = gridItems.indexOf(dropOverItem)
+                                                + (event.getDropLocation() == GridDropLocation.BELOW ? 1 : 0);
+                                gridItems.add(dropIndex, draggedItem);
+                                excerciseSchemes.getDataProvider().refreshAll();
+                        }
+                });
                 /* -- Add Layout to Component -- */
                 add(layoutWithBinder);
                 LOGGER.debug("Finished creation of ManageModuleSchemesView");
@@ -155,16 +193,21 @@ public class ModuleSchemeView extends Div implements HasUrlParameter<String> {
         @Override
         public void setParameter(BeforeEvent event, String moduleSchemeId) {
                 if (moduleSchemeId.equals("new")) {
-                        moduleSchemeBeingEdited = new ModuleScheme();
+                        isNewEntity = true;
+                        /* clear fields by setting null */
+                        binder.readBean(null);
                 } else {
-                        ModuleScheme fetchedModuleScheme = moduleSchemeService.getModuleSchemeById(moduleSchemeId);
 
+                        ModuleScheme fetchedModuleScheme = moduleSchemeService.getModuleSchemeById(moduleSchemeId);
                         /* getModuleSchemeById returns null if no matching ModuleScheme is found */
                         if (fetchedModuleScheme == null) {
                                 throw new NotFoundException();
                         } else {
-                                moduleSchemeBeingEdited = fetchedModuleScheme;
+                                isNewEntity = false;
                                 binder.readBean(fetchedModuleScheme);
+                                gridItems.clear();
+                                gridItems.addAll(fetchedModuleScheme.getExcerciseSchemes());
+                                excerciseSchemes.getDataProvider().refreshAll();
                         }
                 }
 
