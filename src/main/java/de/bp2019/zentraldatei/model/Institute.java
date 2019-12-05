@@ -1,6 +1,9 @@
 package de.bp2019.zentraldatei.model;
 
-public class InstituteTmp {
+import org.springframework.data.annotation.Id;
+
+public class Institute {
+    @Id
     private String name;
 
     public String getName() {
@@ -11,7 +14,7 @@ public class InstituteTmp {
         this.name = name;
     }
 
-    public InstituteTmp(String name) {
+    public Institute(String name) {
         this.name = name;
     }
 }

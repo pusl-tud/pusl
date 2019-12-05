@@ -2,13 +2,13 @@ package de.bp2019.zentraldatei.model;
 
 import java.util.List;
 
-public class UserTmp {
+public class User {
     private String surname;
     private String lastname;
     private String eMail;
     private String password;
     private UserType type;
-    private List<InstituteTmp> institutes;
+    private List<Institute> institutes;
 
     public enum UserType{
         SuperAdmin,
@@ -61,19 +61,19 @@ public class UserTmp {
         this.type = type;
     }
 
-    public List<InstituteTmp> getInstitutes() {
+    public List<Institute> getInstitutes() {
         return institutes;
     }
 
-    public void setInstitutes(List<InstituteTmp> institutes) {
+    public void setInstitutes(List<Institute> institutes) {
         this.institutes = institutes;
     }
 
-    public UserTmp() {
+    public User() {
     }
 
-    public UserTmp(String surname, String lastname, String eMail, String password, UserType type,
-            List<InstituteTmp> institutes) {
+    public User(String surname, String lastname, String eMail, String password, UserType type,
+            List<Institute> institutes) {
         this.surname = surname;
         this.lastname = lastname;
         this.eMail = eMail;
