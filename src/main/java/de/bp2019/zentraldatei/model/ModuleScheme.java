@@ -1,10 +1,9 @@
 package de.bp2019.zentraldatei.model;
 
-
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Id;
 
 import java.util.List;
-import java.util.Date;
 
 /* 
  * A class to model a module. Consists of a name, a list of responsible institutes, a star date, a finish date,
@@ -13,25 +12,27 @@ import java.util.Date;
 @Document
 public class ModuleScheme{
 	
+	@Id
+	private String id;
+	
 	//the calculation rule is stored as a string and later parsed
 	private String name;
 	private List<Institute> institutes;
-	private Date startDate;
-	private Date finishDate;
 	private List<ExerciseScheme> exerciseSchemes;
 	private String calculationRules;
 	private List<User> hasAccess;
 	
-	public ModuleScheme(String name, List<Institute> institutes, Date startDate, Date finishDate,
-	List<ExerciseScheme> exerciseSchemes, String calculationRules, List<User> hasAccess) {
+	public ModuleScheme(String name, List<Institute> institutes, List<ExerciseScheme> exerciseSchemes, String calculationRules, List<User> hasAccess) {
 		this.name = name;
 		this.institutes = institutes;
-		this.startDate = startDate;
-		this.finishDate = finishDate;
 		this.exerciseSchemes = exerciseSchemes;
 		this.calculationRules = calculationRules;
 		this.hasAccess = hasAccess;
 	}
+	
+	public String getId() {
+	    return id;
+	  }
 	
 	public String getName() {
 		return name;
@@ -50,21 +51,6 @@ public class ModuleScheme{
 		this.institutes = institutes;
 	}
 	
-	public Date getStartDate(){
-		return startDate;
-	}
-	
-	public void setStartDate(Date startDate){
-		this.startDate = startDate;
-	}
-	
-	public Date getFinishDate(){
-		return finishDate;
-	}
-	
-	public void setFinishDate(Date finishDate){
-		this.finishDate = finishDate;
-	}
 	
 	public List<ExerciseScheme> getExerciseSchemes(){
 		return exerciseSchemes;

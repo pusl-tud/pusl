@@ -1,6 +1,7 @@
 package de.bp2019.zentraldatei.model;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Id;
 
 import java.util.List;
 import java.util.Date;
@@ -12,6 +13,8 @@ import java.util.Date;
 @Document
 public class ExerciseScheme{
 	
+	@Id
+	private String id;
 	private String name;
 	private boolean isNumeric;
 	private List<String> tokens;
@@ -27,6 +30,10 @@ public class ExerciseScheme{
 		this.finishDate = finishDate;
 		this.hasAccess = hasAccess;
 	}
+	
+	public String getId() {
+	    return id;
+	 }
 	
 	public String getName() {
 		return name;

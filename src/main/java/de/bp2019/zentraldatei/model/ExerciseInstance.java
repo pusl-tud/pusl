@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * A class to model a instance of an exercise. consists of a exerciseScheme and a list of grades
  */
 
-@Document
+
 public class ExerciseInstance{
 	
 	private ExerciseScheme scheme;

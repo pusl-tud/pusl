@@ -1,6 +1,7 @@
 package de.bp2019.zentraldatei.model;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Id;
 import de.bp2019.zentraldatei.enums.UserType;
 
 import java.util.List;
@@ -13,6 +14,8 @@ import java.util.List;
 @Document
 public class User{
 	
+	@Id
+	private String id;
 	private String firstName;
 	private String lastName;
 	private String eMail;
@@ -28,6 +31,10 @@ public class User{
 		this.institutes = institutes;
 		this.type = type;
 	}
+	
+	public String getId() {
+	    return id;
+	  }
 	
 	public String getFirstName() {
 		return firstName;
