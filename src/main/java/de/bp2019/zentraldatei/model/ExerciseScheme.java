@@ -4,7 +4,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
-import java.util.Date;
 
 /**
  * A class to model a exercise scheme. Connsists of a name, a flag for numeric
@@ -21,17 +20,13 @@ public class ExerciseScheme {
 	private String name;
 	private boolean isNumeric;
 	private List<String> tokens;
-	private Date startDate;
-	private Date finishDate;
 	private List<User> hasAccess;
 
-	public ExerciseScheme(String name, boolean isNumeric, List<String> tokens, Date startDate, Date finishDate,
-			List<User> hasAccess) {
+	public ExerciseScheme(String id, String name, boolean isNumeric, List<String> tokens, List<User> hasAccess) {
+		this.id = id;
 		this.name = name;
 		this.isNumeric = isNumeric;
 		this.tokens = tokens;
-		this.startDate = startDate;
-		this.finishDate = finishDate;
 		this.hasAccess = hasAccess;
 	}
 
@@ -61,22 +56,6 @@ public class ExerciseScheme {
 
 	public void setTokens(List<String> tokens) {
 		this.tokens = tokens;
-	}
-
-	public Date getStartDate() {
-		return startDate;
-	}
-
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
-
-	public Date getFinishDate() {
-		return finishDate;
-	}
-
-	public void getFinishDate(Date finishDate) {
-		this.finishDate = finishDate;
 	}
 
 	public List<User> getHasAccess() {

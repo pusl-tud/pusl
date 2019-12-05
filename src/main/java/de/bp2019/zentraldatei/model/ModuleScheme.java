@@ -4,75 +4,80 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
+import java.util.Set;
 
 /**
- * A class to model a module. Consists of a name, a list of responsible
- * institutes, a star date, a finish date, a list of exerciseSchemes a grade
- * calcuation rule an a list of privileged users
+ * A class to model a ModuleScheme. Consists of a name, a list of responsible
+ * institutes, a list of exerciseSchemes, a grade, a calcuation rule and a list
+ * of privileged users
  * 
  * @author Alex Späth
  */
 @Document
 public class ModuleScheme {
 
-	@Id
-	private String id;
-	private String name;
-	private List<Institute> institutes;
-	private List<ExerciseScheme> exerciseSchemes;
-	private String calculationRules;
-	private List<User> hasAccess;
+    @Id
+    private String id;
+    private String name;
+    private Set<Institute> institutes;
+    private Set<User> hasAccess;
+    private List<ExerciseScheme> exerciseSchemes;
+    private String calculationRule;
 
-	public ModuleScheme(String name, List<Institute> institutes, List<ExerciseScheme> exerciseSchemes,
-			String calculationRules, List<User> hasAccess) {
-		this.name = name;
-		this.institutes = institutes;
-		this.exerciseSchemes = exerciseSchemes;
-		this.calculationRules = calculationRules;
-		this.hasAccess = hasAccess;
-	}
+    public ModuleScheme(String id, String name, Set<Institute> institutes, Set<User> hasAccess,
+            List<ExerciseScheme> exerciseSchemes, String calculationRule) {
+        this.id = id;
+        this.name = name;
+        this.institutes = institutes;
+        this.exerciseSchemes = exerciseSchemes;
+        this.calculationRule = calculationRule;
+        this.hasAccess = hasAccess;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public ModuleScheme() {
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public List<Institute> getInstitutes() {
-		return institutes;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setInstitutes(List<Institute> institutes) {
-		this.institutes = institutes;
-	}
+    public Set<Institute> getInstitutes() {
+        return institutes;
+    }
 
-	public List<ExerciseScheme> getExerciseSchemes() {
-		return exerciseSchemes;
-	}
+    public void setInstitutes(Set<Institute> institutes) {
+        this.institutes = institutes;
+    }
 
-	public void setExerciseSchemes(List<ExerciseScheme> exerciseSchemes) {
-		this.exerciseSchemes = exerciseSchemes;
-	}
+    public List<ExerciseScheme> getExerciseSchemes() {
+        return exerciseSchemes;
+    }
 
-	public String getCaculationRules() {
-		return calculationRules;
-	}
+    public void setExerciseSchemes(List<ExerciseScheme> exerciseSchemes) {
+        this.exerciseSchemes = exerciseSchemes;
+    }
 
-	public void getCaculationRules(String calculationRules) {
-		this.calculationRules = calculationRules;
-	}
+    public String getCalculationRule() {
+        return calculationRule;
+    }
 
-	public List<User> getHasAccess() {
-		return hasAccess;
-	}
+    public void setCalculationRule(String calculationRule) {
+        this.calculationRule = calculationRule;
+    }
 
-	public void setHasAccess(List<User> hasAccess) {
-		this.hasAccess = hasAccess;
-	}
+    public Set<User> getHasAccess() {
+        return hasAccess;
+    }
+
+    public void setHasAccess(Set<User> hasAccess) {
+        this.hasAccess = hasAccess;
+    }
 }
