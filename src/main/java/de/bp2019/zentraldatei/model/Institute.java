@@ -30,5 +30,4 @@ public class Institute {
 	public void setName(String name) {
 		this.name = name;
 	}
-
 }

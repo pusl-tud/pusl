@@ -1,12 +1,13 @@
 package de.bp2019.zentraldatei.enums;
 
-/*
- * An class to model the diffent user types
+/**
+ * Enum modelling the different User Types
+ * 
+ * @author Alex Späth
  */
 public enum UserType {
 	SUPERADMIN,
 	ADMIN,
 	WIMI,
 	HIWI
-	
 }
