@@ -6,9 +6,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+/**
+ * Class to handle all the MongoDB configuration
+ * 
+ * @author Leon Chemnitz
+ */
 @Configuration
-@EnableMongoRepositories (basePackages = "de.bp2019.zentraldatei.repository")
-class ApplicationConfig extends AbstractMongoConfiguration {
+@EnableMongoRepositories(basePackages = "de.bp2019.zentraldatei.repository")
+class MongoConfig extends AbstractMongoConfiguration {
 
   @Override
   protected String getDatabaseName() {
