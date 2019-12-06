@@ -1,14 +1,12 @@
 package de.bp2019.zentraldatei.service;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
-
-import javax.annotation.PostConstruct;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +17,10 @@ import de.bp2019.zentraldatei.model.ExerciseScheme;
 import de.bp2019.zentraldatei.model.Institute;
 import de.bp2019.zentraldatei.model.ModuleScheme;
 import de.bp2019.zentraldatei.model.User;
+import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
+import de.bp2019.zentraldatei.repository.InstituteRepository;
+import de.bp2019.zentraldatei.repository.ModuleSchemeRepository;
+import de.bp2019.zentraldatei.repository.UserRepository;
 
 /**
  * Service providing relevant ModuleSchemes
@@ -29,148 +31,168 @@ import de.bp2019.zentraldatei.model.User;
 public class ModuleSchemeService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ModuleSchemeService.class);
 
-    List<ModuleScheme> allModuleSchemes;
-
     @Autowired
-    InstituteService instituteService;
+    ModuleSchemeRepository moduleSchemeRepository;
     @Autowired
-    UserService userService;
+    InstituteRepository instituteRepository;
     @Autowired
-    ExerciseSchemeService exerciseSchemeService;
+    UserRepository userRepository;
+    @Autowired
+    ExerciseSchemeRepository exerciseSchemeRepository;
 
     public ModuleSchemeService() {
-
     }
 
-    @PostConstruct
-    private void PostConstruct(){
-        LOGGER.debug("Started creation of ModuleSchemeService");
-
-        /* Platzhalter Code da noch keine echten Repositories existieren */
-        allModuleSchemes = new ArrayList<ModuleScheme>();
-
-        Set<Institute> instituteSet1 = new HashSet<Institute>();
-        instituteSet1.add(instituteService.getAllInstitutes().get(0));
-        instituteSet1.add(instituteService.getAllInstitutes().get(2));
-
-        Set<User> userSet1 = new HashSet<User>();
-        userSet1.add(userService.getAllUsers().get(3));
-        userSet1.add(userService.getAllUsers().get(5));
-        userSet1.add(userService.getAllUsers().get(0));
-        userSet1.add(userService.getAllUsers().get(1));
-
-        List<ExerciseScheme> exerciseSchemeList1 = new ArrayList<ExerciseScheme>();
-        exerciseSchemeList1.add(exerciseSchemeService.getAllExerciseSchemes().get(0));     
-        exerciseSchemeList1.add(exerciseSchemeService.getAllExerciseSchemes().get(0));     
-        exerciseSchemeList1.add(exerciseSchemeService.getAllExerciseSchemes().get(0));     
-        exerciseSchemeList1.add(exerciseSchemeService.getAllExerciseSchemes().get(2));     
-
-        allModuleSchemes.add(new ModuleScheme(
-                "ASD986SFH9hASf",
-                "Einführung in den Compilerbau",
-                instituteSet1,
-                userSet1,
-                exerciseSchemeList1,
-                "Sehr simple Berechnungsregel" ));
-
-
-                
-        Set<Institute> instituteSet2 = new HashSet<Institute>();
-        instituteSet2.add(instituteService.getAllInstitutes().get(1));
-
-        Set<User> userSet2 = new HashSet<User>();
-        userSet2.add(userService.getAllUsers().get(2));
-        userSet2.add(userService.getAllUsers().get(4));
-
-        List<ExerciseScheme> exerciseSchemeList2 = new ArrayList<ExerciseScheme>();
-        exerciseSchemeList2.add(exerciseSchemeService.getAllExerciseSchemes().get(1));     
-        exerciseSchemeList2.add(exerciseSchemeService.getAllExerciseSchemes().get(0));     
-        exerciseSchemeList2.add(exerciseSchemeService.getAllExerciseSchemes().get(1));     
-        exerciseSchemeList2.add(exerciseSchemeService.getAllExerciseSchemes().get(2));     
-
-        allModuleSchemes.add(new ModuleScheme(
-                "SJDU=)jhAq987Sf",
-                "Mathematik I",
-                instituteSet2,
-                userSet2,
-                exerciseSchemeList2,
-                "ziemlich komplizierte Berechnungsregel" ));
-
-                
-        Set<Institute> instituteSet3 = new HashSet<Institute>();
-        instituteSet3.add(instituteService.getAllInstitutes().get(1));
-        instituteSet3.add(instituteService.getAllInstitutes().get(0));
-        instituteSet3.add(instituteService.getAllInstitutes().get(2));
-
-        Set<User> userSet3 = new HashSet<User>();
-        userSet3.add(userService.getAllUsers().get(1));
-        userSet3.add(userService.getAllUsers().get(5));
-        userSet3.add(userService.getAllUsers().get(0));
-
-        List<ExerciseScheme> exerciseSchemeList3 = new ArrayList<ExerciseScheme>();
-        exerciseSchemeList3.add(exerciseSchemeService.getAllExerciseSchemes().get(1));  
-        exerciseSchemeList3.add(exerciseSchemeService.getAllExerciseSchemes().get(2));    
-        exerciseSchemeList3.add(exerciseSchemeService.getAllExerciseSchemes().get(0));     
-        exerciseSchemeList3.add(exerciseSchemeService.getAllExerciseSchemes().get(0));     
-        exerciseSchemeList3.add(exerciseSchemeService.getAllExerciseSchemes().get(1));     
-        exerciseSchemeList3.add(exerciseSchemeService.getAllExerciseSchemes().get(2));     
-
-        allModuleSchemes.add(new ModuleScheme(
-                "JOZso87qwkd0u",
-                "Visuelle Trendanalyse",
-                instituteSet3,
-                userSet3,
-                exerciseSchemeList3,
-                "wirklich sehr komplizierte Berechnungsregel"));
-
-        LOGGER.debug("Finished creation of ModuleSchemeService");
-    }
-
-  /**
-   * Get a ModuleScheme based on its Id.
-   * Only return ModuleSchemes the User is authenticated to see.
-   * @param Id Id to search for
-   * @return found ModuleScheme with maching Id, null if none is found
-   */
+    /**
+     * Get a ModuleScheme based on its Id. Only return ModuleSchemes the User is
+     * authenticated to see.
+     * 
+     * @param Id Id to search for
+     * @return found ModuleScheme with maching Id, null if none is found
+     * @author Leon Chemnitz
+     */
     public ModuleScheme getModuleSchemeById(String Id) {
         // TODO: Implement Authentication
-        Optional<ModuleScheme> foundModuleScheme = allModuleSchemes.stream().filter(moduleScheme -> moduleScheme.getId().equals(Id)).findFirst();
-        
-        if(foundModuleScheme.isPresent()){
+
+        Optional<ModuleScheme> foundModuleScheme = moduleSchemeRepository.findById(Id);
+
+        if (foundModuleScheme.isPresent()) {
             return foundModuleScheme.get();
-        }else{
+        } else {
             return null;
         }
     }
 
     /**
-     * Get All ModuleSchemes the User is authenticated to see.
-     * @return
+     * Get all ModuleSchemes the User is authenticated to see.
+     * 
+     * @author Leon Chemnitz
      */
     public List<ModuleScheme> getAllModuleSchemes() {
         // TODO: Implement Authentication
-        return allModuleSchemes;
+        return moduleSchemeRepository.findAll();
     }
 
-    public void addModuleScheme(ModuleScheme moduleScheme){
+    /**
+     * Persist one ModuleScheme
+     * 
+     * @author Leon Chemnitz
+     */
+    public void saveModuleScheme(ModuleScheme moduleScheme) {
         // TODO: Data Validation
-
-        moduleScheme.setId(getNewId());
-        allModuleSchemes.add(moduleScheme);
+        moduleSchemeRepository.save(moduleScheme);
     }
 
-    public void updateModuleScheme(ModuleScheme moduleScheme){
+    /**
+     * Update one ModuleScheme in Database
+     * 
+     * @author Leon Chemnitz
+     */
+    public void updateModuleScheme(ModuleScheme moduleScheme) {
         // TODO: Data Validation
-        LOGGER.info(moduleScheme.getId());
-        allModuleSchemes.removeIf(item -> item.getId().equals(moduleScheme.getId()));
-        allModuleSchemes.add(moduleScheme);
+        moduleSchemeRepository.save(moduleScheme);
     }
 
-    private String getNewId(){
-        // TODO: Implement correct Id generation
+    /**
+     * Get the Institutes asociated with a ModuleScheme as a Set. This method is
+     * neccesairy because in a ModuleScheme instance only the Institute Ids are
+     * referenced.
+     * 
+     * @param moduleScheme
+     * @return Set of Institute instances asociated with ModuleScheme
+     * @author Leon Chemnitz
+     */
+    public Set<Institute> getInstitutes(ModuleScheme moduleScheme) {
+        if (moduleScheme.getInstitutes() == null) {
+            return new HashSet<Institute>();
+        } else {
+            Iterable<Institute> institutes = instituteRepository.findAllById(moduleScheme.getInstitutes());
+            return StreamSupport.stream(institutes.spliterator(), false).collect(Collectors.toSet());
+        }
+    }
 
-        byte[] array = new byte[7];
-        new Random().nextBytes(array);
-        return new String(array, Charset.forName("UTF-8"));
+    /**
+     * Set the Institutes asociated with a ModuleScheme. This method is neccesairy
+     * because in a ModuleScheme instance only the Institute Ids are referenced.
+     * 
+     * @param moduleScheme
+     * @return Set of Institute instances asociated with ModuleScheme
+     * @author Leon Chemnitz
+     */
+    public void setInstitutes(ModuleScheme moduleScheme, Set<Institute> institutes) {
+        Set<String> idSet = institutes.stream().map(Institute::getId).collect(Collectors.toSet());
+        moduleScheme.setInstitutes(idSet);
+    }
+
+    /**
+     * Get the Users which have access to a ModuleScheme as a Set. This method is
+     * neccesairy because in a ModuleScheme instance only the User Ids are
+     * referenced.
+     * 
+     * @param moduleScheme
+     * @return Set of User instances that have access to the ModuleScheme
+     * @author Leon Chemnitz
+     */
+    public Set<User> getHasAccess(ModuleScheme moduleScheme) {
+        if (moduleScheme.getHasAccess() == null) {
+            return new HashSet<User>();
+        } else {
+            Iterable<User> users = userRepository.findAllById(moduleScheme.getHasAccess());
+            return StreamSupport.stream(users.spliterator(), false).collect(Collectors.toSet());
+        }
+    }
+
+    /**
+     * Set the Users which have access to a ModuleScheme. This method is neccesairy
+     * because in a ModuleScheme instance only the User Ids are referenced.
+     * 
+     * @param moduleScheme
+     * @return Set of User instances that have access to the ModuleScheme
+     * @author Leon Chemnitz
+     */
+    public void setHasAccess(ModuleScheme moduleScheme, Set<User> hasAccessSet) {
+        Set<String> idSet = hasAccessSet.stream().map(User::getId).collect(Collectors.toSet());
+        moduleScheme.setHasAccess(idSet);
+    }
+
+    /**
+     * Get the ExerciseSchemes asociated with a ModuleScheme as a List. This method
+     * is neccesairy because in a ModuleScheme instance only the ExerciseScheme Ids
+     * are referenced.
+     * 
+     * @param moduleScheme
+     * @return List of ExerciseScheme instances asociated with ModuleScheme
+     * @author Leon Chemnitz
+     */
+    public List<ExerciseScheme> getExerciseSchemes(ModuleScheme moduleScheme) {
+        List<ExerciseScheme> exerciseSchemes = new ArrayList<>();
+
+        if (moduleScheme.getExerciseSchemes() == null) {
+            return exerciseSchemes;
+        }
+
+        moduleScheme.getExerciseSchemes().stream().forEach(id -> {
+            Optional<ExerciseScheme> exerciseScheme = exerciseSchemeRepository.findById(id);
+            if (exerciseScheme.isPresent()) {
+                exerciseSchemes.add(exerciseScheme.get());
+            } else {
+                LOGGER.warn("Tried to find ExerciseScheme which does not exist in repository! Id was: " + id);
+            }
+        });
+
+        return exerciseSchemes;
+    }
+
+    /**
+     * Set the ExerciseSchemes asociated with a ModuleScheme. This method is neccesairy
+     * because in a ModuleScheme instance only the ExerciseScheme Ids are referenced.
+     * 
+     * @param moduleScheme
+     * @return Set of ExerciseScheme instances asociated with ModuleScheme
+     * @author Leon Chemnitz
+     */
+    public void setExerciseSchemes(ModuleScheme moduleScheme, List<ExerciseScheme> exerciseSchemeList) {
+        List<String> idList = exerciseSchemeList.stream().map(ExerciseScheme::getId).collect(Collectors.toList());
+        moduleScheme.setExerciseSchemes(idList);
     }
 }

@@ -1,46 +1,69 @@
 package de.bp2019.zentraldatei.service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.zentraldatei.model.User;
+import de.bp2019.zentraldatei.repository.UserRepository;
 
 /**
  * Service providing relevant Users
+ * 
  * @author Leon Chemnitz
  */
 @Service
 public class UserService {
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(InstituteService.class);
 
-    List<User> allUsers;
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+
+    @Autowired
+    UserRepository userRepository;
 
     public UserService() {
-        LOGGER.debug("Started creation of InstituteService");
-
-        /* Platzhalter Code da noch keine echten Repositories existieren */
-        allUsers = new ArrayList<User>();
-
-        allUsers.add(new User("Walter", "Frosch", null, null, null, null));
-        allUsers.add(new User("Peter", "Pan", null, null, null, null));
-        allUsers.add(new User("Angela", "Merkel", null, null, null, null));
-        allUsers.add(new User("John", "Lennon", null, null, null, null));
-        allUsers.add(new User("Helene", "Fischer", null, null, null, null));
-        allUsers.add(new User("Walter", "Gropius", null, null, null, null));
-
-        LOGGER.debug("Finished creation of InstituteService");
     }
 
+    /**
+     * Get all Users the User is authenticated to see.
+     * 
+     * @author Leon Chemnitz
+     */
     public List<User> getAllUsers() {
-        return allUsers;
+        // TODO: implement authentication
+        return userRepository.findAll();
     }
 
-    public String getFullName(User user){
-        return user.getFirstName() + " " + user.getLastName();
+    /**
+     * Get just the Ids of all the Users the User is authenticated to see.
+     * 
+     * @author Leon Chemnitz
+     */
+    public List<String> getAllUserIDs() {
+        // TODO: authentication
+        return userRepository.findAll().stream().map(User::getId).collect(Collectors.toList());
+    }
+
+    /**
+     * Get the full name of a user based on their ID.
+     * 
+     * @param id User.id
+     * @return Full name of the found User as a String. null if no user is found
+     * @author Leon Chemnitz
+     */
+    public String getFullNameById(String id) {
+        // TODO: authentication
+        Optional<User> user = userRepository.findById(id);
+
+        if (user.isPresent()) {
+            return user.get().getFirstName() + " " + user.get().getLastName();
+        } else {
+            LOGGER.warn("Tried to find User which doesn't exist in Database! User Id was: " + id);
+            return null;
+        }
     }
 }

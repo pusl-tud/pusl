@@ -11,6 +11,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import org.slf4j.Logger;
@@ -25,14 +26,19 @@ import de.bp2019.zentraldatei.service.ModuleSchemeService;
  * 
  * @author Leon Chemnitz
  */
-@Route("moduleSchemes")
+@PageTitle("Zentraldatei | Veranstaltungsschemas")
+@Route(value = "moduleSchemes", layout = MainAppView.class)
 public class ManageModuleSchemesView extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageModuleSchemesView.class);
 
+    private ModuleSchemeService moduleSchemeService;
+
     public ManageModuleSchemesView(@Autowired ModuleSchemeService moduleSchemeService) {
         LOGGER.debug("started creation of ManageModuleSchemesView");
+
+        this.moduleSchemeService = moduleSchemeService;
 
         setWidth("50em");
 
@@ -58,6 +64,13 @@ public class ManageModuleSchemesView extends VerticalLayout {
         LOGGER.debug("finished creation of ManageModuleSchemesView");
     }
 
+    /**
+     * Used to create the button for the Grid entries that displays the name and
+     * links to the edit page of the individual ModuleScheme.
+     * 
+     * @param item ModuleScheme to create the Button for
+     * @author Leon Chemnitz
+     */
     private Button createNameButton(ModuleScheme item) {
         Button button = new Button(item.getName(), clickEvent -> {
             UI.getCurrent().navigate("moduleScheme/" + item.getId());
@@ -66,8 +79,14 @@ public class ManageModuleSchemesView extends VerticalLayout {
         return button;
     }
 
+    /**
+     * Used to generate the Institutes field for each Grid item
+     * 
+     * @param item
+     * @author Leon Chemnitz
+     */
     private Text createInstitutesTag(ModuleScheme item) {
-        Optional<String> text = item.getInstitutes().stream().map(institute -> institute.getName())
+        Optional<String> text = moduleSchemeService.getInstitutes(item).stream().map(institute -> institute.getName())
                 .sorted(String.CASE_INSENSITIVE_ORDER).reduce((i1, i2) -> i1 + ", " + i2);
 
         if (text.isPresent()) {
@@ -77,6 +96,12 @@ public class ManageModuleSchemesView extends VerticalLayout {
         }
     }
 
+    /**
+     * Used to generate the delete button for each Grid Item
+     * 
+     * @param item
+     * @author Leon Chemnitz
+     */
     private Button createDeleteButton(ModuleScheme item) {
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {
             Dialog dialog = new Dialog();

@@ -4,7 +4,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
 import de.bp2019.zentraldatei.enums.UserType;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * A class to model a useser. Consists of a first and last name, an E-mail
@@ -22,10 +22,11 @@ public class User {
 	private String lastName;
 	private String eMail;
 	private String password;
-	private List<Institute> institutes;
+	/** Foreign Key - Institute.id */
+	private Set<String> institutes;
 	private UserType type;
 
-	public User(String firstName, String lastName, String eMail, String password, List<Institute> institutes,
+	public User(String firstName, String lastName, String eMail, String password, Set<String> institutes,
 			UserType type) {
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -71,11 +72,11 @@ public class User {
 		this.password = password;
 	}
 
-	public List<Institute> getInstitutes() {
+	public Set<String> getInstitutes() {
 		return institutes;
 	}
 
-	public void setInstitutes(List<Institute> institutes) {
+	public void setInstitutes(Set<String> institutes) {
 		this.institutes = institutes;
 	}
 

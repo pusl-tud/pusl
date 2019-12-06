@@ -19,14 +19,16 @@ public class ModuleScheme {
     @Id
     private String id;
     private String name;
-    private Set<Institute> institutes;
-    private Set<User> hasAccess;
-    private List<ExerciseScheme> exerciseSchemes;
+    /** Foreign Key - Institute.id */
+    private Set<String> institutes;
+    /** Foreign Key - User.id */
+    private Set<String> hasAccess;
+    /** Foreign Key ExerciseScheme.id */
+    private List<String> exerciseSchemes;
     private String calculationRule;
 
-    public ModuleScheme(String id, String name, Set<Institute> institutes, Set<User> hasAccess,
-            List<ExerciseScheme> exerciseSchemes, String calculationRule) {
-        this.id = id;
+    public ModuleScheme(String name, Set<String> institutes, Set<String> hasAccess,
+            List<String> exerciseSchemes, String calculationRule) {
         this.name = name;
         this.institutes = institutes;
         this.exerciseSchemes = exerciseSchemes;
@@ -53,19 +55,19 @@ public class ModuleScheme {
         this.name = name;
     }
 
-    public Set<Institute> getInstitutes() {
+    public Set<String> getInstitutes() {
         return institutes;
     }
 
-    public void setInstitutes(Set<Institute> institutes) {
+    public void setInstitutes(Set<String> institutes) {
         this.institutes = institutes;
     }
 
-    public List<ExerciseScheme> getExerciseSchemes() {
+    public List<String> getExerciseSchemes() {
         return exerciseSchemes;
     }
 
-    public void setExerciseSchemes(List<ExerciseScheme> exerciseSchemes) {
+    public void setExerciseSchemes(List<String> exerciseSchemes) {
         this.exerciseSchemes = exerciseSchemes;
     }
 
@@ -77,11 +79,11 @@ public class ModuleScheme {
         this.calculationRule = calculationRule;
     }
 
-    public Set<User> getHasAccess() {
+    public Set<String> getHasAccess() {
         return hasAccess;
     }
 
-    public void setHasAccess(Set<User> hasAccess) {
+    public void setHasAccess(Set<String> hasAccess) {
         this.hasAccess = hasAccess;
     }
 }
