@@ -4,6 +4,11 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**
 !**/src/test/**
+vscode_workspace.code-workspace
+webpack.generated.js
+node_modules/**
+logs/**
+.settings/**
 
 ### STS ###
 .apt_generated
@@ -54,4 +59,4 @@ build/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-node_modules
+

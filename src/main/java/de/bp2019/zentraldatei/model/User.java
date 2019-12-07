@@ -1,84 +1,91 @@
 package de.bp2019.zentraldatei.model;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Id;
+import de.bp2019.zentraldatei.enums.UserType;
 
-import java.util.List;
+import java.util.Set;
 
+/**
+ * A class to model a useser. Consists of a first and last name, an E-mail
+ * adress, a password, a list of institutes the user belongs to, and the user
+ * type
+ * 
+ * @author Alex Späth
+ */
+@Document
+public class User {
 
-    /* A class to model a useser. Consists of a  first and last name, an E-mail adress, a password,
-     *a list of institutes the user belongs to, and the user type
-     */
+	@Id
+	private String id;
+	private String firstName;
+	private String lastName;
+	private String eMail;
+	private String password;
+	/** Foreign Key - Institute.id */
+	private Set<String> institutes;
+	private UserType type;
 
-    @Document
-    public class User{
+	public User(String firstName, String lastName, String eMail, String password, Set<String> institutes,
+			UserType type) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.eMail = eMail;
+		this.password = password;
+		this.institutes = institutes;
+		this.type = type;
+	}
 
-        private String firstName;
-        private String lastName;
-        private String eMail;
-        private String password;
-        private List<Institute> institutes;
-        private UserType type;
+	public String getId() {
+		return id;
+	}
 
-        public User(String firstName, String lastName, String eMail, String password, List<Institute> institutes, UserType type) {
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.eMail = eMail;
-            this.password = password;
-            this.institutes = institutes;
-            this.type = type;
-        }
+	public String getFirstName() {
+		return firstName;
+	}
 
-        public String toString() {
-            return firstName + " " + lastName;
-        }
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
 
-        public String getFirstName() {
-            return firstName;
-        }
+	public String getLastName() {
+		return lastName;
+	}
 
-        public void setFirstName(String firstName) {
-            this.firstName = firstName;
-        }
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 
-        public String getLastName() {
-            return lastName;
-        }
+	public String getEMail() {
+		return eMail;
+	}
 
-        public void setLastName(String lastName) {
-            this.lastName = lastName;
-        }
+	public void setEMail(String eMail) {
+		this.eMail = eMail;
+	}
 
-        public String getEMail() {
-            return eMail;
-        }
+	public String getPassword() {
+		return password;
+	}
 
-        public void setEMail(String eMail) {
-            this.eMail = eMail;
-        }
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
-        public String getPassword() {
-            return password;
-        }
+	public Set<String> getInstitutes() {
+		return institutes;
+	}
 
-        public void setPassword(String password) {
-            this.password = password;
-        }
+	public void setInstitutes(Set<String> institutes) {
+		this.institutes = institutes;
+	}
 
-        public List<Institute> getInstitutes(){
-            return institutes;
-        }
+	public UserType getType() {
+		return type;
+	}
 
-        public void setInstitutes(List<Institute> institutes){
-            this.institutes = institutes;
-        }
+	public void setType(UserType type) {
+		this.type = type;
+	}
 
-        public UserType getType() {
-            return type;
-        }
-
-        public void setType(UserType type) {
-            this.type = type;
-        }
-
-    }
-
+}

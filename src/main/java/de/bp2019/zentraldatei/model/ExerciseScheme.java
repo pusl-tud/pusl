@@ -1,88 +1,97 @@
 package de.bp2019.zentraldatei.model;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Id;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
-/* A class to model a exercise scheme. Connsists of a name, a flag for numeric grading, a list of possible tokens,
- * a start date, a finish date and a list of users alowed
+/**
+ * A class to model a exercise scheme. Connsists of a name, a flag for numeric
+ * grading, a list of possible tokens, a start date, a finish date and a list of
+ * users alowed
+ * 
+ * @author Alex Späth
  */
-
 @Document
+public class ExerciseScheme {
 
-public class ExerciseScheme{
+	@Id
+	private String id;
+	private String name;
+	private boolean isNumeric;
+	private Set<String> tokens;
+	/** Foreign key - User.id */
+	private Set<String> hasAccess;
 
-    private String name;
-    private boolean isNumeric;
-    private List<String> tokens;
-    private LocalDate startDate;
-    private LocalDate finishDate;
-    private Set<User> hasAccess;
+	public ExerciseScheme(String name, boolean isNumeric, Set<String> tokens, Set<String> hasAccess) {
+		this.name = name;
+		this.isNumeric = isNumeric;
+		this.tokens = tokens;
+		this.hasAccess = hasAccess;
+	}
 
-    public ExerciseScheme(String name, boolean isNumeric, List<String> tokens, LocalDate startDate, LocalDate finishDate, Set<User> hasAccess) {
-        this.name = name;
-        this.isNumeric = isNumeric;
-        this.tokens = tokens;
-        this.startDate = startDate;
-        this.finishDate = finishDate;
-        this.hasAccess = hasAccess;
-    }
+	public ExerciseScheme(){}
 
-    public String getName() {
-        return name;
-    }
+	public ExerciseScheme(ExerciseScheme exerciseScheme) {
+		this.id = new String(exerciseScheme.getId());
+		this.name = new String(exerciseScheme.getName());
+		this.isNumeric = exerciseScheme.getIsNumeric();
 
-    public void setName(String name) {
-        this.name = name;
-    }
+		this.tokens = new HashSet<String>();
+		exerciseScheme.getTokens().forEach(token -> this.tokens.add(new String(token)));
 
-    public boolean getIsNumeric() {
-        return isNumeric;
-    }
+		this.hasAccess = new HashSet<String>();
+		exerciseScheme.getHasAccess().forEach(user -> this.hasAccess.add(new String(user)));
+	}
 
-    public void setIsNumeric(boolean isNumeric) {
-        this.isNumeric = isNumeric;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public List<String> getTokens(){
-        return tokens;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public void setTokens(List<String> tokens){
-        this.tokens = tokens;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public LocalDate getStartDate(){
-        return startDate;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setStartDate(LocalDate startDate){
-        this.startDate = startDate;
-    }
+	public boolean getIsNumeric() {
+		return isNumeric;
+	}
 
-    public LocalDate getFinishDate(){
-        return finishDate;
-    }
+	public void setIsNumeric(boolean isNumeric) {
+		this.isNumeric = isNumeric;
+	}
 
-    public void setFinishDate(LocalDate finishDate){
-        this.finishDate = finishDate;
-    }
+	public Set<String> getTokens() {
+		return tokens;
+	}
 
-    public Set<User> getHasAccess(){
-        return hasAccess;
-    }
+	public void setTokens(Set<String> tokens) {
+		this.tokens = tokens;
+	}
 
-    public void setHasAccess(Set<User> hasAccess){
-        this.hasAccess = hasAccess;
-    }
+	public Set<String> getHasAccess() {
+		return hasAccess;
+	}
 
-    public ExerciseScheme() {
+	public void getHasAccess(Set<String> hasAccess) {
+		this.hasAccess = hasAccess;
+	}
 
-    }
+	public ExerciseScheme copy() {
+		ExerciseScheme copy = new ExerciseScheme();
+		copy.setId(id);
+		copy.setName(name);
+		copy.setIsNumeric(isNumeric);
+		copy.setTokens(tokens);
 
-
-
+		return copy;
+	}
 }
