@@ -3,9 +3,10 @@ package de.bp2019.zentraldatei.view;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.Route;
+
 import de.bp2019.zentraldatei.model.ExerciseScheme;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,10 +15,15 @@ import java.util.List;
  * @author Luca Dinies
  *
  **/
-
+@Route("exerciseScheme")
 public class ManageExerciseSchemesView extends VerticalLayout {
 
-    public ManageExerciseSchemesView() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public ManageExerciseSchemesView() {
 
         // Test Daten
         List<ExerciseScheme> exercises = Arrays.asList(

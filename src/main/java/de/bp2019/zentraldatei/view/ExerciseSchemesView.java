@@ -12,6 +12,8 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.router.Route;
+
 import org.vaadin.gatanaso.MultiselectComboBox;
 
 import de.bp2019.zentraldatei.model.*;
@@ -27,11 +29,16 @@ import java.util.stream.Collectors;
  * @author Luca Dinies
  *
 **/
-
+@Route("exerciseScheme")
 public class ExerciseSchemesView extends VerticalLayout {
 
 
-    public ExerciseSchemesView() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public ExerciseSchemesView() {
 
         // Test Datensatz
 
