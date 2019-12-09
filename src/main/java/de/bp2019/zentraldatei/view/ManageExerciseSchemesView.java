@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luca Dinies
  *
  **/
-@Route(value ="exerciseScheme", layout = MainAppView.class)
+@Route(value ="exerciseSchemes", layout = MainAppView.class)
 public class ManageExerciseSchemesView extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
@@ -31,10 +31,13 @@ public class ManageExerciseSchemesView extends VerticalLayout {
 
         setWidth("50em");
 
-        // Table for the exist Exercises
+        /*  Table for the exist Exercises */
         Grid<ExerciseScheme> grid = new Grid<>(ExerciseScheme.class);
         grid.setWidth("100%");
         grid.setItems(exerciseSchemeService.getAllExerciseSchemes());
+
+        grid.removeAllColumns();
+        grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true).setHeader("Übungs Schemas");
 
         add(grid);
 
@@ -48,6 +51,21 @@ public class ManageExerciseSchemesView extends VerticalLayout {
 
         LOGGER.debug("finished creation of ManageExerciseSchemesView");
 
+    }
+
+    /**
+     * Used to create the button for the Grid entries that displays the name and
+     * links to the edit page of the individual ExerciseScheme.
+     *
+     * @param item ModuleScheme to create the Button for
+     * @author Luca Dinies
+     */
+    private Button createNameButton(ExerciseScheme item) {
+        Button button = new Button(item.getName(), clickEvent -> {
+            UI.getCurrent().navigate("exerciseScheme/" + item.getId());
+        });
+        button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        return button;
     }
 
 }

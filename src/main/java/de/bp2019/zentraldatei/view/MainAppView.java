@@ -27,6 +27,7 @@ class MainAppView extends AppLayout {
         addToNavbar(new DrawerToggle(), title);
         VerticalLayout sidebar = new VerticalLayout();
         sidebar.add(generateMenuButton("Veranstaltungsschemas", "moduleSchemes"));
+        sidebar.add(generateMenuButton("Übungsschemas", "exerciseSchemes"));
         sidebar.add(generateMenuButton("Datenbank neu befüllen", "demo"));
         addToDrawer(sidebar);
     }

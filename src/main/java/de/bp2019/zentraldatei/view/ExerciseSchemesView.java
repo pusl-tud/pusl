@@ -24,6 +24,7 @@ import de.bp2019.zentraldatei.model.ExerciseScheme;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -52,7 +53,7 @@ public class ExerciseSchemesView extends Div implements HasUrlParameter<String> 
      */
     private boolean isNewEntity;
 
-    public ExerciseSchemesView() {
+    public ExerciseSchemesView(@Autowired ExerciseSchemeService exerciseSchemeService) {
 
         LOGGER.debug("Started creation of ExerciseSchemeView");
 
@@ -65,6 +66,7 @@ public class ExerciseSchemesView extends Div implements HasUrlParameter<String> 
         TextField name = new TextField("Name", "Name der Übung");
         name.setValueChangeMode(ValueChangeMode.EAGER);
         form.setWidth("40em");
+        form.getStyle().set("marginLeft", "3em");
         form.add(name);
 
         /*  TODO: Tokens  */
