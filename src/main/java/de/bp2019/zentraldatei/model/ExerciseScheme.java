@@ -1,15 +1,15 @@
 package de.bp2019.zentraldatei.model;
 
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A class to model a exercise scheme. Connsists of a name, a flag for numeric
+ * A class to model a exercise scheme. Consists of a name, a flag for numeric
  * grading, a list of possible tokens, a start date, a finish date and a list of
- * users alowed
+ * users allowed
  * 
  * @author Alex Späth
  */

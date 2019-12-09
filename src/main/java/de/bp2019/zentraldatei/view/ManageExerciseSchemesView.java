@@ -1,55 +1,52 @@
 package de.bp2019.zentraldatei.view;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
-
 import de.bp2019.zentraldatei.model.ExerciseScheme;
-
-import java.util.Arrays;
-import java.util.List;
+import de.bp2019.zentraldatei.service.ExerciseSchemeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
  * @author Luca Dinies
  *
  **/
-@Route("exerciseScheme")
+@Route(value ="exerciseScheme", layout = MainAppView.class)
 public class ManageExerciseSchemesView extends VerticalLayout {
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ManageExerciseSchemesView.class);
 
-	public ManageExerciseSchemesView() {
+    private ExerciseSchemeService exerciseSchemeService;
 
-        // Test Daten
-        List<ExerciseScheme> exercises = Arrays.asList(
+	public ManageExerciseSchemesView(@Autowired ExerciseSchemeService exerciseSchemeService) {
 
-                new ExerciseScheme("RO Hausübung 2", true, null, null, null, null),
-                new ExerciseScheme("RO Hausübung 1", true, null, null, null, null),
-                new ExerciseScheme("RO Hausübung 3", true, null, null, null, null)
+        LOGGER.debug("started creation of ManageExerciseSchemesView");
 
-        );
-
+        setWidth("50em");
 
         // Table for the exist Exercises
-        Grid<ExerciseScheme> actualExercises = new Grid<>(ExerciseScheme.class);
-        actualExercises.setItems(exercises);
-        actualExercises.removeAllColumns();
-        actualExercises.addColumn("name");
+        Grid<ExerciseScheme> grid = new Grid<>(ExerciseScheme.class);
+        grid.setWidth("100%");
+        grid.setItems(exerciseSchemeService.getAllExerciseSchemes());
 
-        add(actualExercises);
+        add(grid);
 
-        Button createExercise =new Button("Veranstaltung erstellen");
-        add(createExercise);
+        Button newExerciseSchemeButton = new Button("Neue Übung");
+        newExerciseSchemeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
+        add(newExerciseSchemeButton);
+        setHorizontalComponentAlignment(Alignment.END, newExerciseSchemeButton);
 
+        newExerciseSchemeButton.addClickListener(event -> UI.getCurrent().navigate("exerciseScheme/new"));
 
-
-
+        LOGGER.debug("finished creation of ManageExerciseSchemesView");
 
     }
 
