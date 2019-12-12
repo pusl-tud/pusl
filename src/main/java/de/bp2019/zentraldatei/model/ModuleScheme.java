@@ -26,6 +26,7 @@ public class ModuleScheme {
     /** Foreign Key ExerciseScheme.id */
     private List<String> exerciseSchemes;
     private String calculationRule;
+    private List<PerformanceScheme> performanceSchemes;
 
     public ModuleScheme(String name, Set<String> institutes, Set<String> hasAccess,
             List<String> exerciseSchemes, String calculationRule) {

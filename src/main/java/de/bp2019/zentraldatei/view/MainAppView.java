@@ -5,8 +5,12 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.server.PWA;
 
@@ -16,6 +20,7 @@ import com.vaadin.flow.server.PWA;
  * 
  * @author Leon Chemnitz
  */
+@CssImport("./styles/global.css")
 @Viewport("width=device-width, minimum-scale=0.5, initial-scale=1, user-scalable=yes, viewport-fit=cover")
 @PWA(name = "Zentraldatei", shortName = "Zentraldatei")
 class MainAppView extends AppLayout {
@@ -26,9 +31,21 @@ class MainAppView extends AppLayout {
         Label title = new Label("Zentraldatei");
         addToNavbar(new DrawerToggle(), title);
         VerticalLayout sidebar = new VerticalLayout();
-        sidebar.add(generateMenuButton("Veranstaltungsschemas", "moduleSchemes"));
-        sidebar.add(generateMenuButton("Übungsschemas", "exerciseSchemes"));
-        sidebar.add(generateMenuButton("Datenbank neu befüllen", "demo"));
+        sidebar.setHeightFull();
+        sidebar.getStyle().set("background-color","var(--lumo-primary-color)");
+        sidebar.setAlignItems(Alignment.AUTO);
+
+        VerticalLayout content = new VerticalLayout();
+        content.add(generateMenuButton("Veranstaltungsschemas", "moduleSchemes"));
+        content.add(generateMenuButton("Übungsschemas", "exerciseSchemes"));
+        content.add(generateMenuButton("Datenbank neu befüllen", "demo"));
+        sidebar.add(content);
+
+        VerticalLayout footer = new VerticalLayout();
+        footer.add(generateLogoutButton());
+        sidebar.add(footer);
+        footer.setAlignSelf(Alignment.END);
+
         addToDrawer(sidebar);
     }
 
@@ -46,6 +63,26 @@ class MainAppView extends AppLayout {
         button.addClickListener(event -> {
             UI.getCurrent().navigate(url);
         });
+        button.getStyle().set("color", "white");
         return button;
+    }
+
+    private Button generateLogoutButton() {
+        Button button = new Button("logout",new Icon(VaadinIcon.KEY));
+        button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        button.addClickListener(event -> {
+            // Close the VaadinServiceSession
+            UI.getCurrent().getSession().close();
+
+            // Invalidate underlying session instead if login info is stored there
+            // VaadinService.getCurrentRequest().getWrappedSession().invalidate();
+
+            // Redirect to avoid keeping the removed UI open in the browser
+            UI.getCurrent().navigate("login");
+        });
+        button.getStyle().set("color", "white");
+
+        return button;
+
     }
 }
