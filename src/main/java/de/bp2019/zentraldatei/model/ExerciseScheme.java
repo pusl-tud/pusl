@@ -20,13 +20,15 @@ public class ExerciseScheme {
 	private String id;
 	private String name;
 	private boolean isNumeric;
+	private Set<String> institutes;
 	private Set<String> tokens;
 	/** Foreign key - User.id */
 	private Set<String> hasAccess;
 
-	public ExerciseScheme(String name, boolean isNumeric, Set<String> tokens, Set<String> hasAccess) {
+	public ExerciseScheme(String name, boolean isNumeric, Set<String> institutes, Set<String> tokens, Set<String> hasAccess) {
 		this.name = name;
 		this.isNumeric = isNumeric;
+		this.institutes = institutes;
 		this.tokens = tokens;
 		this.hasAccess = hasAccess;
 	}
@@ -67,6 +69,14 @@ public class ExerciseScheme {
 
 	public void setIsNumeric(boolean isNumeric) {
 		this.isNumeric = isNumeric;
+	}
+
+	public Set<String> getInstitutes() {
+		return institutes;
+	}
+
+	public void setInstitutes(Set<String> institutes) {
+		this.institutes = institutes;
 	}
 
 	public Set<String> getTokens() {

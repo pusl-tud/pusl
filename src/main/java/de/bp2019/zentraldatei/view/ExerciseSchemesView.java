@@ -22,9 +22,11 @@ import com.vaadin.flow.router.NotFoundException;
 import com.vaadin.flow.router.Route;
 import de.bp2019.zentraldatei.model.ExerciseScheme;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
+import de.bp2019.zentraldatei.service.InstituteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.gatanaso.MultiselectComboBox;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -53,13 +55,17 @@ public class ExerciseSchemesView extends Div implements HasUrlParameter<String> 
      */
     private boolean isNewEntity;
 
-    public ExerciseSchemesView(@Autowired ExerciseSchemeService exerciseSchemeService) {
+    public ExerciseSchemesView(@Autowired ExerciseSchemeService exerciseSchemeService, @Autowired InstituteService instituteService) {
 
         LOGGER.debug("Started creation of ExerciseSchemeView");
 
         this.exerciseSchemeService = exerciseSchemeService;
 
         FormLayout form = new FormLayout();
+        form.setResponsiveSteps(new FormLayout.ResponsiveStep("5em", 1), new FormLayout.ResponsiveStep("5em", 2));
+        form.setWidth("40em");
+        form.getStyle().set("marginLeft", "3em");
+
         binder = new Binder<>();
 
         /*  Create the fields  */
@@ -67,7 +73,13 @@ public class ExerciseSchemesView extends Div implements HasUrlParameter<String> 
         name.setValueChangeMode(ValueChangeMode.EAGER);
         form.setWidth("40em");
         form.getStyle().set("marginLeft", "3em");
-        form.add(name);
+        form.add(name,1);
+
+        MultiselectComboBox<String> institutes = new MultiselectComboBox<String>();
+        institutes.setLabel("Institute");
+        institutes.setItems(instituteService.getAllInstituteIDs());
+        institutes.setItemLabelGenerator(item -> instituteService.getInstituteById(item).getName());
+        form.add(institutes, 2);
 
         /*  TODO: Tokens  */
 
@@ -94,6 +106,11 @@ public class ExerciseSchemesView extends Div implements HasUrlParameter<String> 
 
         binder.forField(name).withValidator(new StringLengthValidator("Bitte Namen der Übung eingeben", 1, null))
                 .bind(ExerciseScheme::getName, ExerciseScheme::setName);
+
+        binder.forField(institutes)
+                .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
+                        "Bitte mind. ein Institut angeben")
+                .bind(ExerciseScheme::getInstitutes, ExerciseScheme::setInstitutes);
 
         binder.bind(isNumeric, ExerciseScheme::getIsNumeric, ExerciseScheme::setIsNumeric);
 
