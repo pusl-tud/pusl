@@ -83,19 +83,6 @@ public class ExerciseSchemeService {
     }
 
     /**
-     * Get the Institutes associated with a ExerciseScheme as a Set. This method is
-     * necessary because in a ExerciseScheme instance only the Institute Ids are
-     * referenced.
-     *
-     * @param exerciseScheme
-     * @return Set of Institute instances associated with ModuleScheme
-     * @author Luca Dinies
-     */
-    public Set<String> getTokens(ExerciseScheme exerciseScheme) {
-        return exerciseScheme.getTokens();
-    }
-
-    /**
      * Get a ExerciseScheme based on its Id. Only returns ExerciseSchemes the User
      * is authenticated to see.
      * 
