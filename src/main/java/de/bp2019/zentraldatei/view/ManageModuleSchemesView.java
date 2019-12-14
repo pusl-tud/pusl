@@ -1,7 +1,5 @@
 package de.bp2019.zentraldatei.view;
 
-import java.util.Optional;
-
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -12,15 +10,16 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
+import de.bp2019.zentraldatei.model.ModuleScheme;
+import de.bp2019.zentraldatei.service.ModuleSchemeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.bp2019.zentraldatei.model.ModuleScheme;
-import de.bp2019.zentraldatei.service.ModuleSchemeService;
+import java.util.Optional;
 
 /**
  * View that displays a list of all ModuleSchemes
@@ -36,7 +35,10 @@ public class ManageModuleSchemesView extends VerticalLayout {
 
     private ModuleSchemeService moduleSchemeService;
 
+    private Grid<ModuleScheme> grid = new Grid<>();
+
     public ManageModuleSchemesView(@Autowired ModuleSchemeService moduleSchemeService) {
+
         LOGGER.debug("started creation of ManageModuleSchemesView");
 
         this.moduleSchemeService = moduleSchemeService;
@@ -46,11 +48,13 @@ public class ManageModuleSchemesView extends VerticalLayout {
         getStyle().set("marginLeft", "2em");
 
         /* -- Create Components -- */
+      
         Label title = new Label("Veranstaltungsschemas");
         title.getStyle().set("font-size", "2em");
         add(title);
 
         Grid<ModuleScheme> grid = new Grid<>();
+      
         grid.setWidth("100%");
         grid.setItems(moduleSchemeService.getAllModuleSchemes());
 
@@ -109,10 +113,30 @@ public class ManageModuleSchemesView extends VerticalLayout {
      * @param item
      * @author Leon Chemnitz
      */
-    private Button createDeleteButton(ModuleScheme item) {
+    protected Button createDeleteButton(ModuleScheme item) {
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {
             Dialog dialog = new Dialog();
-            dialog.add(new Text("Wirklich löschen oder so?"));
+            dialog.add(new Text("Wirklich Löschen?"));
+            dialog.setCloseOnEsc(false);
+            dialog.setCloseOnOutsideClick(false);
+
+            Button confirmButton = new Button("Löschen", event -> {
+                moduleSchemeService.deleteModuleScheme(item);
+                ListDataProvider<ModuleScheme> dataProvider = (ListDataProvider<ModuleScheme>) grid.getDataProvider();
+                dataProvider.getItems().remove(item);
+                dataProvider.refreshAll();
+
+                dialog.close();
+                Dialog answerDialog = new Dialog();
+                answerDialog.add(new Text("Modulschema '" + item.getName() + "' gelöscht"));
+                answerDialog.open();
+            });
+
+            Button cancelButton = new Button("Abbruch", event -> {
+                dialog.close();
+            });
+
+            dialog.add(confirmButton, cancelButton);
             dialog.open();
         });
         button.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_ERROR);
