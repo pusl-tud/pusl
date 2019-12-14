@@ -10,29 +10,33 @@ import org.springframework.stereotype.Component;
 import de.bp2019.zentraldatei.util.SecurityUtils;
 import de.bp2019.zentraldatei.view.LoginView;
 
+/**
+ * Used for vaadin login, taken directly from vaadin website...
+ * 
+ * @author Leon Chemnitz
+ */
 @Component
-public class UIServiceInitListenerConfig implements VaadinServiceInitListener { // 
+public class UIServiceInitListenerConfig implements VaadinServiceInitListener {
 
     private static final long serialVersionUID = 1L;
 
     @Override
     public void serviceInit(ServiceInitEvent event) {
         event.getSource().addUIInitListener(uiEvent -> {
-        final UI ui = uiEvent.getUI();
-        ui.addBeforeEnterListener(this::beforeEnter); // 
+            final UI ui = uiEvent.getUI();
+            ui.addBeforeEnterListener(this::beforeEnter);
         });
     }
 
     /**
      * Reroutes the user if (s)he is not authorized to access the view.
      *
-     * @param event
-     *            before navigation event with event details
+     * @param event before navigation event with event details
+     * 
      */
     private void beforeEnter(BeforeEnterEvent event) {
-        if (!LoginView.class.equals(event.getNavigationTarget()) // 
-            && !SecurityUtils.isUserLoggedIn()) { // 
-            event.rerouteTo(LoginView.class); // 
+        if (!LoginView.class.equals(event.getNavigationTarget()) && !SecurityUtils.isUserLoggedIn()) {
+            event.rerouteTo(LoginView.class);
         }
     }
 }

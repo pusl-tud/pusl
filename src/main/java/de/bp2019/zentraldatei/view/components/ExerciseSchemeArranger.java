@@ -10,12 +10,16 @@ import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.BoxSizing;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 
 import org.slf4j.Logger;
@@ -35,6 +39,8 @@ public class ExerciseSchemeArranger extends CustomField<List<String>> {
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ExerciseSchemeArranger.class);
 
+    private static final String WIDTH = "15em";
+
     private Grid<ExerciseScheme> exerciseSchemesGrid;
     private ExerciseScheme draggedItem;
     private List<ExerciseScheme> gridItems;
@@ -44,34 +50,32 @@ public class ExerciseSchemeArranger extends CustomField<List<String>> {
     public ExerciseSchemeArranger(ExerciseSchemeService exerciseSchemeService) {
         Label label = new Label("Prüfungsschemas");
         add(label);
-
         this.exerciseSchemeService = exerciseSchemeService;
 
         exerciseSchemesGrid = new Grid<>();
         gridItems = new ArrayList<ExerciseScheme>();
-        exerciseSchemesGrid.setWidth("100%");
         exerciseSchemesGrid.setItems(gridItems);
         exerciseSchemesGrid.addColumn(item -> gridItems.indexOf(item) + 1).setWidth("1em");
-        exerciseSchemesGrid.addColumn(ExerciseScheme::getName).setAutoWidth(true);
-        exerciseSchemesGrid.addComponentColumn(item -> createDeleteButton(item));
+        exerciseSchemesGrid.addColumn(ExerciseScheme::getName).setWidth("5.3em");
+        exerciseSchemesGrid.addComponentColumn(item -> createDeleteButton(item)).setWidth("0.7em");
         exerciseSchemesGrid.setSelectionMode(SelectionMode.NONE);
         exerciseSchemesGrid.setRowsDraggable(true);
+        exerciseSchemesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         exerciseSchemesGrid.setHeight("15em");
+        exerciseSchemesGrid.setWidth(WIDTH);
         add(exerciseSchemesGrid);
-
-        FormLayout newExerciseSchemeLayout = new FormLayout();
-        newExerciseSchemeLayout.setWidthFull();
-        setWidthFull();
-        newExerciseSchemeLayout.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
 
         Select<ExerciseScheme> exerciseSchemesSelect = new Select<>();
         exerciseSchemesSelect.setItemLabelGenerator(item -> item.getName());
         List<ExerciseScheme> allExerciseSchemes = exerciseSchemeService.getAllExerciseSchemes();
         exerciseSchemesSelect.setItems(allExerciseSchemes);
         exerciseSchemesSelect.setValue(allExerciseSchemes.get(0));
-        newExerciseSchemeLayout.add(exerciseSchemesSelect);
+        exerciseSchemesSelect.setWidth(WIDTH);
+        add(exerciseSchemesSelect);
 
-        Button exerciseSchemesButton = new Button("Prüfungsschema hinzufügen");
+        Button exerciseSchemesButton = new Button("Prüfungsschema hinzufügen", new Icon(VaadinIcon.PLUS_CIRCLE));
+        exerciseSchemesButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+        exerciseSchemesButton.setWidth(WIDTH);
         exerciseSchemesButton.addClickListener(event -> {
             gridItems.add(exerciseSchemesSelect.getValue().copy());
             exerciseSchemesGrid.getDataProvider().refreshAll();
@@ -80,9 +84,7 @@ public class ExerciseSchemeArranger extends CustomField<List<String>> {
             setValue(gridItems.stream().map(ExerciseScheme::getId).collect(Collectors.toList()));
         });
 
-        newExerciseSchemeLayout.add(exerciseSchemesButton);
-
-        add(newExerciseSchemeLayout);
+        add(exerciseSchemesButton);
 
         /* ########### Drag and Drop Logic ########### */
 

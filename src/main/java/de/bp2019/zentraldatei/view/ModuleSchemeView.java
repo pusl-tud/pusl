@@ -11,6 +11,8 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -45,7 +47,7 @@ import de.bp2019.zentraldatei.view.components.ExerciseSchemeArranger;
  */
 @PageTitle("Zentraldatei | Veranstaltungsschema")
 @Route(value = "moduleScheme", layout = MainAppView.class)
-public class ModuleSchemeView extends Div implements HasUrlParameter<String> {
+public class ModuleSchemeView extends VerticalLayout implements HasUrlParameter<String> {
 
         private static final long serialVersionUID = 1L;
         private static final Logger LOGGER = LoggerFactory.getLogger(ModuleSchemeView.class);
@@ -72,13 +74,23 @@ public class ModuleSchemeView extends Div implements HasUrlParameter<String> {
                 LOGGER.debug("Started creation of ModuleSchemeView");
 
                 this.moduleSchemeService = moduleSchemeService;
+                
+                setWidth("90%");
+                setMaxWidth("50em");
+                getStyle().set("marginLeft", "2em");
 
                 FormLayout layoutWithBinder = new FormLayout();
                 layoutWithBinder.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
-                layoutWithBinder.setWidth("40em");
-                layoutWithBinder.getStyle().set("marginLeft", "3em");
+                layoutWithBinder.setWidth("100%");
+                layoutWithBinder.getStyle().set("marginLeft", "1em");
+                layoutWithBinder.getStyle().set("marginTop","-0.5em");
 
                 binder = new Binder<>();
+
+
+                Label title = new Label("Veranstaltungsschema bearbeiten");
+                title.getStyle().set("font-size", "2em");
+                add(title);
 
                 /* ########### Create the fields ########### */
 
@@ -86,28 +98,37 @@ public class ModuleSchemeView extends Div implements HasUrlParameter<String> {
                 name.setLabel("Name");
                 name.setPlaceholder("Name Der Veranstaltung");
                 name.setValueChangeMode(ValueChangeMode.EAGER);
-                layoutWithBinder.add(name);
+                layoutWithBinder.add(name, 1);
 
                 MultiselectComboBox<String> institutes = new MultiselectComboBox<String>();
                 institutes.setLabel("Institute");
                 institutes.setItems(instituteService.getAllInstituteIDs());
                 institutes.setItemLabelGenerator(item -> instituteService.getInstituteById(item).getName());
-                layoutWithBinder.add(institutes, 2);
+                layoutWithBinder.add(institutes, 1);
 
                 MultiselectComboBox<String> hasAccess = new MultiselectComboBox<String>();
-                hasAccess.setLabel("Hat Zugriff");
+                hasAccess.setLabel("Zugriff");
                 hasAccess.setItems(userService.getAllUserIDs());
                 hasAccess.setItemLabelGenerator(item -> userService.getFullNameById(item));
                 layoutWithBinder.add(hasAccess, 2);
 
+                HorizontalLayout exerciseSchemeLayout = new HorizontalLayout();
+
                 ExerciseSchemeArranger exerciseSchemes = new ExerciseSchemeArranger(exerciseSchemeService);
-                layoutWithBinder.add(exerciseSchemes, 2);
+                // layoutWithBinder.add(exerciseSchemes, 1);
+                exerciseSchemeLayout.add(exerciseSchemes);
 
                 TextArea calculationRule = new TextArea();
                 calculationRule.setValueChangeMode(ValueChangeMode.EAGER);
                 calculationRule.setLabel("Berechnungsregel");
                 calculationRule.setPlaceholder("Platzhalter");
-                layoutWithBinder.add(calculationRule, 2);
+                calculationRule.setHeight("15em");
+                calculationRule.setWidthFull();
+
+                exerciseSchemeLayout.add(calculationRule);
+                layoutWithBinder.add(exerciseSchemeLayout);
+                //layoutWithBinder.add(calculationRule, 1);
+                layoutWithBinder.add(exerciseSchemeLayout, 2);
 
                 Button save = new Button("Speichern");
                 save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -166,7 +187,6 @@ public class ModuleSchemeView extends Div implements HasUrlParameter<String> {
                                 LOGGER.debug("There are errors: " + errorText);
                         }
                 });
-
 
                 /* ########### Add Layout to Component ########### */
 
