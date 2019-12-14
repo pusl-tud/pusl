@@ -6,7 +6,7 @@ import java.util.List;
  * A class to model a instance of an exercise. consists of a exerciseScheme and
  * a list of grades
  * 
- * @author Alex Späth
+ * @author Alex Spaeth
  */
 public class ExerciseInstance {
 
