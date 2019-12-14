@@ -18,7 +18,7 @@ import com.vaadin.flow.server.PWA;
  */
 @Viewport("width=device-width, minimum-scale=0.5, initial-scale=1, user-scalable=yes, viewport-fit=cover")
 @PWA(name = "Zentraldatei", shortName = "Zentraldatei")
-class MainAppView extends AppLayout {
+public class MainAppView extends AppLayout {
 
     private static final long serialVersionUID = 1L;
 
