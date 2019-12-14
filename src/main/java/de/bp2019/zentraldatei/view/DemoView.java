@@ -1,18 +1,8 @@
 package de.bp2019.zentraldatei.view;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import de.bp2019.zentraldatei.model.ExerciseScheme;
 import de.bp2019.zentraldatei.model.Institute;
 import de.bp2019.zentraldatei.model.ModuleScheme;
@@ -21,6 +11,14 @@ import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
 import de.bp2019.zentraldatei.repository.InstituteRepository;
 import de.bp2019.zentraldatei.repository.ModuleSchemeRepository;
 import de.bp2019.zentraldatei.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Demo View currently just empties and refills the database.
@@ -88,9 +86,14 @@ public class DemoView extends VerticalLayout {
                 userSet3.add(users.get(5).getId());
                 userSet3.add(users.get(0).getId());
 
-                exerciseSchemeRepository.save(new ExerciseScheme("Testat", false, null, userSet2));
-                exerciseSchemeRepository.save(new ExerciseScheme("Übung", true, null, userSet1));
-                exerciseSchemeRepository.save(new ExerciseScheme("Klausur", true, null, userSet3));
+                Set<String> tokenSet1 = new HashSet<String>();
+                tokenSet1.add("wiedervorlage");
+                tokenSet1.add("ausgegeben");
+                tokenSet1.add("abgegeben");
+
+                exerciseSchemeRepository.save(new ExerciseScheme("Testat", false, instituteSet3, tokenSet1, userSet2));
+                exerciseSchemeRepository.save(new ExerciseScheme("Übung", true, instituteSet1, tokenSet1, userSet1));
+                exerciseSchemeRepository.save(new ExerciseScheme("Klausur", true,instituteSet2 , tokenSet1, userSet3));
 
                 List<ExerciseScheme> exerciseSchemes = exerciseSchemeRepository.findAll();
 

@@ -1,9 +1,5 @@
 package de.bp2019.zentraldatei.view.components;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.customfield.CustomField;
@@ -17,12 +13,14 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.select.Select;
-
+import de.bp2019.zentraldatei.model.ExerciseScheme;
+import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.bp2019.zentraldatei.model.ExerciseScheme;
-import de.bp2019.zentraldatei.service.ExerciseSchemeService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Component used as a Field to add, remove and arrange ExerciseSchemes in a
@@ -44,7 +42,6 @@ public class ExerciseSchemeArranger extends CustomField<List<String>> {
     public ExerciseSchemeArranger(ExerciseSchemeService exerciseSchemeService) {
         Label label = new Label("Prüfungsschemas");
         add(label);
-
         this.exerciseSchemeService = exerciseSchemeService;
 
         exerciseSchemesGrid = new Grid<>();

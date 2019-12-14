@@ -1,18 +1,5 @@
 package de.bp2019.zentraldatei.service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import de.bp2019.zentraldatei.model.ExerciseScheme;
 import de.bp2019.zentraldatei.model.Institute;
 import de.bp2019.zentraldatei.model.ModuleScheme;
@@ -21,6 +8,14 @@ import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
 import de.bp2019.zentraldatei.repository.InstituteRepository;
 import de.bp2019.zentraldatei.repository.ModuleSchemeRepository;
 import de.bp2019.zentraldatei.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Service providing relevant ModuleSchemes
@@ -194,5 +189,15 @@ public class ModuleSchemeService {
     public void setExerciseSchemes(ModuleScheme moduleScheme, List<ExerciseScheme> exerciseSchemeList) {
         List<String> idList = exerciseSchemeList.stream().map(ExerciseScheme::getId).collect(Collectors.toList());
         moduleScheme.setExerciseSchemes(idList);
+    }
+
+    /**
+     * Delete a ModuleScheme
+     *
+     * @author Luca Dinies
+     */
+
+    public void deleteModuleScheme(ModuleScheme moduleScheme){
+        moduleSchemeRepository.delete(moduleScheme);
     }
 }
