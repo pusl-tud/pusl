@@ -118,14 +118,21 @@ public class DemoView extends VerticalLayout {
                 exerciseSchemeList3.add(exerciseSchemes.get(1).getId());
                 exerciseSchemeList3.add(exerciseSchemes.get(2).getId());
 
+                String berechnungsRegel = "function calcuate(results) { \n";
+                berechnungsRegel +=       "    //ziemlich komplizierte Berechnungsregel... \n";
+                berechnungsRegel +=       "    return ergebnis;\n";
+                berechnungsRegel +=       "}";
+                
+
+
                 moduleSchemeRepository.save(new ModuleScheme("Einführung in den Compilerbau", instituteSet1, userSet1,
-                                exerciseSchemeList1, "Sehr simple Berechnungsregel"));
+                                exerciseSchemeList1, berechnungsRegel));
 
                 moduleSchemeRepository.save(new ModuleScheme("Mathematik I", instituteSet2, userSet2,
-                                exerciseSchemeList2, "ziemlich komplizierte Berechnungsregel"));
+                                exerciseSchemeList2, berechnungsRegel));
 
                 moduleSchemeRepository.save(new ModuleScheme("Visuelle Trendanalyse", instituteSet3, userSet3,
-                                exerciseSchemeList3, "wirklich sehr komplizierte Berechnungsregel"));
+                                exerciseSchemeList3, berechnungsRegel));
 
                 LOGGER.info("refilling Database done.");
         }

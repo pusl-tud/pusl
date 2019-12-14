@@ -6,6 +6,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -42,16 +43,24 @@ public class ManageModuleSchemesView extends VerticalLayout {
 
         this.moduleSchemeService = moduleSchemeService;
 
-        setWidth("50em");
+        setWidth("90%");
+        setMaxWidth("50em");
+        getStyle().set("marginLeft", "2em");
 
         /* -- Create Components -- */
+      
+        Label title = new Label("Veranstaltungsschemas");
+        title.getStyle().set("font-size", "2em");
+        add(title);
 
+        Grid<ModuleScheme> grid = new Grid<>();
+      
         grid.setWidth("100%");
         grid.setItems(moduleSchemeService.getAllModuleSchemes());
 
-        grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true).setHeader("Veranstaltungs Schemas");
+        grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true);
         grid.addComponentColumn(item -> createInstitutesTag(item)).setAutoWidth(true);
-        grid.addComponentColumn(item -> createDeleteButton(item)).setFlexGrow(0).setWidth("5em");
+        grid.addComponentColumn(item -> createDeleteButton(item)).setFlexGrow(0).setWidth("4em");
 
         add(grid);
 
@@ -130,7 +139,7 @@ public class ManageModuleSchemesView extends VerticalLayout {
             dialog.add(confirmButton, cancelButton);
             dialog.open();
         });
-        button.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+        button.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_ERROR);
         return button;
     }
 }
