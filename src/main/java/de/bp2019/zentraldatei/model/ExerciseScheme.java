@@ -40,6 +40,7 @@ public class ExerciseScheme {
 		this.name = new String(exerciseScheme.getName());
 		this.isNumeric = exerciseScheme.getIsNumeric();
 
+		this.institutes = new HashSet<String>();
 		this.tokens = new HashSet<String>();
 		exerciseScheme.getTokens().forEach(token -> this.tokens.add(new String(token)));
 

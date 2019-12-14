@@ -86,9 +86,14 @@ public class DemoView extends VerticalLayout {
                 userSet3.add(users.get(5).getId());
                 userSet3.add(users.get(0).getId());
 
-                exerciseSchemeRepository.save(new ExerciseScheme("Testat", false, instituteSet3, null, userSet2));
-                exerciseSchemeRepository.save(new ExerciseScheme("Übung", true, instituteSet1, null, userSet1));
-                exerciseSchemeRepository.save(new ExerciseScheme("Klausur", true,instituteSet2 , null, userSet3));
+                Set<String> tokenSet1 = new HashSet<String>();
+                tokenSet1.add("wiedervorlage");
+                tokenSet1.add("ausgegeben");
+                tokenSet1.add("abgegeben");
+
+                exerciseSchemeRepository.save(new ExerciseScheme("Testat", false, instituteSet3, tokenSet1, userSet2));
+                exerciseSchemeRepository.save(new ExerciseScheme("Übung", true, instituteSet1, tokenSet1, userSet1));
+                exerciseSchemeRepository.save(new ExerciseScheme("Klausur", true,instituteSet2 , tokenSet1, userSet3));
 
                 List<ExerciseScheme> exerciseSchemes = exerciseSchemeRepository.findAll();
 

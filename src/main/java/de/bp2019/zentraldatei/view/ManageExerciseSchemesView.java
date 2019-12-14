@@ -9,6 +9,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.bp2019.zentraldatei.model.ExerciseScheme;
@@ -34,6 +35,8 @@ public class ManageExerciseSchemesView extends VerticalLayout {
 
     private ExerciseSchemeService exerciseSchemeService;
 
+    Grid<ExerciseScheme> grid = new Grid<>(ExerciseScheme.class);
+
 	public ManageExerciseSchemesView(@Autowired ExerciseSchemeService exerciseSchemeService) {
 
         LOGGER.debug("started creation of ManageExerciseSchemesView");
@@ -43,9 +46,11 @@ public class ManageExerciseSchemesView extends VerticalLayout {
         setWidth("50em");
 
         /*  Table for the exist Exercises */
-        Grid<ExerciseScheme> grid = new Grid<>(ExerciseScheme.class);
+
         grid.setWidth("100%");
         grid.setItems(exerciseSchemeService.getAllExerciseSchemes());
+
+
 
         grid.removeAllColumns();
         grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true).setHeader("Übungs Schemas");
@@ -115,7 +120,10 @@ public class ManageExerciseSchemesView extends VerticalLayout {
 
             Button confirmButton = new Button("Löschen", event -> {
                 exerciseSchemeService.deleteExerciseScheme(item);
-                UI.getCurrent().getPage().reload();
+                ListDataProvider<ExerciseScheme> dataProvider = (ListDataProvider<ExerciseScheme>) grid.getDataProvider();
+                dataProvider.getItems().remove(item);
+                dataProvider.refreshAll();
+
                 dialog.close();
                 Dialog answerDialog = new Dialog();
                 answerDialog.add(new Text("Übungsschema '" + item.getName() + "' gelöscht"));

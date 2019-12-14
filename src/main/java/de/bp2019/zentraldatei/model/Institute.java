@@ -1,11 +1,11 @@
 package de.bp2019.zentraldatei.model;
 
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Encapsulates an instute as a class for ease of handling
- * 
+ *
  * @author Alex Späth
  */
 @Document

@@ -9,6 +9,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.bp2019.zentraldatei.model.ModuleScheme;
@@ -33,6 +34,8 @@ public class ManageModuleSchemesView extends VerticalLayout {
 
     private ModuleSchemeService moduleSchemeService;
 
+    private Grid<ModuleScheme> grid = new Grid<>();
+
     public ManageModuleSchemesView(@Autowired ModuleSchemeService moduleSchemeService) {
 
         LOGGER.debug("started creation of ManageModuleSchemesView");
@@ -42,7 +45,7 @@ public class ManageModuleSchemesView extends VerticalLayout {
         setWidth("50em");
 
         /* -- Create Components -- */
-        Grid<ModuleScheme> grid = new Grid<>();
+
         grid.setWidth("100%");
         grid.setItems(moduleSchemeService.getAllModuleSchemes());
 
@@ -110,7 +113,10 @@ public class ManageModuleSchemesView extends VerticalLayout {
 
             Button confirmButton = new Button("Löschen", event -> {
                 moduleSchemeService.deleteModuleScheme(item);
-                UI.getCurrent().getPage().reload();
+                ListDataProvider<ModuleScheme> dataProvider = (ListDataProvider<ModuleScheme>) grid.getDataProvider();
+                dataProvider.getItems().remove(item);
+                dataProvider.refreshAll();
+
                 dialog.close();
                 Dialog answerDialog = new Dialog();
                 answerDialog.add(new Text("Modulschema '" + item.getName() + "' gelöscht"));
