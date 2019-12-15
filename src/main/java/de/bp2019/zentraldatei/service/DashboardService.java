@@ -23,9 +23,9 @@ import de.bp2019.zentraldatei.model.User;
 public class DashboardService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DashboardService.class);
 
-    protected List<ModuleScheme> recentModuleSchemes;
-    protected List<ExerciseScheme> recentExerciseSchemes;
-    protected List<User> recentUsers;
+    private List<ModuleScheme> recentModuleSchemes;
+    private List<ExerciseScheme> recentExerciseSchemes;
+    private List<User> recentUsers;
     
     
     public DashboardService() {
