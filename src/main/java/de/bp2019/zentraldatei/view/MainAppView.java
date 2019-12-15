@@ -32,10 +32,13 @@ class MainAppView extends AppLayout {
         addToNavbar(new DrawerToggle(), title);
         VerticalLayout sidebar = new VerticalLayout();
         sidebar.setHeightFull();
-        sidebar.getStyle().set("background-color","var(--lumo-primary-color)");
+        sidebar.getStyle().set("background-color", "var(--lumo-primary-color)");
         sidebar.setAlignItems(Alignment.AUTO);
 
         VerticalLayout content = new VerticalLayout();
+        content.setSpacing(false);
+
+        content.add(generateAdminLabel());
         content.add(generateMenuButton("Veranstaltungsschemas", "moduleSchemes"));
         content.add(generateMenuButton("Übungsschemas", "exerciseSchemes"));
         content.add(generateMenuButton("Datenbank neu befüllen", "demo"));
@@ -67,22 +70,35 @@ class MainAppView extends AppLayout {
         return button;
     }
 
+    /**
+     * @author Leon Chemnitz
+     * @return
+     */
     private Button generateLogoutButton() {
-        Button button = new Button("logout",new Icon(VaadinIcon.KEY));
+        Button button = new Button("logout", new Icon(VaadinIcon.KEY));
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         button.addClickListener(event -> {
-            // Close the VaadinServiceSession
+            /* Close the VaadinServiceSession */
             UI.getCurrent().getSession().close();
 
-            // Invalidate underlying session instead if login info is stored there
-            // VaadinService.getCurrentRequest().getWrappedSession().invalidate();
-
-            // Redirect to avoid keeping the removed UI open in the browser
+            /*
+             * Redirect to avoid keeping the removed UI open in the browser
+             */
             UI.getCurrent().navigate("login");
         });
         button.getStyle().set("color", "white");
 
         return button;
+    }
 
+    /**
+     * @author Leon Chemnitz
+     */
+    private Label generateAdminLabel() {
+        Label adminLabel = new Label("Admin");
+        adminLabel.getStyle().set("color", "white");
+        adminLabel.getStyle().set("font-size", "1.5em");
+
+        return adminLabel;
     }
 }

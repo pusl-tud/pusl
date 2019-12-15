@@ -6,10 +6,8 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -28,7 +26,7 @@ import java.util.Optional;
  */
 @PageTitle("Zentraldatei | Veranstaltungsschemas")
 @Route(value = "moduleSchemes", layout = MainAppView.class)
-public class ManageModuleSchemesView extends VerticalLayout {
+public class ManageModuleSchemesView extends BaseView {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageModuleSchemesView.class);
@@ -37,21 +35,15 @@ public class ManageModuleSchemesView extends VerticalLayout {
 
     private Grid<ModuleScheme> grid = new Grid<>();
 
-    public ManageModuleSchemesView(@Autowired ModuleSchemeService moduleSchemeService) {
-
+    @Autowired
+    public ManageModuleSchemesView(ModuleSchemeService moduleSchemeService) {
+        super("Veranstaltungsschemas");
         LOGGER.debug("started creation of ManageModuleSchemesView");
 
         this.moduleSchemeService = moduleSchemeService;
 
-        setWidth("90%");
-        setMaxWidth("50em");
-        getStyle().set("marginLeft", "2em");
 
         /* -- Create Components -- */
-      
-        Label title = new Label("Veranstaltungsschemas");
-        title.getStyle().set("font-size", "2em");
-        add(title);
 
         Grid<ModuleScheme> grid = new Grid<>();
       

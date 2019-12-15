@@ -9,6 +9,8 @@ webpack.generated.js
 node_modules/**
 logs/**
 .settings/**
+package.json
+package-lock.json
 
 ### STS ###
 .apt_generated

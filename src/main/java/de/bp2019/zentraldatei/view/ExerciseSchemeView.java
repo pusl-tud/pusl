@@ -7,7 +7,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 @PageTitle("Zentraldatei | Übungsschema")
 @Route(value = "exerciseScheme", layout = MainAppView.class)
 
-public class ExerciseSchemeView extends Div implements HasUrlParameter<String> {
+public class ExerciseSchemeView extends BaseView implements HasUrlParameter<String> {
 
 	private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ExerciseSchemeView.class);
@@ -49,29 +49,28 @@ public class ExerciseSchemeView extends Div implements HasUrlParameter<String> {
     private ExerciseSchemeService exerciseSchemeService;
 
     /*
-     * set if a new MoudleScheme is being created, not set if an existing
+     * set if a new ExerciseScheme is being created, not set if an existing
      * ModuleScheme is being edited
      */
     private boolean isNewEntity;
 
     public ExerciseSchemeView(@Autowired ExerciseSchemeService exerciseSchemeService, @Autowired InstituteService instituteService) {
-
+        super("Übungsschema bearbeiten");
         LOGGER.debug("Started creation of ExerciseSchemeView");
 
         this.exerciseSchemeService = exerciseSchemeService;
 
         FormLayout form = new FormLayout();
-        form.setResponsiveSteps(new FormLayout.ResponsiveStep("5em", 1), new FormLayout.ResponsiveStep("5em", 2));
-        form.setWidth("40em");
-        form.getStyle().set("marginLeft", "3em");
+        form.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
+        form.setWidth("100%");
+        form.getStyle().set("marginLeft", "1em");
+        form.getStyle().set("marginTop", "-0.5em");
 
         binder = new Binder<>();
 
         /*  Create the fields  */
         TextField name = new TextField("Name", "Name der Übung");
         name.setValueChangeMode(ValueChangeMode.EAGER);
-        form.setWidth("40em");
-        form.getStyle().set("marginLeft", "3em");
         form.add(name,1);
 
         MultiselectComboBox<String> institutes = new MultiselectComboBox<String>();
@@ -80,7 +79,6 @@ public class ExerciseSchemeView extends Div implements HasUrlParameter<String> {
         institutes.setItemLabelGenerator(item -> instituteService.getInstituteById(item).getName());
         form.add(institutes, 2);
 
-        /*  TODO: Tokens  */
         TokenEditor tokens = new TokenEditor(exerciseSchemeService);
         form.add(tokens, 2);
 

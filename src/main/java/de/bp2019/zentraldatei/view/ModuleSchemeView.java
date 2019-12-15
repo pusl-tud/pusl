@@ -10,11 +10,8 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -47,9 +44,10 @@ import de.bp2019.zentraldatei.view.components.ExerciseSchemeArranger;
  */
 @PageTitle("Zentraldatei | Veranstaltungsschema")
 @Route(value = "moduleScheme", layout = MainAppView.class)
-public class ModuleSchemeView extends VerticalLayout implements HasUrlParameter<String> {
+public class ModuleSchemeView extends BaseView implements HasUrlParameter<String> {
 
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -7352842685521794385L;
+
         private static final Logger LOGGER = LoggerFactory.getLogger(ModuleSchemeView.class);
 
         /*
@@ -71,26 +69,19 @@ public class ModuleSchemeView extends VerticalLayout implements HasUrlParameter<
                         @Autowired ModuleSchemeService moduleSchemeService,
                         @Autowired ExerciseSchemeService exerciseSchemeService) {
 
+                super("Veranstaltungsschema bearbeiten");
+
                 LOGGER.debug("Started creation of ModuleSchemeView");
 
                 this.moduleSchemeService = moduleSchemeService;
-                
-                setWidth("90%");
-                setMaxWidth("50em");
-                getStyle().set("marginLeft", "2em");
 
-                FormLayout layoutWithBinder = new FormLayout();
-                layoutWithBinder.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
-                layoutWithBinder.setWidth("100%");
-                layoutWithBinder.getStyle().set("marginLeft", "1em");
-                layoutWithBinder.getStyle().set("marginTop","-0.5em");
+                FormLayout form = new FormLayout();
+                form.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
+                form.setWidth("100%");
+                form.getStyle().set("marginLeft", "1em");
+                form.getStyle().set("marginTop", "-0.5em");
 
                 binder = new Binder<>();
-
-
-                Label title = new Label("Veranstaltungsschema bearbeiten");
-                title.getStyle().set("font-size", "2em");
-                add(title);
 
                 /* ########### Create the fields ########### */
 
@@ -98,19 +89,19 @@ public class ModuleSchemeView extends VerticalLayout implements HasUrlParameter<
                 name.setLabel("Name");
                 name.setPlaceholder("Name Der Veranstaltung");
                 name.setValueChangeMode(ValueChangeMode.EAGER);
-                layoutWithBinder.add(name, 1);
+                form.add(name, 1);
 
                 MultiselectComboBox<String> institutes = new MultiselectComboBox<String>();
                 institutes.setLabel("Institute");
                 institutes.setItems(instituteService.getAllInstituteIDs());
                 institutes.setItemLabelGenerator(item -> instituteService.getInstituteById(item).getName());
-                layoutWithBinder.add(institutes, 1);
+                form.add(institutes, 1);
 
                 MultiselectComboBox<String> hasAccess = new MultiselectComboBox<String>();
                 hasAccess.setLabel("Zugriff");
                 hasAccess.setItems(userService.getAllUserIDs());
                 hasAccess.setItemLabelGenerator(item -> userService.getFullNameById(item));
-                layoutWithBinder.add(hasAccess, 2);
+                form.add(hasAccess, 2);
 
                 HorizontalLayout exerciseSchemeLayout = new HorizontalLayout();
 
@@ -126,9 +117,9 @@ public class ModuleSchemeView extends VerticalLayout implements HasUrlParameter<
                 calculationRule.setWidthFull();
 
                 exerciseSchemeLayout.add(calculationRule);
-                layoutWithBinder.add(exerciseSchemeLayout);
-                //layoutWithBinder.add(calculationRule, 1);
-                layoutWithBinder.add(exerciseSchemeLayout, 2);
+                form.add(exerciseSchemeLayout);
+                // layoutWithBinder.add(calculationRule, 1);
+                form.add(exerciseSchemeLayout, 2);
 
                 Button save = new Button("Speichern");
                 save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -136,7 +127,7 @@ public class ModuleSchemeView extends VerticalLayout implements HasUrlParameter<
                 VerticalLayout actions = new VerticalLayout();
                 actions.add(save);
                 actions.setHorizontalComponentAlignment(Alignment.END, save);
-                layoutWithBinder.add(actions, 2);
+                form.add(actions, 2);
 
                 /*
                  * Hidden TextField to bind Id, if someone knows a cleaner Solution please
@@ -190,7 +181,7 @@ public class ModuleSchemeView extends VerticalLayout implements HasUrlParameter<
 
                 /* ########### Add Layout to Component ########### */
 
-                add(layoutWithBinder);
+                add(form);
                 LOGGER.debug("Finished creation of ManageModuleSchemesView");
         }
 

@@ -8,7 +8,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -25,41 +24,37 @@ import java.util.Optional;
  * @author Luca Dinies
  *
  **/
-
 @PageTitle("Zentraldatei | Übungsschemas")
-@Route(value ="exerciseSchemes", layout = MainAppView.class)
-public class ManageExerciseSchemesView extends VerticalLayout {
+@Route(value = "exerciseSchemes", layout = MainAppView.class)
+public class ManageExerciseSchemesView extends BaseView {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageExerciseSchemesView.class);
 
     private ExerciseSchemeService exerciseSchemeService;
 
-    Grid<ExerciseScheme> grid = new Grid<>(ExerciseScheme.class);
+    Grid<ExerciseScheme> grid = new Grid<>();
 
-	public ManageExerciseSchemesView(@Autowired ExerciseSchemeService exerciseSchemeService) {
+    public ManageExerciseSchemesView(@Autowired ExerciseSchemeService exerciseSchemeService) {
+        super("Übungsschemas");
 
         LOGGER.debug("started creation of ManageExerciseSchemesView");
 
         this.exerciseSchemeService = exerciseSchemeService;
 
-        setWidth("50em");
 
-        /*  Table for the exist Exercises */
+        /* Table for the exist Exercises */
 
         grid.setWidth("100%");
         grid.setItems(exerciseSchemeService.getAllExerciseSchemes());
 
-
-
-        grid.removeAllColumns();
-        grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true).setHeader("Übungs Schemas");
+        grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true);
         grid.addComponentColumn(item -> createInstitutesTag(item)).setAutoWidth(true);
-        grid.addComponentColumn(item -> createDeleteButton(item)).setFlexGrow(0).setWidth("5em");
+        grid.addComponentColumn(item -> createDeleteButton(item)).setFlexGrow(0).setWidth("4em");
 
         add(grid);
 
-        Button newExerciseSchemeButton = new Button("Neue Übung");
+        Button newExerciseSchemeButton = new Button("Neues Übungsschema");
         newExerciseSchemeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         add(newExerciseSchemeButton);
@@ -120,7 +115,8 @@ public class ManageExerciseSchemesView extends VerticalLayout {
 
             Button confirmButton = new Button("Löschen", event -> {
                 exerciseSchemeService.deleteExerciseScheme(item);
-                ListDataProvider<ExerciseScheme> dataProvider = (ListDataProvider<ExerciseScheme>) grid.getDataProvider();
+                ListDataProvider<ExerciseScheme> dataProvider = (ListDataProvider<ExerciseScheme>) grid
+                        .getDataProvider();
                 dataProvider.getItems().remove(item);
                 dataProvider.refreshAll();
 
@@ -139,7 +135,7 @@ public class ManageExerciseSchemesView extends VerticalLayout {
 
         });
 
-        button.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+        button.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_ERROR);
         return button;
     }
 
