@@ -44,10 +44,20 @@ public class UserService {
      * @author Leon Chemnitz
      */
     public List<String> getAllUserIDs() {
-        // TODO: authentication
+    	// TODO: authentication
         return userRepository.findAll().stream().map(User::getId).collect(Collectors.toList());
     }
 
+    /**
+     * Get all users
+     * 
+     * @author Fabio Costa
+     */
+    public List<User> getAllUser(){
+    	// TODO: authentication
+    	return userRepository.findAll();
+    }
+    
     /**
      * Get the full name of a user based on their ID.
      * 
@@ -55,6 +65,7 @@ public class UserService {
      * @return Full name of the found User as a String. null if no user is found
      * @author Leon Chemnitz
      */
+    
     public String getFullNameById(String id) {
         // TODO: authentication
         Optional<User> user = userRepository.findById(id);
@@ -66,4 +77,19 @@ public class UserService {
             return null;
         }
     }
+    
+    // einfach mal hier eingefügt
+    /**
+     * Save the user and all its data
+     * 
+     * @param user
+     * @return returns the userrepository with the new user
+     * @author Fabio Costa
+     */
+    public User saveUser(User user){
+    	// TODO: authentication
+    	return userRepository.save(user);
+    }
+
+	
 }
