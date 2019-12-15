@@ -10,7 +10,8 @@ import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 
-import de.bp2019.zentraldatei.view.LoginView;
+import de.bp2019.zentraldatei.UI.views.LoginView;
+
 
 /**
  * HttpSessionRequestCache that avoids saving internal framework requests.
@@ -45,7 +46,7 @@ public class CustomRequestCache extends HttpSessionRequestCache {
 			}
 		}
 
-		// if everything fails, redirect to the main view
+		/* if everything fails, redirect to the main view */
 		return "";
 	}
 

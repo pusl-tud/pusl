@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.view;
+package de.bp2019.zentraldatei.UI.views.ExerciseScheme;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -11,6 +11,9 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
+import de.bp2019.zentraldatei.UI.views.BaseView;
+import de.bp2019.zentraldatei.UI.views.MainAppView;
 import de.bp2019.zentraldatei.model.ExerciseScheme;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import org.slf4j.Logger;
@@ -43,8 +46,7 @@ public class ManageExerciseSchemesView extends BaseView {
         this.exerciseSchemeService = exerciseSchemeService;
 
 
-        /* Table for the exist Exercises */
-
+        /* Table for the existing ExerciseSchemes */
         grid.setWidth("100%");
         grid.setItems(exerciseSchemeService.getAllExerciseSchemes());
 

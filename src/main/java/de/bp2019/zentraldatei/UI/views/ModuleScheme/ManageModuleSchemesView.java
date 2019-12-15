@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.view;
+package de.bp2019.zentraldatei.UI.views.ModuleScheme;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -11,6 +11,9 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
+import de.bp2019.zentraldatei.UI.views.BaseView;
+import de.bp2019.zentraldatei.UI.views.MainAppView;
 import de.bp2019.zentraldatei.model.ModuleScheme;
 import de.bp2019.zentraldatei.service.ModuleSchemeService;
 import org.slf4j.Logger;

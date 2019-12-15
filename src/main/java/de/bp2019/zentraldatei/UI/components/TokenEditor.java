@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.view.components;
+package de.bp2019.zentraldatei.UI.components;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;

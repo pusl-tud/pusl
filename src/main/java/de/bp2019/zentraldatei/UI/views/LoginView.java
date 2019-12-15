@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.view;
+package de.bp2019.zentraldatei.UI.views;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.login.LoginOverlay;

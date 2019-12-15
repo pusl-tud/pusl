@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.view;
+package de.bp2019.zentraldatei.UI.views.ModuleScheme;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,12 +30,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
+import de.bp2019.zentraldatei.UI.components.ExerciseSchemeArranger;
+import de.bp2019.zentraldatei.UI.views.BaseView;
+import de.bp2019.zentraldatei.UI.views.MainAppView;
 import de.bp2019.zentraldatei.model.ModuleScheme;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import de.bp2019.zentraldatei.service.InstituteService;
 import de.bp2019.zentraldatei.service.ModuleSchemeService;
 import de.bp2019.zentraldatei.service.UserService;
-import de.bp2019.zentraldatei.view.components.ExerciseSchemeArranger;
 
 /**
  * View containing a form to edit a ModuleScheme

@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.view;
+package de.bp2019.zentraldatei.UI.views.ExerciseScheme;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -17,10 +17,13 @@ import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
+
+import de.bp2019.zentraldatei.UI.components.TokenEditor;
+import de.bp2019.zentraldatei.UI.views.BaseView;
+import de.bp2019.zentraldatei.UI.views.MainAppView;
 import de.bp2019.zentraldatei.model.ExerciseScheme;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import de.bp2019.zentraldatei.service.InstituteService;
-import de.bp2019.zentraldatei.view.components.TokenEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +80,7 @@ public class ExerciseSchemeView extends BaseView implements HasUrlParameter<Stri
         institutes.setLabel("Institute");
         institutes.setItems(instituteService.getAllInstituteIDs());
         institutes.setItemLabelGenerator(item -> instituteService.getInstituteById(item).getName());
-        form.add(institutes, 2);
+        form.add(institutes, 1);
 
         TokenEditor tokens = new TokenEditor(exerciseSchemeService);
         form.add(tokens, 2);

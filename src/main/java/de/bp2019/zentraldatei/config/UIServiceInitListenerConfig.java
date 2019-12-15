@@ -7,8 +7,8 @@ import com.vaadin.flow.server.VaadinServiceInitListener;
 
 import org.springframework.stereotype.Component;
 
+import de.bp2019.zentraldatei.UI.views.LoginView;
 import de.bp2019.zentraldatei.util.SecurityUtils;
-import de.bp2019.zentraldatei.view.LoginView;
 
 /**
  * Used for vaadin login, taken directly from vaadin website...

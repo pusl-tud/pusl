@@ -12,9 +12,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
+import de.bp2019.zentraldatei.UI.views.LoginView;
 import de.bp2019.zentraldatei.util.CustomRequestCache;
 import de.bp2019.zentraldatei.util.SecurityUtils;
-import de.bp2019.zentraldatei.view.LoginView;
 
 /**
  * Class containing the Spring and vaadin security configuration. most of it is
@@ -92,7 +92,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				"/VAADIN/**",
 
 				/* the standard favicon URI */
-				"/favicon.ico",
+				"/icons/**",
 
 				/* the robots exclusion standard */
 				"/robots.txt",

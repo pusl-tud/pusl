@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.view.components;
+package de.bp2019.zentraldatei.UI.components;
 
 import java.util.List;
 import java.util.Map;
