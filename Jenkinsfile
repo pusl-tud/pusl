@@ -33,7 +33,7 @@ pipeline {
 
         stage ('Deploy') {
             steps {
-                sh 'cp target/*.jar /var/run/zentraldatei/zentraldatei.jar'
+                sh 'sudo cp target/*.jar /var/run/zentraldatei/zentraldatei.jar'
             }
         }
     }
