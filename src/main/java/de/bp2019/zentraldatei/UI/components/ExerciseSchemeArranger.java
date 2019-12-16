@@ -123,6 +123,8 @@ public class ExerciseSchemeArranger extends CustomField<List<String>> {
     /**
      * Used to create the delete buttons for the Grid items.
      * 
+     * @param item
+     * @return
      * @author Leon Chemnitz
      */
     private Button createDeleteButton(ExerciseScheme item) {

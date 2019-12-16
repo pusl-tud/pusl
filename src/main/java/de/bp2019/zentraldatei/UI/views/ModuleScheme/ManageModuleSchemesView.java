@@ -45,11 +45,10 @@ public class ManageModuleSchemesView extends BaseView {
 
         this.moduleSchemeService = moduleSchemeService;
 
-
         /* -- Create Components -- */
 
         Grid<ModuleScheme> grid = new Grid<>();
-      
+
         grid.setWidth("100%");
         grid.setItems(moduleSchemeService.getAllModuleSchemes());
 
@@ -75,6 +74,7 @@ public class ManageModuleSchemesView extends BaseView {
      * links to the edit page of the individual ModuleScheme.
      * 
      * @param item ModuleScheme to create the Button for
+     * @return
      * @author Leon Chemnitz
      */
     private Button createNameButton(ModuleScheme item) {
@@ -88,8 +88,9 @@ public class ManageModuleSchemesView extends BaseView {
     /**
      * Used to generate the Institutes field for each Grid item
      * 
-     * @param item
+     * @param item entity to create unstitutes tag for
      * @author Leon Chemnitz
+     * @return institutes tag
      */
     private Text createInstitutesTag(ModuleScheme item) {
         Optional<String> text = moduleSchemeService.getInstitutes(item).stream().map(institute -> institute.getName())
@@ -105,8 +106,9 @@ public class ManageModuleSchemesView extends BaseView {
     /**
      * Used to generate the delete button for each Grid Item
      * 
-     * @param item
+     * @param item entity to create button for
      * @author Leon Chemnitz
+     * @return delete button
      */
     protected Button createDeleteButton(ModuleScheme item) {
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {

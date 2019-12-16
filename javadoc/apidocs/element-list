@@ -1,0 +1,11 @@
+de.bp2019.zentraldatei
+de.bp2019.zentraldatei.config
+de.bp2019.zentraldatei.enums
+de.bp2019.zentraldatei.model
+de.bp2019.zentraldatei.repository
+de.bp2019.zentraldatei.service
+de.bp2019.zentraldatei.UI.components
+de.bp2019.zentraldatei.UI.views
+de.bp2019.zentraldatei.UI.views.ExerciseScheme
+de.bp2019.zentraldatei.UI.views.ModuleScheme
+de.bp2019.zentraldatei.util

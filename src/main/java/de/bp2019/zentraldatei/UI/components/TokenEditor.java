@@ -20,12 +20,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Component used as a Field to add and remove Tokens in a
- * list. Used in ExerciseSchemeView.
+ * Component used as a Field to add and remove Tokens in a list. Used in
+ * ExerciseSchemeView.
  *
  * @author Luca Dinies
  */
-
 public class TokenEditor extends CustomField<Set<String>> {
 
     private static final long serialVersionUID = 1L;
@@ -54,7 +53,8 @@ public class TokenEditor extends CustomField<Set<String>> {
         FormLayout tokenFormLayout = new FormLayout();
         tokenFormLayout.setWidthFull();
         setWidthFull();
-        tokenFormLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("5em", 1), new FormLayout.ResponsiveStep("5em", 2));
+        tokenFormLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("5em", 1),
+                new FormLayout.ResponsiveStep("5em", 2));
 
         TextField addedToken = new TextField();
         addedToken.setPlaceholder("Token");
@@ -72,7 +72,6 @@ public class TokenEditor extends CustomField<Set<String>> {
         tokenFormLayout.add(tokenButton);
         add(tokenFormLayout);
     };
-
 
     @Override
     protected Set<String> generateModelValue() {

@@ -73,6 +73,7 @@ public class ManageExerciseSchemesView extends BaseView {
      * links to the edit page of the individual ExerciseScheme.
      *
      * @param item ModuleScheme to create the Button for
+     * @return
      * @author Luca Dinies
      */
     private Button createNameButton(ExerciseScheme item) {
@@ -87,6 +88,7 @@ public class ManageExerciseSchemesView extends BaseView {
      * Used to generate the Institutes field for each Grid item
      *
      * @param item
+     * @return
      * @author Luca Dinies
      */
     private Text createInstitutesTag(ExerciseScheme item) {
@@ -104,6 +106,7 @@ public class ManageExerciseSchemesView extends BaseView {
      * Used to generate the delete button for each Grid Item
      *
      * @param item
+     * @return
      * @author Luca Dinies
      */
     private Button createDeleteButton(ExerciseScheme item) {

@@ -6,8 +6,8 @@ target/
 !**/src/test/**
 vscode_workspace.code-workspace
 webpack.generated.js
-node_modules/**
-logs/**
+node_modules/
+logs/
 .settings/**
 package.json
 package-lock.json

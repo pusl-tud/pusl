@@ -14,7 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 /**
  * SecurityUtils takes care of all such static operations that have to do with
  * security and querying rights from different beans of the UI.
- *
+ *	@author Leon Chemnitz
  */
 public final class SecurityUtils {
 
@@ -33,9 +33,9 @@ public final class SecurityUtils {
 	}
 
 	/**
-	 * Tests if some user is authenticated. As Spring Security always will create an
-	 * {@link AnonymousAuthenticationToken} we have to ignore those tokens
-	 * explicitly.
+	 * Tests if the current user is logged in. 
+	 * @author Leon Chemnitz
+	 * @return true if logged in
 	 */
 	public static boolean isUserLoggedIn() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

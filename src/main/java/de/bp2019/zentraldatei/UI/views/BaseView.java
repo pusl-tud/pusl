@@ -3,7 +3,13 @@ package de.bp2019.zentraldatei.UI.views;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-public class BaseView extends VerticalLayout{
+/**
+ * Base View containing some formatting and title. All Views displayed in
+ * MainAppView should extend this view.
+ * 
+ * @author Leon Chemnitz
+ */
+public class BaseView extends VerticalLayout {
 
     private static final long serialVersionUID = 5906463495344039816L;
 

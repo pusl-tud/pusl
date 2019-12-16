@@ -37,6 +37,7 @@ public class ExerciseSchemeService {
     /**
      * Get all ExerciseSchemes the User is authenticated to see.
      * 
+     * @return list of all exercise schemes
      * @author Leon Chemnitz
      */
     public List<ExerciseScheme> getAllExerciseSchemes() {
@@ -47,6 +48,7 @@ public class ExerciseSchemeService {
     /**
      * Persist one ExerciseScheme
      *
+     * @param exerciseScheme to persist
      * @author Luca Dinies
      */
     public void saveModuleScheme(ExerciseScheme exerciseScheme) {
@@ -57,6 +59,7 @@ public class ExerciseSchemeService {
     /**
      * Update one ExerciseScheme in Database
      *
+     * @param exerciseScheme to update
      * @author Luca Dinies
      */
     public void updateModuleScheme(ExerciseScheme exerciseScheme) {
@@ -69,7 +72,7 @@ public class ExerciseSchemeService {
      * necessary because in a ExerciseScheme instance only the Institute Ids are
      * referenced.
      *
-     * @param exerciseScheme
+     * @param exerciseScheme exercise scheme
      * @return Set of Institute instances associated with ModuleScheme
      * @author Luca Dinies
      */
@@ -106,9 +109,9 @@ public class ExerciseSchemeService {
     /**
      * Delete an ExerciseScheme
      *
+     * @param exerciseScheme to delete
      * @author Luca Dinies
      */
-
     public void deleteExerciseScheme(ExerciseScheme exerciseScheme){
         exerciseSchemeRepository.delete(exerciseScheme);
     }
