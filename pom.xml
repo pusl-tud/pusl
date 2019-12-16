@@ -127,6 +127,7 @@
       <id>production</id>
       <properties>
         <vaadin.productionMode>true</vaadin.productionMode>
+        <spring.port>8088</spring.port>
       </properties>
       <dependencies>
         <dependency>
