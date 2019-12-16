@@ -38,13 +38,13 @@ public class ManageExerciseSchemesView extends BaseView {
 
     Grid<ExerciseScheme> grid = new Grid<>();
 
-    public ManageExerciseSchemesView(@Autowired ExerciseSchemeService exerciseSchemeService) {
+    @Autowired
+    public ManageExerciseSchemesView(ExerciseSchemeService exerciseSchemeService) {
         super("Übungsschemas");
 
         LOGGER.debug("started creation of ManageExerciseSchemesView");
 
         this.exerciseSchemeService = exerciseSchemeService;
-
 
         /* Table for the existing ExerciseSchemes */
         grid.setWidth("100%");

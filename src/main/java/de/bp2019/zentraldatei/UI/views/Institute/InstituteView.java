@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.UI.views.ModuleScheme;
+package de.bp2019.zentraldatei.UI.views.Institute;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,6 +33,7 @@ import org.vaadin.gatanaso.MultiselectComboBox;
 import de.bp2019.zentraldatei.UI.components.ExerciseSchemeArranger;
 import de.bp2019.zentraldatei.UI.views.BaseView;
 import de.bp2019.zentraldatei.UI.views.MainAppView;
+import de.bp2019.zentraldatei.model.Institute;
 import de.bp2019.zentraldatei.model.ModuleScheme;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import de.bp2019.zentraldatei.service.InstituteService;
@@ -44,38 +45,36 @@ import de.bp2019.zentraldatei.service.UserService;
  * 
  * @author Leon Chemnitz
  */
-@PageTitle("Zentraldatei | Veranstaltungsschema")
-@Route(value = "moduleScheme", layout = MainAppView.class)
-public class ModuleSchemeView extends BaseView implements HasUrlParameter<String> {
+@PageTitle("Zentraldatei | Institut")
+@Route(value = "institute", layout = MainAppView.class)
+public class InstituteView extends BaseView implements HasUrlParameter<String> {
 
-        private static final long serialVersionUID = -7352842685521794385L;
+        private static final long serialVersionUID = 1L;
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(ModuleSchemeView.class);
+        private static final Logger LOGGER = LoggerFactory.getLogger(InstituteView.class);
 
         /*
          * no @Autowire because service is injected by constructor. Vaadin likes it
          * better this way...
          */
-        private ModuleSchemeService moduleSchemeService;
+        private InstituteService instituteService;
 
         /** Binder to bind the form Data to an Object */
-        private Binder<ModuleScheme> binder;
+        private Binder<Institute> binder;
 
         /**
-         * set if a new MoudleScheme is being created, not set if an existing
-         * ModuleScheme is being edited
+         * set if a new Institute is being created, not set if an existing Institute is
+         * being edited
          */
         private boolean isNewEntity;
 
         @Autowired
-        public ModuleSchemeView(InstituteService instituteService, UserService userService,
-                        ModuleSchemeService moduleSchemeService, ExerciseSchemeService exerciseSchemeService) {
+        public InstituteView(InstituteService instituteService) {
+                super("Institut bearbeiten");
 
-                super("Veranstaltungsschema bearbeiten");
+                this.instituteService = instituteService;
 
-                LOGGER.debug("Started creation of ModuleSchemeView");
-
-                this.moduleSchemeService = moduleSchemeService;
+                LOGGER.debug("Started creation of InstituteView");
 
                 FormLayout form = new FormLayout();
                 form.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
@@ -89,39 +88,9 @@ public class ModuleSchemeView extends BaseView implements HasUrlParameter<String
 
                 TextField name = new TextField();
                 name.setLabel("Name");
-                name.setPlaceholder("Name Der Veranstaltung");
+                name.setPlaceholder("Name Des Instituts");
                 name.setValueChangeMode(ValueChangeMode.EAGER);
                 form.add(name, 1);
-
-                MultiselectComboBox<String> institutes = new MultiselectComboBox<String>();
-                institutes.setLabel("Institute");
-                institutes.setItems(instituteService.getAllInstituteIDs());
-                institutes.setItemLabelGenerator(item -> instituteService.getInstituteById(item).getName());
-                form.add(institutes, 1);
-
-                MultiselectComboBox<String> hasAccess = new MultiselectComboBox<String>();
-                hasAccess.setLabel("Zugriff");
-                hasAccess.setItems(userService.getAllUserIDs());
-                hasAccess.setItemLabelGenerator(item -> userService.getFullNameById(item));
-                form.add(hasAccess, 2);
-
-                HorizontalLayout exerciseSchemeLayout = new HorizontalLayout();
-
-                ExerciseSchemeArranger exerciseSchemes = new ExerciseSchemeArranger(exerciseSchemeService);
-                // layoutWithBinder.add(exerciseSchemes, 1);
-                exerciseSchemeLayout.add(exerciseSchemes);
-
-                TextArea calculationRule = new TextArea();
-                calculationRule.setValueChangeMode(ValueChangeMode.EAGER);
-                calculationRule.setLabel("Berechnungsregel");
-                calculationRule.setPlaceholder("Platzhalter");
-                calculationRule.setHeight("15em");
-                calculationRule.setWidthFull();
-
-                exerciseSchemeLayout.add(calculationRule);
-                form.add(exerciseSchemeLayout);
-                // layoutWithBinder.add(calculationRule, 1);
-                form.add(exerciseSchemeLayout, 2);
 
                 Button save = new Button("Speichern");
                 save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -139,40 +108,29 @@ public class ModuleSchemeView extends BaseView implements HasUrlParameter<String
 
                 /* ########### Data Binding and validation ########### */
 
-                binder.bind(id, ModuleScheme::getId, ModuleScheme::setId);
+                binder.bind(id, Institute::getId, Institute::setId);
 
-                binder.forField(name).withValidator(
-                                new StringLengthValidator("Bitte Name der Veranstaltung angeben", 1, null))
-                                .bind(ModuleScheme::getName, ModuleScheme::setName);
-
-                binder.forField(institutes)
-                                .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
-                                                "Bitte mind. ein Institut angeben")
-                                .bind(ModuleScheme::getInstitutes, ModuleScheme::setInstitutes);
-
-                binder.bind(hasAccess, ModuleScheme::getHasAccess, ModuleScheme::setHasAccess);
-
-                binder.bind(exerciseSchemes, ModuleScheme::getExerciseSchemes, ModuleScheme::setExerciseSchemes);
-
-                binder.bind(calculationRule, ModuleScheme::getCalculationRule, ModuleScheme::setCalculationRule);
+                binder.forField(name)
+                                .withValidator(new StringLengthValidator("Bitte Name des Instituts angeben", 1, null))
+                                .bind(Institute::getName, Institute::setName);
 
                 /* ########### Click Listeners for Buttons ########### */
 
                 save.addClickListener(event -> {
-                        ModuleScheme formData = new ModuleScheme();
+                        Institute formData = new Institute();
                         if (binder.writeBeanIfValid(formData)) {
                                 Dialog dialog = new Dialog();
                                 if (isNewEntity) {
-                                        moduleSchemeService.saveModuleScheme(formData);
-                                        dialog.add(new Text("Veranstaltungsschema erfolgreich erstellt oder so..."));
+                                        instituteService.saveInstitute(formData);
+                                        dialog.add(new Text("Institut erfolgreich erstellt oder so..."));
                                 } else {
-                                        moduleSchemeService.updateModuleScheme(formData);
-                                        dialog.add(new Text("Veranstaltungsschema erfolgreich verändert oder so..."));
+                                        instituteService.updateInstitute(formData);
+                                        dialog.add(new Text("Institut erfolgreich verändert oder so..."));
                                 }
-                                UI.getCurrent().navigate("moduleSchemes");
+                                UI.getCurrent().navigate("institutes");
                                 dialog.open();
                         } else {
-                                BinderValidationStatus<ModuleScheme> validate = binder.validate();
+                                BinderValidationStatus<Institute> validate = binder.validate();
                                 String errorText = validate.getFieldValidationStatuses().stream()
                                                 .filter(BindingValidationStatus::isError)
                                                 .map(BindingValidationStatus::getMessage).map(Optional::get).distinct()
@@ -184,23 +142,23 @@ public class ModuleSchemeView extends BaseView implements HasUrlParameter<String
                 /* ########### Add Layout to Component ########### */
 
                 add(form);
-                LOGGER.debug("Finished creation of ManageModuleSchemesView");
+                LOGGER.debug("Finished creation of InstituteView");
         }
 
         @Override
-        public void setParameter(BeforeEvent event, String moduleSchemeId) {
-                if (moduleSchemeId.equals("new")) {
+        public void setParameter(BeforeEvent event, String instituteId) {
+                if (instituteId.equals("new")) {
                         isNewEntity = true;
                         /* clear fields by setting null */
                         binder.readBean(null);
                 } else {
-                        ModuleScheme fetchedModuleScheme = moduleSchemeService.getModuleSchemeById(moduleSchemeId);
+                        Institute fetchedInstitute = instituteService.getInstituteById(instituteId);
                         /* getModuleSchemeById returns null if no matching ModuleScheme is found */
-                        if (fetchedModuleScheme == null) {
+                        if (fetchedInstitute == null) {
                                 throw new NotFoundException();
                         } else {
                                 isNewEntity = false;
-                                binder.readBean(fetchedModuleScheme);
+                                binder.readBean(fetchedInstitute);
                         }
                 }
         }

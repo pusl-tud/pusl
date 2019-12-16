@@ -36,14 +36,14 @@ import java.util.stream.Collectors;
  *
  * @author Luca Dinies
  *
-**/
+ **/
 
 @PageTitle("Zentraldatei | Übungsschema")
 @Route(value = "exerciseScheme", layout = MainAppView.class)
 
 public class ExerciseSchemeView extends BaseView implements HasUrlParameter<String> {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ExerciseSchemeView.class);
 
     private Binder<ExerciseScheme> binder;
@@ -57,7 +57,8 @@ public class ExerciseSchemeView extends BaseView implements HasUrlParameter<Stri
      */
     private boolean isNewEntity;
 
-    public ExerciseSchemeView(@Autowired ExerciseSchemeService exerciseSchemeService, @Autowired InstituteService instituteService) {
+    @Autowired
+    public ExerciseSchemeView(ExerciseSchemeService exerciseSchemeService, InstituteService instituteService) {
         super("Übungsschema bearbeiten");
         LOGGER.debug("Started creation of ExerciseSchemeView");
 
@@ -71,10 +72,10 @@ public class ExerciseSchemeView extends BaseView implements HasUrlParameter<Stri
 
         binder = new Binder<>();
 
-        /*  Create the fields  */
+        /* Create the fields */
         TextField name = new TextField("Name", "Name der Übung");
         name.setValueChangeMode(ValueChangeMode.EAGER);
-        form.add(name,1);
+        form.add(name, 1);
 
         MultiselectComboBox<String> institutes = new MultiselectComboBox<String>();
         institutes.setLabel("Institute");
@@ -91,7 +92,7 @@ public class ExerciseSchemeView extends BaseView implements HasUrlParameter<Stri
         Button save = new Button("Speichern");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        /*  Button Bar  */
+        /* Button Bar */
         VerticalLayout actions = new VerticalLayout();
         actions.add(save);
         actions.setHorizontalComponentAlignment(FlexComponent.Alignment.END, save);
@@ -103,22 +104,21 @@ public class ExerciseSchemeView extends BaseView implements HasUrlParameter<Stri
          */
         TextField id = new TextField("");
 
-        /*  Binding and validation  */
+        /* Binding and validation */
         binder.bind(id, ExerciseScheme::getId, ExerciseScheme::setId);
 
         binder.forField(name).withValidator(new StringLengthValidator("Bitte Namen der Übung eingeben", 1, null))
                 .bind(ExerciseScheme::getName, ExerciseScheme::setName);
 
         binder.forField(institutes)
-                .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
-                        "Bitte mind. ein Institut angeben")
+                .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(), "Bitte mind. ein Institut angeben")
                 .bind(ExerciseScheme::getInstitutes, ExerciseScheme::setInstitutes);
 
         binder.bind(tokens, ExerciseScheme::getTokens, ExerciseScheme::setTokens);
 
         binder.bind(isNumeric, ExerciseScheme::getIsNumeric, ExerciseScheme::setIsNumeric);
 
-        /*  Click-Listeners  */
+        /* Click-Listeners */
         save.addClickListener(event -> {
             ExerciseScheme formData = new ExerciseScheme();
             if (binder.writeBeanIfValid(formData)) {
@@ -135,14 +135,13 @@ public class ExerciseSchemeView extends BaseView implements HasUrlParameter<Stri
             } else {
                 BinderValidationStatus<ExerciseScheme> validate = binder.validate();
                 String errorText = validate.getFieldValidationStatuses().stream()
-                        .filter(BindingValidationStatus::isError)
-                        .map(BindingValidationStatus::getMessage).map(Optional::get).distinct()
-                        .collect(Collectors.joining(", "));
+                        .filter(BindingValidationStatus::isError).map(BindingValidationStatus::getMessage)
+                        .map(Optional::get).distinct().collect(Collectors.joining(", "));
                 LOGGER.debug("There are errors: " + errorText);
             }
         });
 
-        /*  Add Layout to Component  */
+        /* Add Layout to Component */
 
         add(form);
         LOGGER.debug("Finished creation of ManageExerciseSchemesView");

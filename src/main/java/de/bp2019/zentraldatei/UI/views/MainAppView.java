@@ -50,7 +50,7 @@ public class MainAppView extends AppLayout {
         content.add(generateMenuButton("Übungsschemas", "exerciseSchemes"));
         content.add(generateSeperator());
         content.add(generateSectionLabel("Global"));
-        content.add(generateMenuButton("Institute", "demo"));
+        content.add(generateMenuButton("Institute", "institutes"));
         content.add(generateMenuButton("Datenbank neu befüllen", "demo"));
         sidebar.add(content);
 

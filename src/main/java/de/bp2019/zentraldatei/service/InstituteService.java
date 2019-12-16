@@ -69,4 +69,36 @@ public class InstituteService {
             return null;
         }
     }
+
+    /**
+     * Persist one Institute
+     *
+     * @param institute to persist
+     * @author Leon Chemnitz
+     */
+    public void saveInstitute(Institute institute) {
+        // TODO: Data Validation
+        instituteRepository.save(institute);
+    }
+
+    /**
+     * Update one Institute in Database
+     * 
+     * @param institute to update
+     * @author Leon Chemnitz
+     */
+    public void updateInstitute(Institute institute) {
+        // TODO: Data Validation
+        instituteRepository.save(institute);
+    }
+
+    /**
+     * Delete a Institute
+     *
+     * @param institute to delete
+     * @author Leon Chemnitz
+     */
+    public void deleteInstitute(Institute institute) {
+        instituteRepository.delete(institute);
+    }
 }
