@@ -1,0 +1,7 @@
+html {
+  --lumo-border-radius: 0px;
+  --lumo-primary-text-color: rgb(0, 0, 0);
+  --lumo-primary-color-50pct: rgba(185, 15, 34, 0.5);
+  --lumo-primary-color-10pct: rgba(185, 15, 34, 0.1);
+  --lumo-primary-color: #B90F22;
+}

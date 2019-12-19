@@ -1,11 +1,11 @@
 package de.bp2019.zentraldatei.model;
 
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Encapsulates an instute as a class for ease of handling
- * 
+ *
  * @author Alex Späth
  */
 @Document
@@ -15,12 +15,19 @@ public class Institute {
 	private String id;
 	private String name;
 
+	public Institute() {
+	}
+
 	public Institute(String name) {
 		this.name = name;
 	}
 
 	public String getId() {
 		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getName() {

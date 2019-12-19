@@ -15,10 +15,8 @@
   <properties>
     <java.version>11</java.version>
     <vaadin.version>14.0.12</vaadin.version>
-    <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
     <vaadin.productionMode>false</vaadin.productionMode>
   </properties>
-  <packaging>war</packaging>
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -31,7 +29,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-tomcat</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
@@ -64,7 +61,14 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
       <scope>compile</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
+    </dependency>
   </dependencies>
   <repositories>
     <repository>
@@ -108,6 +112,14 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.1.1</version>
+        <configuration>
+          <reportOutputDirectory>docs</reportOutputDirectory>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <profiles>
@@ -115,6 +127,7 @@
       <id>production</id>
       <properties>
         <vaadin.productionMode>true</vaadin.productionMode>
+        <spring.port>8088</spring.port>
       </properties>
       <dependencies>
         <dependency>

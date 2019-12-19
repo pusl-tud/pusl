@@ -31,6 +31,7 @@ public class InstituteService {
     /**
      * Get all Institutes the User is authenticated to see.
      * 
+     * @return list of all institutes
      * @author Leon Chemnitz
      */
     public List<Institute> getAllInstitutes() {
@@ -41,6 +42,7 @@ public class InstituteService {
     /**
      * Get just the Ids of all the Institutes the User is authenticated to see.
      * 
+     * @return list of all institute ids
      * @author Leon Chemnitz
      */
     public List<String> getAllInstituteIDs() {
@@ -52,7 +54,7 @@ public class InstituteService {
      * Get a Institute based on its Id. Only returns Institutes the User is
      * authenticated to see.
      * 
-     * @param Id Id to search for
+     * @param id Id to search for
      * @return found Institute with maching Id, null if none is found
      * @author Leon Chemnitz
      */
@@ -66,5 +68,37 @@ public class InstituteService {
             LOGGER.warn("Tried to get Institute which doesn't exist in Database! Institute ID was: " + id);
             return null;
         }
+    }
+
+    /**
+     * Persist one Institute
+     *
+     * @param institute to persist
+     * @author Leon Chemnitz
+     */
+    public void saveInstitute(Institute institute) {
+        // TODO: Data Validation
+        instituteRepository.save(institute);
+    }
+
+    /**
+     * Update one Institute in Database
+     * 
+     * @param institute to update
+     * @author Leon Chemnitz
+     */
+    public void updateInstitute(Institute institute) {
+        // TODO: Data Validation
+        instituteRepository.save(institute);
+    }
+
+    /**
+     * Delete a Institute
+     *
+     * @param institute to delete
+     * @author Leon Chemnitz
+     */
+    public void deleteInstitute(Institute institute) {
+        instituteRepository.delete(institute);
     }
 }

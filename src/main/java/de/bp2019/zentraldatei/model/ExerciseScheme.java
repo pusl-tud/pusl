@@ -1,15 +1,15 @@
 package de.bp2019.zentraldatei.model;
 
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A class to model a exercise scheme. Connsists of a name, a flag for numeric
+ * A class to model a exercise scheme. Consists of a name, a flag for numeric
  * grading, a list of possible tokens, a start date, a finish date and a list of
- * users alowed
+ * users allowed
  * 
  * @author Alex Späth
  */
@@ -20,13 +20,15 @@ public class ExerciseScheme {
 	private String id;
 	private String name;
 	private boolean isNumeric;
+	private Set<String> institutes;
 	private Set<String> tokens;
 	/** Foreign key - User.id */
 	private Set<String> hasAccess;
 
-	public ExerciseScheme(String name, boolean isNumeric, Set<String> tokens, Set<String> hasAccess) {
+	public ExerciseScheme(String name, boolean isNumeric, Set<String> institutes, Set<String> tokens, Set<String> hasAccess) {
 		this.name = name;
 		this.isNumeric = isNumeric;
+		this.institutes = institutes;
 		this.tokens = tokens;
 		this.hasAccess = hasAccess;
 	}
@@ -38,6 +40,7 @@ public class ExerciseScheme {
 		this.name = new String(exerciseScheme.getName());
 		this.isNumeric = exerciseScheme.getIsNumeric();
 
+		this.institutes = new HashSet<String>();
 		this.tokens = new HashSet<String>();
 		exerciseScheme.getTokens().forEach(token -> this.tokens.add(new String(token)));
 
@@ -67,6 +70,14 @@ public class ExerciseScheme {
 
 	public void setIsNumeric(boolean isNumeric) {
 		this.isNumeric = isNumeric;
+	}
+
+	public Set<String> getInstitutes() {
+		return institutes;
+	}
+
+	public void setInstitutes(Set<String> institutes) {
+		this.institutes = institutes;
 	}
 
 	public Set<String> getTokens() {

@@ -31,6 +31,7 @@ public class UserService {
     /**
      * Get all Users the User is authenticated to see.
      * 
+     * @return list of all users
      * @author Leon Chemnitz
      */
     public List<User> getAllUsers() {
@@ -41,6 +42,7 @@ public class UserService {
     /**
      * Get just the Ids of all the Users the User is authenticated to see.
      * 
+     * @return list of all user ids
      * @author Leon Chemnitz
      */
     public List<String> getAllUserIDs() {
