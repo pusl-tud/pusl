@@ -17,6 +17,10 @@ import com.vaadin.flow.server.PWA;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import de.bp2019.zentraldatei.UI.views.ExerciseScheme.ManageExerciseSchemesView;
+import de.bp2019.zentraldatei.UI.views.Institute.ManageInstitutesView;
+import de.bp2019.zentraldatei.UI.views.Module.ManageModulesView;
+
 /**
  * Main View used as a overlay for all other Application views (excluding
  * LoginView). Contains header and Navigation sideBar.
@@ -46,12 +50,12 @@ public class MainAppView extends AppLayout {
         content.setSpacing(false);
 
         content.add(generateSectionLabel("Admin"));
-        content.add(generateMenuButton("Veranstaltungsschemas", "moduleSchemes"));
-        content.add(generateMenuButton("Übungsschemas", "exerciseSchemes"));
+        content.add(generateMenuButton("Veranstaltungen bearbeiten", ManageModulesView.ROUTE));
+        content.add(generateMenuButton("Übungsschemas", ManageExerciseSchemesView.ROUTE));
         content.add(generateSeperator());
         content.add(generateSectionLabel("Global"));
-        content.add(generateMenuButton("Institute", "institutes"));
-        content.add(generateMenuButton("Datenbank neu befüllen", "demo"));
+        content.add(generateMenuButton("Institute", ManageInstitutesView.ROUTE));
+        content.add(generateMenuButton("Datenbank neu befüllen", DemoView.ROUTE));
         sidebar.add(content);
 
         VerticalLayout footer = new VerticalLayout();
@@ -93,7 +97,7 @@ public class MainAppView extends AppLayout {
             /* Close the VaadinServiceSession */
             UI.getCurrent().getSession().close();
             /* Redirect to avoid keeping the removed UI open in the browser */
-            UI.getCurrent().navigate("login");
+            UI.getCurrent().navigate(LoginView.ROUTE);
         });
         button.getStyle().set("color", "white");
 

@@ -2,10 +2,10 @@ package de.bp2019.zentraldatei.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import de.bp2019.zentraldatei.model.ExerciseScheme;
+import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
 
 /**
- * Repository for access of ExerciseSchemes
+ * Repository for access of {@link ExerciseScheme}s
  * 
  * @author Leon Chemnitz
  */

@@ -12,24 +12,25 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.select.Select;
-import de.bp2019.zentraldatei.model.ExerciseScheme;
+import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
+import de.bp2019.zentraldatei.UI.views.Module.EditModuleView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * Component used as a Field to add, remove and arrange ExerciseSchemes in a
- * list. Used in ModuleSchemeView.
+ * Component used as a Field to add, remove and arrange {@link ExerciseScheme}s
+ * in a list. Used in {@link EditModuleView}.
  * 
  * @author Leon Chemnitz
  */
-public class ExerciseSchemeArranger extends CustomField<List<String>> {
+public class ExerciseSchemeArranger extends CustomField<List<ExerciseScheme>> {
 
     private static final long serialVersionUID = 1L;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ExerciseSchemeArranger.class);
 
     private static final String WIDTH = "15em";
@@ -59,7 +60,7 @@ public class ExerciseSchemeArranger extends CustomField<List<String>> {
         add(exerciseSchemesGrid);
 
         Select<ExerciseScheme> exerciseSchemesSelect = new Select<>();
-        exerciseSchemesSelect.setItemLabelGenerator(item -> item.getName());
+        exerciseSchemesSelect.setItemLabelGenerator(ExerciseScheme::getName);
         List<ExerciseScheme> allExerciseSchemes = exerciseSchemeService.getAllExerciseSchemes();
         exerciseSchemesSelect.setItems(allExerciseSchemes);
         exerciseSchemesSelect.setValue(allExerciseSchemes.get(0));
@@ -71,10 +72,7 @@ public class ExerciseSchemeArranger extends CustomField<List<String>> {
         exerciseSchemesButton.setWidth(WIDTH);
         exerciseSchemesButton.addClickListener(event -> {
             gridItems.add(exerciseSchemesSelect.getValue().copy());
-            exerciseSchemesGrid.getDataProvider().refreshAll();
-
-            /* VERY INEFFICIENT!! BETTER SOLUTION NEEDED */
-            setValue(gridItems.stream().map(ExerciseScheme::getId).collect(Collectors.toList()));
+            setValue(new ArrayList<>(gridItems));
         });
 
         add(exerciseSchemesButton);
@@ -98,25 +96,21 @@ public class ExerciseSchemeArranger extends CustomField<List<String>> {
                 int dropIndex = gridItems.indexOf(dropOverItem)
                         + (event.getDropLocation() == GridDropLocation.BELOW ? 1 : 0);
                 gridItems.add(dropIndex, draggedItem);
-                exerciseSchemesGrid.getDataProvider().refreshAll();
-
-                /* VERY INEFFICIENT!! BETTER SOLUTION NEEDED */
-                setValue(gridItems.stream().map(ExerciseScheme::getId).collect(Collectors.toList()));
+                setValue(new ArrayList<>(gridItems));
             }
         });
     }
 
     @Override
-    protected List<String> generateModelValue() {
+    protected List<ExerciseScheme> generateModelValue() {
         LOGGER.info(gridItems.toString());
-        return gridItems.stream().map(ExerciseScheme::getId).collect(Collectors.toList());
+        return gridItems;
     }
 
     @Override
-    protected void setPresentationValue(List<String> newPresentationValue) {
+    protected void setPresentationValue(List<ExerciseScheme> newPresentationValue) {
         gridItems.clear();
-        newPresentationValue.stream().forEach(id -> gridItems.add(exerciseSchemeService.getExerciseSchemeById(id)));
-
+        newPresentationValue.forEach(item -> gridItems.add(item.copy()));
         exerciseSchemesGrid.getDataProvider().refreshAll();
     }
 
@@ -130,10 +124,7 @@ public class ExerciseSchemeArranger extends CustomField<List<String>> {
     private Button createDeleteButton(ExerciseScheme item) {
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {
             gridItems.remove(item);
-            exerciseSchemesGrid.getDataProvider().refreshAll();
-
-            /* VERY INEFFICIENT!! BETTER SOLUTION NEEDED */
-            setValue(gridItems.stream().map(ExerciseScheme::getId).collect(Collectors.toList()));
+            setValue(new ArrayList<>(gridItems));
         });
         button.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
         return button;

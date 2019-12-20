@@ -26,10 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Leon Chemnitz
  */
 @PageTitle("Zentraldatei | Institute")
-@Route(value = "institutes", layout = MainAppView.class)
+@Route(value = ManageInstitutesView.ROUTE, layout = MainAppView.class)
 public class ManageInstitutesView extends BaseView {
 
     private static final long serialVersionUID = -5763725756205681478L;
+
+    public static final String ROUTE = "manage-institutes";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageInstitutesView.class);
 
@@ -62,7 +64,7 @@ public class ManageInstitutesView extends BaseView {
         add(newInstituteButton);
         setHorizontalComponentAlignment(Alignment.END, newInstituteButton);
 
-        newInstituteButton.addClickListener(event -> UI.getCurrent().navigate("institute/new"));
+        newInstituteButton.addClickListener(event -> UI.getCurrent().navigate(EditInstituteView.ROUTE + "/new"));
 
         LOGGER.debug("finished creation of ManageInstitutesView");
     }
@@ -77,7 +79,7 @@ public class ManageInstitutesView extends BaseView {
      */
     private Button createNameButton(Institute item) {
         Button button = new Button(item.getName(), clickEvent -> {
-            UI.getCurrent().navigate("institute/" + item.getId());
+            UI.getCurrent().navigate(EditInstituteView.ROUTE + "/" + item.getId());
         });
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         return button;

@@ -1,5 +1,6 @@
 package de.bp2019.zentraldatei.model;
 
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
 import de.bp2019.zentraldatei.enums.UserType;
@@ -22,11 +23,11 @@ public class User {
 	private String lastName;
 	private String eMail;
 	private String password;
-	/** Foreign Key - Institute.id */
-	private Set<String> institutes;
+	@DBRef
+	private Set<Institute> institutes;
 	private UserType type;
 
-	public User(String firstName, String lastName, String eMail, String password, Set<String> institutes,
+	public User(String firstName, String lastName, String eMail, String password, Set<Institute> institutes,
 			UserType type) {
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -72,11 +73,11 @@ public class User {
 		this.password = password;
 	}
 
-	public Set<String> getInstitutes() {
+	public Set<Institute> getInstitutes() {
 		return institutes;
 	}
 
-	public void setInstitutes(Set<String> institutes) {
+	public void setInstitutes(Set<Institute> institutes) {
 		this.institutes = institutes;
 	}
 

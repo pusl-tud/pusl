@@ -14,7 +14,8 @@ import com.vaadin.flow.router.Route;
 
 import de.bp2019.zentraldatei.UI.views.BaseView;
 import de.bp2019.zentraldatei.UI.views.MainAppView;
-import de.bp2019.zentraldatei.model.ExerciseScheme;
+import de.bp2019.zentraldatei.model.Institute;
+import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +29,13 @@ import java.util.Optional;
  *
  **/
 @PageTitle("Zentraldatei | Übungsschemas")
-@Route(value = "exerciseSchemes", layout = MainAppView.class)
+@Route(value = ManageExerciseSchemesView.ROUTE, layout = MainAppView.class)
 public class ManageExerciseSchemesView extends BaseView {
 
     private static final long serialVersionUID = 1L;
+
+    public static final String ROUTE = "manage-exerciseSchemes";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageExerciseSchemesView.class);
 
     private ExerciseSchemeService exerciseSchemeService;
@@ -62,7 +66,7 @@ public class ManageExerciseSchemesView extends BaseView {
         add(newExerciseSchemeButton);
         setHorizontalComponentAlignment(Alignment.END, newExerciseSchemeButton);
 
-        newExerciseSchemeButton.addClickListener(event -> UI.getCurrent().navigate("exerciseScheme/new"));
+        newExerciseSchemeButton.addClickListener(event -> UI.getCurrent().navigate(EditExerciseSchemeView.ROUTE + "/new"));
 
         LOGGER.debug("finished creation of ManageExerciseSchemesView");
 
@@ -78,7 +82,7 @@ public class ManageExerciseSchemesView extends BaseView {
      */
     private Button createNameButton(ExerciseScheme item) {
         Button button = new Button(item.getName(), clickEvent -> {
-            UI.getCurrent().navigate("exerciseScheme/" + item.getId());
+            UI.getCurrent().navigate(EditExerciseSchemeView.ROUTE + "/" + item.getId());
         });
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         return button;
@@ -92,7 +96,7 @@ public class ManageExerciseSchemesView extends BaseView {
      * @author Luca Dinies
      */
     private Text createInstitutesTag(ExerciseScheme item) {
-        Optional<String> text = exerciseSchemeService.getInstitutes(item).stream().map(institute -> institute.getName())
+        Optional<String> text = item.getInstitutes().stream().map(Institute::getName)
                 .sorted(String.CASE_INSENSITIVE_ORDER).reduce((i1, i2) -> i1 + ", " + i2);
 
         if (text.isPresent()) {

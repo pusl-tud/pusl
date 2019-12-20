@@ -21,7 +21,8 @@ import com.vaadin.flow.router.*;
 import de.bp2019.zentraldatei.UI.components.TokenEditor;
 import de.bp2019.zentraldatei.UI.views.BaseView;
 import de.bp2019.zentraldatei.UI.views.MainAppView;
-import de.bp2019.zentraldatei.model.ExerciseScheme;
+import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
+import de.bp2019.zentraldatei.model.Institute;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import de.bp2019.zentraldatei.service.InstituteService;
 import org.slf4j.Logger;
@@ -38,13 +39,15 @@ import java.util.stream.Collectors;
  *
  **/
 
-@PageTitle("Zentraldatei | Übungsschema")
-@Route(value = "exerciseScheme", layout = MainAppView.class)
+@PageTitle("Zentraldatei | Übungsschema bearbeiten")
+@Route(value = EditExerciseSchemeView.ROUTE, layout = MainAppView.class)
+public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<String> {
 
-public class ExerciseSchemeView extends BaseView implements HasUrlParameter<String> {
+    private static final long serialVersionUID = -1771968129664884637L;
 
-    private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExerciseSchemeView.class);
+    public static final String ROUTE = "edit-exerciseScheme";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditExerciseSchemeView.class);
 
     private Binder<ExerciseScheme> binder;
 
@@ -53,12 +56,12 @@ public class ExerciseSchemeView extends BaseView implements HasUrlParameter<Stri
 
     /*
      * set if a new ExerciseScheme is being created, not set if an existing
-     * ModuleScheme is being edited
+     * ExerciseScheme is being edited
      */
     private boolean isNewEntity;
 
     @Autowired
-    public ExerciseSchemeView(ExerciseSchemeService exerciseSchemeService, InstituteService instituteService) {
+    public EditExerciseSchemeView(ExerciseSchemeService exerciseSchemeService, InstituteService instituteService) {
         super("Übungsschema bearbeiten");
         LOGGER.debug("Started creation of ExerciseSchemeView");
 
@@ -77,10 +80,10 @@ public class ExerciseSchemeView extends BaseView implements HasUrlParameter<Stri
         name.setValueChangeMode(ValueChangeMode.EAGER);
         form.add(name, 1);
 
-        MultiselectComboBox<String> institutes = new MultiselectComboBox<String>();
+        MultiselectComboBox<Institute> institutes = new MultiselectComboBox<Institute>();
         institutes.setLabel("Institute");
-        institutes.setItems(instituteService.getAllInstituteIDs());
-        institutes.setItemLabelGenerator(item -> instituteService.getInstituteById(item).getName());
+        institutes.setItems(instituteService.getAllInstitutes());
+        institutes.setItemLabelGenerator(Institute::getName);
         form.add(institutes, 1);
 
         TokenEditor tokens = new TokenEditor(exerciseSchemeService);
@@ -124,13 +127,13 @@ public class ExerciseSchemeView extends BaseView implements HasUrlParameter<Stri
             if (binder.writeBeanIfValid(formData)) {
                 Dialog dialog = new Dialog();
                 if (isNewEntity) {
-                    exerciseSchemeService.saveModuleScheme(formData);
+                    exerciseSchemeService.saveExerciseScheme(formData);
                     dialog.add(new Text("Übung erfolgreich erstellt"));
                 } else {
-                    exerciseSchemeService.updateModuleScheme(formData);
+                    exerciseSchemeService.updateExerciseScheme(formData);
                     dialog.add(new Text("Übung erfolgreich bearbeitet"));
                 }
-                UI.getCurrent().navigate("exerciseSchemes");
+                UI.getCurrent().navigate(ManageExerciseSchemesView.ROUTE);
                 dialog.open();
             } else {
                 BinderValidationStatus<ExerciseScheme> validate = binder.validate();

@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import de.bp2019.zentraldatei.model.Institute;
 
 /**
- * Repository for access of Institutes
+ * Repository for access of {@link Institute}s
  * 
  * @author Leon Chemnitz
  */

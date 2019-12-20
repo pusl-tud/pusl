@@ -10,9 +10,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -28,30 +26,26 @@ import com.vaadin.flow.router.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.gatanaso.MultiselectComboBox;
 
-import de.bp2019.zentraldatei.UI.components.ExerciseSchemeArranger;
 import de.bp2019.zentraldatei.UI.views.BaseView;
 import de.bp2019.zentraldatei.UI.views.MainAppView;
 import de.bp2019.zentraldatei.model.Institute;
-import de.bp2019.zentraldatei.model.ModuleScheme;
-import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import de.bp2019.zentraldatei.service.InstituteService;
-import de.bp2019.zentraldatei.service.ModuleSchemeService;
-import de.bp2019.zentraldatei.service.UserService;
 
 /**
- * View containing a form to edit a ModuleScheme
+ * View containing a form to edit a Institute
  * 
  * @author Leon Chemnitz
  */
-@PageTitle("Zentraldatei | Institut")
-@Route(value = "institute", layout = MainAppView.class)
-public class InstituteView extends BaseView implements HasUrlParameter<String> {
+@PageTitle("Zentraldatei | Institut bearbeiten")
+@Route(value = EditInstituteView.ROUTE, layout = MainAppView.class)
+public class EditInstituteView extends BaseView implements HasUrlParameter<String> {
 
         private static final long serialVersionUID = 1L;
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(InstituteView.class);
+        public static final String ROUTE = "edit-institute";
+
+        private static final Logger LOGGER = LoggerFactory.getLogger(EditInstituteView.class);
 
         /*
          * no @Autowire because service is injected by constructor. Vaadin likes it
@@ -69,7 +63,7 @@ public class InstituteView extends BaseView implements HasUrlParameter<String> {
         private boolean isNewEntity;
 
         @Autowired
-        public InstituteView(InstituteService instituteService) {
+        public EditInstituteView(InstituteService instituteService) {
                 super("Institut bearbeiten");
 
                 this.instituteService = instituteService;
@@ -127,7 +121,7 @@ public class InstituteView extends BaseView implements HasUrlParameter<String> {
                                         instituteService.updateInstitute(formData);
                                         dialog.add(new Text("Institut erfolgreich verändert oder so..."));
                                 }
-                                UI.getCurrent().navigate("institutes");
+                                UI.getCurrent().navigate(ManageInstitutesView.ROUTE);
                                 dialog.open();
                         } else {
                                 BinderValidationStatus<Institute> validate = binder.validate();
@@ -153,7 +147,7 @@ public class InstituteView extends BaseView implements HasUrlParameter<String> {
                         binder.readBean(null);
                 } else {
                         Institute fetchedInstitute = instituteService.getInstituteById(instituteId);
-                        /* getModuleSchemeById returns null if no matching ModuleScheme is found */
+                        /* getInstituteById returns null if no matching Institute is found */
                         if (fetchedInstitute == null) {
                                 throw new NotFoundException();
                         } else {

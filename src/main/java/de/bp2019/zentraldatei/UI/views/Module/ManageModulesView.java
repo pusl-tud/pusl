@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.UI.views.ModuleScheme;
+package de.bp2019.zentraldatei.UI.views.Module;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -14,8 +14,9 @@ import com.vaadin.flow.router.Route;
 
 import de.bp2019.zentraldatei.UI.views.BaseView;
 import de.bp2019.zentraldatei.UI.views.MainAppView;
-import de.bp2019.zentraldatei.model.ModuleScheme;
-import de.bp2019.zentraldatei.service.ModuleSchemeService;
+import de.bp2019.zentraldatei.model.Institute;
+import de.bp2019.zentraldatei.model.module.Module;
+import de.bp2019.zentraldatei.service.ModuleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,34 +24,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 /**
- * View that displays a list of all ModuleSchemes
+ * View that displays a list of all Modules
  * 
  * @author Leon Chemnitz
  */
-@PageTitle("Zentraldatei | Veranstaltungsschemas")
-@Route(value = "moduleSchemes", layout = MainAppView.class)
-public class ManageModuleSchemesView extends BaseView {
+@PageTitle("Zentraldatei | Veranstaltungen verwalten")
+@Route(value = ManageModulesView.ROUTE, layout = MainAppView.class)
+public class ManageModulesView extends BaseView {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(ManageModuleSchemesView.class);
 
-    private ModuleSchemeService moduleSchemeService;
+    public static final String ROUTE = "manage-modules";
 
-    private Grid<ModuleScheme> grid = new Grid<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ManageModulesView.class);
+
+    private ModuleService moduleService;
+
+    private Grid<Module> grid = new Grid<>();
 
     @Autowired
-    public ManageModuleSchemesView(ModuleSchemeService moduleSchemeService) {
-        super("Veranstaltungsschemas");
-        LOGGER.debug("started creation of ManageModuleSchemesView");
+    public ManageModulesView(ModuleService moduleService) {
+        super("Veranstaltungen verwalten");
+        LOGGER.debug("started creation of ManageModulesView");
 
-        this.moduleSchemeService = moduleSchemeService;
+        this.moduleService = moduleService;
 
         /* -- Create Components -- */
 
-        Grid<ModuleScheme> grid = new Grid<>();
+        Grid<Module> grid = new Grid<>();
 
         grid.setWidth("100%");
-        grid.setItems(moduleSchemeService.getAllModuleSchemes());
+        grid.setItems(moduleService.getAllModules());
 
         grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true);
         grid.addComponentColumn(item -> createInstitutesTag(item)).setAutoWidth(true);
@@ -58,28 +62,28 @@ public class ManageModuleSchemesView extends BaseView {
 
         add(grid);
 
-        Button newModuleSchemeButton = new Button("Neues Veranstaltungsschema");
-        newModuleSchemeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        Button newModuleButton = new Button("Neues Veranstaltungsschema");
+        newModuleButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        add(newModuleSchemeButton);
-        setHorizontalComponentAlignment(Alignment.END, newModuleSchemeButton);
+        add(newModuleButton);
+        setHorizontalComponentAlignment(Alignment.END, newModuleButton);
 
-        newModuleSchemeButton.addClickListener(event -> UI.getCurrent().navigate("moduleScheme/new"));
+        newModuleButton.addClickListener(event -> UI.getCurrent().navigate(EditModuleView.ROUTE + "/new"));
 
-        LOGGER.debug("finished creation of ManageModuleSchemesView");
+        LOGGER.debug("finished creation of ManageModulesView");
     }
 
     /**
      * Used to create the button for the Grid entries that displays the name and
-     * links to the edit page of the individual ModuleScheme.
+     * links to the edit page of the individual Module.
      * 
-     * @param item ModuleScheme to create the Button for
+     * @param item Module to create the Button for
      * @return
      * @author Leon Chemnitz
      */
-    private Button createNameButton(ModuleScheme item) {
+    private Button createNameButton(Module item) {
         Button button = new Button(item.getName(), clickEvent -> {
-            UI.getCurrent().navigate("moduleScheme/" + item.getId());
+            UI.getCurrent().navigate(EditModuleView.ROUTE + "/" + item.getId());
         });
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         return button;
@@ -92,8 +96,8 @@ public class ManageModuleSchemesView extends BaseView {
      * @author Leon Chemnitz
      * @return institutes tag
      */
-    private Text createInstitutesTag(ModuleScheme item) {
-        Optional<String> text = moduleSchemeService.getInstitutes(item).stream().map(institute -> institute.getName())
+    private Text createInstitutesTag(Module item) {
+        Optional<String> text = item.getInstitutes().stream().map(Institute::getName)
                 .sorted(String.CASE_INSENSITIVE_ORDER).reduce((i1, i2) -> i1 + ", " + i2);
 
         if (text.isPresent()) {
@@ -110,7 +114,7 @@ public class ManageModuleSchemesView extends BaseView {
      * @author Leon Chemnitz
      * @return delete button
      */
-    protected Button createDeleteButton(ModuleScheme item) {
+    protected Button createDeleteButton(Module item) {
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {
             Dialog dialog = new Dialog();
             dialog.add(new Text("Wirklich Löschen?"));
@@ -118,8 +122,8 @@ public class ManageModuleSchemesView extends BaseView {
             dialog.setCloseOnOutsideClick(false);
 
             Button confirmButton = new Button("Löschen", event -> {
-                moduleSchemeService.deleteModuleScheme(item);
-                ListDataProvider<ModuleScheme> dataProvider = (ListDataProvider<ModuleScheme>) grid.getDataProvider();
+                moduleService.deleteModule(item);
+                ListDataProvider<Module> dataProvider = (ListDataProvider<Module>) grid.getDataProvider();
                 dataProvider.getItems().remove(item);
                 dataProvider.refreshAll();
 

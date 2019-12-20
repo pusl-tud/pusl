@@ -9,15 +9,14 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.textfield.TextField;
-import de.bp2019.zentraldatei.model.Token;
+
+import de.bp2019.zentraldatei.model.exercise.Token;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Component used as a Field to add and remove Tokens in a list. Used in
@@ -25,13 +24,14 @@ import java.util.stream.Collectors;
  *
  * @author Luca Dinies
  */
-public class TokenEditor extends CustomField<Set<String>> {
+public class TokenEditor extends CustomField<Set<Token>> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 8157418441923421547L;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TokenEditor.class);
 
     Grid<Token> tokenGrid;
-    List<Token> gridItems;
+    Set<Token> gridItems;
 
     ExerciseSchemeService exerciseSchemeService;
 
@@ -41,10 +41,10 @@ public class TokenEditor extends CustomField<Set<String>> {
         this.exerciseSchemeService = exerciseSchemeService;
 
         tokenGrid = new Grid<>();
-        gridItems = new ArrayList<Token>();
+        gridItems = new HashSet<>();
         tokenGrid.setWidth("100%");
         tokenGrid.setItems(gridItems);
-        tokenGrid.addColumn(Token::getTokenName).setAutoWidth(true);
+        tokenGrid.addColumn(Token::getName).setAutoWidth(true);
         tokenGrid.addComponentColumn(item -> createDeleteButton(item));
         tokenGrid.setSelectionMode(Grid.SelectionMode.NONE);
         tokenGrid.setHeight("15em");
@@ -61,12 +61,10 @@ public class TokenEditor extends CustomField<Set<String>> {
         tokenFormLayout.add(addedToken);
 
         Button tokenButton = new Button("Token Hinzufügen", event -> {
-            Token token = new Token(addedToken.getValue());
-            gridItems.add(token);
+            gridItems.add(new Token(addedToken.getValue(), false));
             tokenGrid.getDataProvider().refreshAll();
+            setValue(new HashSet<>(gridItems));
             addedToken.clear();
-
-            setValue(gridItems.stream().map(Token::getTokenName).collect(Collectors.toSet()));
         });
 
         tokenFormLayout.add(tokenButton);
@@ -74,15 +72,14 @@ public class TokenEditor extends CustomField<Set<String>> {
     };
 
     @Override
-    protected Set<String> generateModelValue() {
-        LOGGER.info(gridItems.toString());
-        return gridItems.stream().map(Token::getTokenName).collect(Collectors.toSet());
+    protected Set<Token> generateModelValue() {
+        return gridItems;
     }
 
     @Override
-    protected void setPresentationValue(Set<String> newPresentationValue) {
+    protected void setPresentationValue(Set<Token> newPresentationValue) {
         gridItems.clear();
-        newPresentationValue.stream().forEach(token -> gridItems.add(new Token(token)));
+        newPresentationValue.stream().forEach(token -> gridItems.add(token.copy()));
 
         tokenGrid.getDataProvider().refreshAll();
     }
@@ -91,9 +88,7 @@ public class TokenEditor extends CustomField<Set<String>> {
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {
             gridItems.remove(item);
             tokenGrid.getDataProvider().refreshAll();
-
-            /* VERY INEFFICIENT!! BETTER SOLUTION NEEDED */
-            setValue(gridItems.stream().map(Token::getTokenName).collect(Collectors.toSet()));
+            setValue(new HashSet<>(gridItems));
         });
         button.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
         return button;

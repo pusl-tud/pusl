@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.bp2019.zentraldatei.service.DashboardService;
+// import de.bp2019.zentraldatei.service.DashboardService;
 
 /**
  * View that displays a Dashboard
@@ -27,7 +27,7 @@ public class DashboardView extends BaseView {
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(DashboardView.class);
 
-    private DashboardService dashboardService;
+    // private DashboardService dashboardService;
     
     //Helperclass for displaying recently edited entries
     class RecentElement{
@@ -54,11 +54,11 @@ public class DashboardView extends BaseView {
     	}
     }     
 
-    public DashboardView(@Autowired DashboardService dashboardService) {
+    public DashboardView() {
         super("Kürzlich bearbeitete Daten");
         LOGGER.debug("started creation of DashboardView");
 
-        this.dashboardService = dashboardService;
+        // this.dashboardService = dashboardService;
         
          //Dummy data set for display purposes
         List<DashboardView.RecentElement> recentElements = new ArrayList<>();

@@ -1,7 +1,6 @@
 package de.bp2019.zentraldatei.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -57,14 +56,10 @@ public class UserService {
      * @return Full name of the found User as a String. null if no user is found
      * @author Leon Chemnitz
      */
-    public String getFullNameById(String id) {
-        // TODO: authentication
-        Optional<User> user = userRepository.findById(id);
-
-        if (user.isPresent()) {
-            return user.get().getFirstName() + " " + user.get().getLastName();
+    public static String getFullName(User user) {
+        if (user != null) {
+            return user.getFirstName() + " " + user.getLastName();
         } else {
-            LOGGER.warn("Tried to find User which doesn't exist in Database! User Id was: " + id);
             return null;
         }
     }
