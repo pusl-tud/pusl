@@ -36,6 +36,11 @@ public class User {
 		this.type = type;
 	}
 
+	//abändern
+	public User(){
+		
+	}
+	
 	public String getId() {
 		return id;
 	}

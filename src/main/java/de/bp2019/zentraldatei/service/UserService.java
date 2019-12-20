@@ -49,16 +49,6 @@ public class UserService {
     	// TODO: authentication
         return userRepository.findAll().stream().map(User::getId).collect(Collectors.toList());
     }
-
-    /**
-     * Get all users
-     * 
-     * @author Fabio Costa
-     */
-    public List<User> getAllUser(){
-    	// TODO: authentication
-    	return userRepository.findAll();
-    }
     
     /**
      * Get the full name of a user based on their ID.
@@ -92,6 +82,36 @@ public class UserService {
     	// TODO: authentication
     	return userRepository.save(user);
     }
+
+    
+    /**
+     * Searches after specific user id
+     * 
+     * @param user
+     * @return returns the user
+     * @author Fabio Costa
+     */
+	public User getUserID(String userId) {
+		Optional<User> user = userRepository.findById(userId);
+		
+		if (user.isPresent()) {
+			return user.get();
+		} else {
+			LOGGER.warn("Tried to find User which doesn't exist in Database! User Id was: " + userId);
+            return null;
+		}
+	}
+
+	/**
+     * Deletes a specific user
+     * 
+     * @param user
+     * @author Fabio Costa
+     */
+	public void deleteUser(User user) {
+		userRepository.delete(user);
+		
+	}
 
 	
 }
