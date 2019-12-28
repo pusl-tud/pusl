@@ -17,12 +17,12 @@ import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
-
+import de.bp2019.zentraldatei.UI.components.NoFlexExerciseDialog;
 import de.bp2019.zentraldatei.UI.components.TokenEditor;
 import de.bp2019.zentraldatei.UI.views.BaseView;
 import de.bp2019.zentraldatei.UI.views.MainAppView;
-import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
 import de.bp2019.zentraldatei.model.Institute;
+import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import de.bp2019.zentraldatei.service.InstituteService;
 import org.slf4j.Logger;
@@ -34,9 +34,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
+ * View containing a form to edit an Exercise
  *
  * @author Luca Dinies
- *
  **/
 
 @PageTitle("Zentraldatei | Übungsschema bearbeiten")
@@ -95,11 +95,19 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         Button save = new Button("Speichern");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
+        Button dialogTest = new Button("dialogTest");
+
         /* Button Bar */
         VerticalLayout actions = new VerticalLayout();
         actions.add(save);
+        actions.add(dialogTest);
         actions.setHorizontalComponentAlignment(FlexComponent.Alignment.END, save);
         form.add(actions);
+
+
+        dialogTest.addClickListener(event -> {
+             NoFlexExerciseDialog exerciseWindow= new NoFlexExerciseDialog(exerciseSchemeService);
+        });
 
         /*
          * Hidden TextField to bind Id, if someone knows a cleaner Solution please
