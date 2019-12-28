@@ -17,12 +17,11 @@ import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
-
 import de.bp2019.zentraldatei.UI.components.TokenEditor;
 import de.bp2019.zentraldatei.UI.views.BaseView;
 import de.bp2019.zentraldatei.UI.views.MainAppView;
-import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
 import de.bp2019.zentraldatei.model.Institute;
+import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import de.bp2019.zentraldatei.service.InstituteService;
 import org.slf4j.Logger;
@@ -78,19 +77,35 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         /* Create the fields */
         TextField name = new TextField("Name", "Name der Übung");
         name.setValueChangeMode(ValueChangeMode.EAGER);
-        form.add(name, 1);
 
         MultiselectComboBox<Institute> institutes = new MultiselectComboBox<Institute>();
         institutes.setLabel("Institute");
         institutes.setItems(instituteService.getAllInstitutes());
         institutes.setItemLabelGenerator(Institute::getName);
-        form.add(institutes, 1);
 
         TokenEditor tokens = new TokenEditor(exerciseSchemeService);
-        form.add(tokens, 2);
 
         Checkbox isNumeric = new Checkbox("Mit Note");
+        isNumeric.addValueChangeListener(evt -> {
+            if(isNumeric.getValue()){
+                tokens.setVisible(false);
+            } else {
+                tokens.setVisible(true);
+            }
+        });
+
+        Checkbox flexHandin = new Checkbox("Einzel-Ausgabe");
+
+        TextField defaultValue = new TextField();
+        defaultValue.setLabel("Standart Wert");
+
+
+        form.add(name, 1);
+        form.add(institutes, 1);
         form.add(isNumeric);
+        form.add(flexHandin);
+        form.add(defaultValue);
+        form.add(tokens, 2);
 
         Button save = new Button("Speichern");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -120,6 +135,11 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         binder.bind(tokens, ExerciseScheme::getTokens, ExerciseScheme::setTokens);
 
         binder.bind(isNumeric, ExerciseScheme::getIsNumeric, ExerciseScheme::setIsNumeric);
+
+        binder.bind(flexHandin, ExerciseScheme::isFlexHandin, ExerciseScheme::setFlexHandin);
+
+        binder.forField(defaultValue).withValidator(new StringLengthValidator("Bitte Standart-Bewertung eingeben!", 1, null))
+                .bind(ExerciseScheme::getDefaultValue, ExerciseScheme::setDefaultValue);
 
         /* Click-Listeners */
         save.addClickListener(event -> {
