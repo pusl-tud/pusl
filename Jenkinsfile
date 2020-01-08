@@ -26,10 +26,15 @@ pipeline {
         }
 
         stage('SonarQube analysis') {
-            def scannerHome = tool 'SonarScanner 4.2';
-            steps{
+            environment {
+                scannerHome = tool 'SonarScanner 4.2'
+            }
+            steps {
                 withSonarQubeEnv('SonarServer_bp2019') {
                     sh "${scannerHome}/bin/sonar-scanner"
+                }
+                timeout(time: 10, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
