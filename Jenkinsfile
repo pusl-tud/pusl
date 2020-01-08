@@ -25,6 +25,13 @@ pipeline {
             }
         }
 
+        stage('SonarQube analysis') {
+            def scannerHome = tool 'SonarScanner';
+            withSonarQubeEnv('sonar') {
+                sh "${scannerHome}/bin/sonar-scanner"
+             }
+        }
+
         stage ('Production Build') {
             steps {
                 sh 'mvn clean package -Pproduction'
