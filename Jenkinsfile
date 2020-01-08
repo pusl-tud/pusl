@@ -3,6 +3,7 @@ pipeline {
     tools {
         maven 'Maven 3.6.2'
         jdk 'jdk11'
+        sonar 'SonarScanner 4.2'
     }
     stages {
         stage ('Initialize') {
@@ -27,8 +28,8 @@ pipeline {
 
         stage('SonarQube analysis') {
             steps{
-                def scannerHome = tool 'SonarScanner';
-                withSonarQubeEnv('sonar') {
+                def scannerHome = tool 'sonar';
+                withSonarQubeEnv('SonarServer_bp2019') {
                     sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
