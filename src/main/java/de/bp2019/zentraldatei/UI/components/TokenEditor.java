@@ -10,7 +10,6 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.textfield.TextField;
-
 import de.bp2019.zentraldatei.model.exercise.Token;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import org.slf4j.Logger;
@@ -102,6 +101,7 @@ public class TokenEditor extends CustomField<Set<Token>> {
             item.setAssignableByHIWI(changeEvent.getValue());
             LOGGER.debug(String.valueOf(item.getAssignableByHIWI()));
         });
+        checkbox.setValue(item.getAssignableByHIWI());
         return checkbox;
     }
 }
