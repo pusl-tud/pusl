@@ -45,6 +45,7 @@ public class MainAppView extends AppLayout {
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(false);
 
+        content.add(generateMenuButton("Dashboard", ""));
         content.add(generateSectionLabel("Admin"));
         content.add(generateMenuButton("Veranstaltungsschemas", "moduleSchemes"));
         content.add(generateMenuButton("Übungsschemas", "exerciseSchemes"));
