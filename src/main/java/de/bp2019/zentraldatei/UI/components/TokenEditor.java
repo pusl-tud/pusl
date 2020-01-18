@@ -2,6 +2,7 @@ package de.bp2019.zentraldatei.UI.components;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -9,7 +10,6 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.textfield.TextField;
-
 import de.bp2019.zentraldatei.model.exercise.Token;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import org.slf4j.Logger;
@@ -45,6 +45,7 @@ public class TokenEditor extends CustomField<Set<Token>> {
         tokenGrid.setWidth("100%");
         tokenGrid.setItems(gridItems);
         tokenGrid.addColumn(Token::getName).setAutoWidth(true);
+        tokenGrid.addComponentColumn(item -> createHiWiAccessCheckbox(item));
         tokenGrid.addComponentColumn(item -> createDeleteButton(item));
         tokenGrid.setSelectionMode(Grid.SelectionMode.NONE);
         tokenGrid.setHeight("15em");
@@ -94,4 +95,13 @@ public class TokenEditor extends CustomField<Set<Token>> {
         return button;
     }
 
+
+    private Checkbox createHiWiAccessCheckbox(Token item) {
+        Checkbox checkbox = new Checkbox("HiWi", changeEvent -> {
+            item.setAssignableByHIWI(changeEvent.getValue());
+            LOGGER.debug(String.valueOf(item.getAssignableByHIWI()));
+        });
+        checkbox.setValue(item.getAssignableByHIWI());
+        return checkbox;
+    }
 }

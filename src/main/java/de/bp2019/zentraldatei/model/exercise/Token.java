@@ -37,7 +37,7 @@ public class Token {
         this.name = name;
     }
 
-    public boolean isAssignableByHIWI() {
+    public boolean getAssignableByHIWI() {
         return assignableByHIWI;
     }
 
