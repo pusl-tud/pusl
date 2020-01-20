@@ -32,12 +32,13 @@ import de.bp2019.zentraldatei.model.User;
 import de.bp2019.zentraldatei.service.UserService;
 
 /**
+ * View containing a form to edit a Userview
  *
  * @author Fabio Costa
  *
  **/
 @PageTitle("Zentraldatei | UserView")
-@Route(value = "userview", layout = MainAppView.class)
+@Route(value = "userviews", layout = MainAppView.class)
 public class UserManagementView extends BaseView {
 
 	private static final long serialVersionUID = 1L;
@@ -85,7 +86,7 @@ public class UserManagementView extends BaseView {
      */
 	private Button createUserButton(User item) {
 		Button button = new Button(item.getLastName(), clickEvent -> {
-			UI.getCurrent().navigate("UserView/" + item.getId());
+			UI.getCurrent().navigate("User/" + item.getId());
 		});
 		button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 		return button;

@@ -54,7 +54,7 @@ import de.bp2019.zentraldatei.service.UserService;
  */
 
 @PageTitle("Zentraldatei | UserView/new")
-@Route(value = "userview/new", layout = MainAppView.class)
+@Route(value = "userview", layout = MainAppView.class)
 public class UserView extends BaseView implements HasUrlParameter<String> {
 
 	private static final long serialVersionUID = 1L;
