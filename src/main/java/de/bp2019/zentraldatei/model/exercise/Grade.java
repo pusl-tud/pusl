@@ -1,7 +1,6 @@
 package de.bp2019.zentraldatei.model.exercise;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 import com.mongodb.lang.NonNull;
 

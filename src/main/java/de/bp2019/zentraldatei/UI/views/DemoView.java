@@ -1,33 +1,30 @@
 package de.bp2019.zentraldatei.UI.views;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import de.bp2019.zentraldatei.model.Institute;
+import de.bp2019.zentraldatei.model.User;
 import de.bp2019.zentraldatei.model.exercise.Exercise;
 import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
-import de.bp2019.zentraldatei.model.exercise.Grade;
-import de.bp2019.zentraldatei.model.exercise.Handout;
 import de.bp2019.zentraldatei.model.exercise.Token;
-import de.bp2019.zentraldatei.model.Institute;
 import de.bp2019.zentraldatei.model.module.Module;
-import de.bp2019.zentraldatei.model.User;
 import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
 import de.bp2019.zentraldatei.repository.GradeRepository;
 import de.bp2019.zentraldatei.repository.HandoutRepository;
 import de.bp2019.zentraldatei.repository.InstituteRepository;
 import de.bp2019.zentraldatei.repository.ModuleRepository;
 import de.bp2019.zentraldatei.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Demo View currently just empties and refills the database.
