@@ -38,7 +38,7 @@ public class NoFlexExerciseDialog {
         form.getStyle().set("marginTop", "-0.5em");
 
         DatePicker datePicker = new DatePicker();
-        datePicker.setLabel("Abgabe-Datum");
+        //datePicker.setLabel("Abgabe-Datum");
         form.add(datePicker);
 
         Select<ExerciseScheme> exerciseSchemesSelect = new Select<>();
