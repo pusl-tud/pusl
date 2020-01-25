@@ -5,8 +5,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import de.bp2019.zentraldatei.model.Institute;
 import de.bp2019.zentraldatei.model.User;
-import de.bp2019.zentraldatei.model.exercise.ExerciseInstance;
+import de.bp2019.zentraldatei.model.exercise.Exercise;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Set;
 
 /**
  * A class to model a Module. Consists of a name, a list of responsible
- * {@link institute}s, a list of {@link ExerciseInstance}s, a {@link Grade}, a
+ * {@link institute}s, a list of {@link Exercise}s, a {@link Grade}, a
  * calcuation rule and a list of privileged {@link user}s
  * 
  * @author Alex Späth
@@ -23,21 +24,20 @@ import java.util.Set;
 public class Module {
 
     @Id
-    private String id;
+    private ObjectId id;
     private String name;
     @DBRef
     private Set<Institute> institutes;
     @DBRef
     private Set<User> hasAccess;
-    @DBRef
-    private List<ExerciseInstance> exercises;
+    private List<Exercise> exercises;
 
     private List<PerformanceScheme> performanceSchemes;
 
     /** Temporary field TODO: replace with PerformanceSchemes */
     private String calculationRule;
 
-    public Module(String name, Set<Institute> institutes, Set<User> hasAccess, List<ExerciseInstance> exercises,
+    public Module(String name, Set<Institute> institutes, Set<User> hasAccess, List<Exercise> exercises,
             String calculationRule) {
         this.name = name;
         this.institutes = institutes;
@@ -49,11 +49,11 @@ public class Module {
     public Module() {
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
@@ -81,11 +81,11 @@ public class Module {
         this.hasAccess = hasAccess;
     }
 
-    public List<ExerciseInstance> getExercises() {
+    public List<Exercise> getExercises() {
         return exercises;
     }
 
-    public void setExercises(List<ExerciseInstance> exercises) {
+    public void setExercises(List<Exercise> exercises) {
         this.exercises = exercises;
     }
 
