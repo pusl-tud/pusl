@@ -45,18 +45,6 @@ public class ExerciseScheme {
 		this.hasAccess = hasAccess;
 	}
 
-	public ExerciseScheme copy() {
-		ExerciseScheme copy = new ExerciseScheme();
-		copy.setId(id);
-		copy.setName(name);
-		copy.setIsNumeric(isNumeric);
-		copy.setFlexHandin(flexHandin);
-		copy.setTokens(tokens);
-		copy.setHasAccess(hasAccess);
-
-		return copy;
-	}
-
 	public String getId() {
 		return id;
 	}

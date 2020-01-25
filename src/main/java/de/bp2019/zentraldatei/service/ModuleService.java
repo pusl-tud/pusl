@@ -3,15 +3,17 @@ package de.bp2019.zentraldatei.service;
 import de.bp2019.zentraldatei.model.exercise.ExerciseInstance;
 import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
 import de.bp2019.zentraldatei.model.module.Module;
-import de.bp2019.zentraldatei.repository.*;
+import de.bp2019.zentraldatei.repository.ExerciseInstanceRepository;
+import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
+import de.bp2019.zentraldatei.repository.InstituteRepository;
+import de.bp2019.zentraldatei.repository.ModuleRepository;
+import de.bp2019.zentraldatei.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Service providing relevant {@link Module}s
@@ -39,7 +41,7 @@ public class ModuleService {
     /**
      * Get a Module based on its Id. Only return Modules the User is authenticated
      * to see.
-     *
+     * 
      * @param id Id to search for
      * @return found Module with maching Id, null if none is found
      * @author Leon Chemnitz
@@ -58,7 +60,7 @@ public class ModuleService {
 
     /**
      * Get all Modules the User is authenticated to see.
-     *
+     * 
      * @return list of al module schemes
      * @author Leon Chemnitz
      */
@@ -80,7 +82,7 @@ public class ModuleService {
 
     /**
      * Update one Module in Database
-     *
+     * 
      * @param module to update
      * @author Leon Chemnitz
      */
@@ -100,6 +102,7 @@ public class ModuleService {
     }
 
     /**
+     * 
      * @param exerciseSchemes
      * @author Leon Chemnitz
      */
@@ -109,5 +112,4 @@ public class ModuleService {
         exerciseSchemes.forEach(scheme -> newInstances.add(new ExerciseInstance(scheme, module)));
         exerciseInstanceRepository.saveAll(newInstances);
         module.setExercises(exerciseInstanceRepository.findByModule(module));
-    }
-}
+    }}

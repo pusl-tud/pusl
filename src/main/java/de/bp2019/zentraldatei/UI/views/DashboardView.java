@@ -1,7 +1,7 @@
 package de.bp2019.zentraldatei.UI.views;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -11,7 +11,6 @@ import com.vaadin.flow.router.Route;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 // import de.bp2019.zentraldatei.service.DashboardService;
 
