@@ -55,7 +55,7 @@ public class Grade {
 		this.grade = grade;
 		this.handIn = handIn;
 	}
-	
+
 	public Module getModule() {
 		return module;
 	}
