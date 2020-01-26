@@ -16,7 +16,7 @@ import de.bp2019.zentraldatei.repository.UserRepository;
 
 /**
  * Service providing relevant {@link Module}s
- * 
+ *
  * @author Leon Chemnitz
  */
 @Service
@@ -38,7 +38,7 @@ public class ModuleService {
     /**
      * Get a Module based on its Id. Only return Modules the User is authenticated
      * to see.
-     * 
+     *
      * @param id Id to search for
      * @return found Module with maching Id, null if none is found
      * @author Leon Chemnitz
@@ -57,7 +57,7 @@ public class ModuleService {
 
     /**
      * Get all Modules the User is authenticated to see.
-     * 
+     *
      * @return list of al module schemes
      * @author Leon Chemnitz
      */

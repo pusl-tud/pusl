@@ -1,14 +1,12 @@
 package de.bp2019.zentraldatei.UI.views;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 
+import de.bp2019.zentraldatei.model.exercise.Grade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,6 +138,10 @@ public class DemoView extends VerticalLayout {
                                 new Exercise("Klausur", exerciseSchemes.get(2),false));
                 moduleRepository.save(new Module("Visuelle Trendanalyse", instituteSet3, userSet3, exerciseList,
                                 berechnungsRegel));
+
+                //gradeRepository.save(
+                        //new Grade(new Module("Mathematik I", instituteSet2, userSet2, exerciseList, berechnungsRegel), new Exercise("Testat 2", exerciseSchemes.get(0),true),
+                                //253642259, "bestanden", new Date().toInstant()));
                         
                 LOGGER.info("refilling Database done.");
         }

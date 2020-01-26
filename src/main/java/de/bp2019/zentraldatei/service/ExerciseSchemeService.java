@@ -31,7 +31,7 @@ public class ExerciseSchemeService {
 
     /**
      * Get all ExerciseSchemes the User is authenticated to see.
-     * 
+     *
      * @return list of all exercise schemes
      * @author Leon Chemnitz
      */

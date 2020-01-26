@@ -1,11 +1,14 @@
 package de.bp2019.zentraldatei.model.exercise;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Date;
 
 import com.mongodb.lang.NonNull;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.convert.Jsr310Converters;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -38,11 +41,11 @@ public class Grade {
 	@DBRef
 	private User gradedBy;
 
-	@NonNull
+	//@NonNull
 	/** Grade is stored as a string to enable non-numeric entries */
 	private String grade;
 
-	@NonNull
+	//@NonNull
 	private Instant handIn;
 
 	public Grade() {
@@ -55,7 +58,7 @@ public class Grade {
 		this.grade = grade;
 		this.handIn = handIn;
 	}
-	
+
 	public Module getModule() {
 		return module;
 	}

@@ -11,7 +11,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import de.bp2019.zentraldatei.UI.views.BaseView;
 import de.bp2019.zentraldatei.UI.views.MainAppView;
 import de.bp2019.zentraldatei.model.Institute;
@@ -24,9 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 /**
+ * View that displays a list of all Exercises
  *
  * @author Luca Dinies
- *
  **/
 @PageTitle("Zentraldatei | Übungsschemas")
 @Route(value = ManageExerciseSchemesView.ROUTE, layout = MainAppView.class)

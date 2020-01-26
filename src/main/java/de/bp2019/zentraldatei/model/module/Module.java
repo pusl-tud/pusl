@@ -1,5 +1,6 @@
 package de.bp2019.zentraldatei.model.module;
 
+import com.fasterxml.jackson.databind.ser.impl.PropertySerializerMap;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
