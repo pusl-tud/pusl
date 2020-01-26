@@ -26,7 +26,7 @@ import de.bp2019.zentraldatei.service.ModuleService;
 /**
  * View that displays a Dashboard
  * 
- * @author Alexander Spaeth
+ * @author Alexander Spaeth, Tomoki Tokuyama
  */
 @PageTitle("Zentraldatei | Meine Module")
 @Route(value = "", layout = MainAppView.class)
