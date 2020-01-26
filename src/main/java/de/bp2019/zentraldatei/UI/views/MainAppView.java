@@ -49,7 +49,11 @@ public class MainAppView extends AppLayout {
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(false);
 
+<<<<<<< HEAD
         content.add(generateMenuButton("Dashboard", ""));
+=======
+        content.add(generateMenuButton("Noten einsehen", WorkView.ROUTE));
+>>>>>>> c45dca96870e47ec6ca318f1d3688f2e3da68b6b
         content.add(generateSectionLabel("Admin"));
         content.add(generateMenuButton("Veranstaltungen bearbeiten", ManageModulesView.ROUTE));
         content.add(generateMenuButton("Übungsschemas", ManageExerciseSchemesView.ROUTE));

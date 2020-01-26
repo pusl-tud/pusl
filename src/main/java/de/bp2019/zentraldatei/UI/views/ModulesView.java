@@ -75,7 +75,7 @@ public class ModulesView extends BaseView {
 
 
 	private Button createIdButton(ExerciseInstance item) {
-		Button button = new Button(item.getId(), clickEvent -> {
+		Button button = new Button(item.getName(), clickEvent -> {
             UI.getCurrent().navigate(DemoView.ROUTE);
         });
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);

@@ -1,31 +1,28 @@
 package de.bp2019.zentraldatei.UI.views;
 
+import java.util.*;
+
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 
-import de.bp2019.zentraldatei.model.exercise.ExerciseInstance;
-import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
 import de.bp2019.zentraldatei.model.exercise.Grade;
-import de.bp2019.zentraldatei.model.exercise.Handout;
-import de.bp2019.zentraldatei.model.exercise.Token;
-import de.bp2019.zentraldatei.model.Institute;
-import de.bp2019.zentraldatei.model.module.Module;
-import de.bp2019.zentraldatei.model.User;
-import de.bp2019.zentraldatei.repository.ExerciseInstanceRepository;
-import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
-import de.bp2019.zentraldatei.repository.InstituteRepository;
-import de.bp2019.zentraldatei.repository.ModuleRepository;
-import de.bp2019.zentraldatei.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import de.bp2019.zentraldatei.model.Institute;
+import de.bp2019.zentraldatei.model.User;
+import de.bp2019.zentraldatei.model.exercise.Exercise;
+import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
+import de.bp2019.zentraldatei.model.exercise.Token;
+import de.bp2019.zentraldatei.model.module.Module;
+import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
+import de.bp2019.zentraldatei.repository.GradeRepository;
+import de.bp2019.zentraldatei.repository.HandoutRepository;
+import de.bp2019.zentraldatei.repository.InstituteRepository;
+import de.bp2019.zentraldatei.repository.ModuleRepository;
+import de.bp2019.zentraldatei.repository.UserRepository;
 
 /**
  * Demo View currently just empties and refills the database.
@@ -44,7 +41,7 @@ public class DemoView extends VerticalLayout {
         @Autowired
         public DemoView(InstituteRepository instituteRepository, UserRepository userRepository,
                         ExerciseSchemeRepository exerciseSchemeRepository, ModuleRepository moduleRepository,
-                        ExerciseInstanceRepository exerciseInstanceRepository) {
+                        GradeRepository gradeRepository, HandoutRepository handoutRepository) {
 
                 add(new Text("Befülle die Datenbank mit Testdaten!"));
 
@@ -52,8 +49,9 @@ public class DemoView extends VerticalLayout {
                 instituteRepository.deleteAll();
                 userRepository.deleteAll();
                 exerciseSchemeRepository.deleteAll();
-                exerciseInstanceRepository.deleteAll();
+                gradeRepository.deleteAll();
                 moduleRepository.deleteAll();
+                handoutRepository.deleteAll();
 
                 LOGGER.info("refilling Database...");
                 instituteRepository.save(new Institute("Bahntechnik"));
@@ -111,43 +109,40 @@ public class DemoView extends VerticalLayout {
 
                 List<ExerciseScheme> exerciseSchemes = exerciseSchemeRepository.findAll();
 
-                List<Grade> gradeList1 = new ArrayList<>();
-                gradeList1.add(new Grade(239876883, "5", LocalDateTime.now()));
-                gradeList1.add(new Grade(239236883, "3", LocalDateTime.now()));
-                gradeList1.add(new Grade(319384003, "2", LocalDateTime.now()));
-
-                List<Handout> handoutList1 = new ArrayList<>();
-                handoutList1.add(new Handout(LocalDateTime.now(), LocalDateTime.now(), 239236883));
-                handoutList1.add(new Handout(LocalDateTime.now(), LocalDateTime.now(), 173847983));
-                handoutList1.add(new Handout(LocalDateTime.now(), LocalDateTime.now(), 902384827));
-
-                exerciseInstanceRepository.save(new ExerciseInstance(exerciseSchemes.get(0), gradeList1, handoutList1));
-                exerciseInstanceRepository.save(new ExerciseInstance(exerciseSchemes.get(1), gradeList1, handoutList1));
-                exerciseInstanceRepository.save(new ExerciseInstance(exerciseSchemes.get(2), gradeList1, handoutList1));
-
-                List<ExerciseInstance> exerciseInstances = exerciseInstanceRepository.findAll();
-
-                List<ExerciseInstance> exerciseInstanceList1 = new ArrayList<>();
-                exerciseInstanceList1.add(exerciseInstances.get(1));
-                exerciseInstanceList1.add(exerciseInstances.get(0));
-                exerciseInstanceList1.add(exerciseInstances.get(0));
-                exerciseInstanceList1.add(exerciseInstances.get(0));
-                exerciseInstanceList1.add(exerciseInstances.get(2));
-
                 String berechnungsRegel = "function calcuate(results) { \n";
                 berechnungsRegel += "    //ziemlich komplizierte Berechnungsregel... \n";
                 berechnungsRegel += "    return ergebnis;\n";
                 berechnungsRegel += "}";
 
-                moduleRepository.save(new Module("Einführung in den Compilerbau", instituteSet1, userSet1,
-                                exerciseInstanceList1, berechnungsRegel));
+                List<Exercise> exerciseList = Arrays.asList(new Exercise("Übung 1", exerciseSchemes.get(1), true),
+                                new Exercise("1. Testat", exerciseSchemes.get(0), true),
+                                new Exercise("2. Testat", exerciseSchemes.get(0), true),
+                                new Exercise("Klausur", exerciseSchemes.get(2), false));
 
-                moduleRepository.save(new Module("Mathematik I", instituteSet2, userSet2, exerciseInstanceList1,
+                moduleRepository.save(new Module("Einführung in den Compilerbau", instituteSet1, userSet1, exerciseList,
                                 berechnungsRegel));
 
-                moduleRepository.save(new Module("Visuelle Trendanalyse", instituteSet3, userSet3,
-                                exerciseInstanceList1, berechnungsRegel));
+                exerciseList = Arrays.asList(new Exercise("1. Übung", exerciseSchemes.get(1), true),
+                                new Exercise("2.Übung", exerciseSchemes.get(1), true),
+                                new Exercise("Zwischenprüfung", exerciseSchemes.get(2), true),
+                                new Exercise("3.Übung", exerciseSchemes.get(1), false),
+                                new Exercise("4.Übung", exerciseSchemes.get(1), false),
+                                new Exercise("Klausur", exerciseSchemes.get(2),false));
 
+                moduleRepository.save(
+                                new Module("Mathematik I", instituteSet2, userSet2, exerciseList, berechnungsRegel));
+
+                exerciseList = Arrays.asList(new Exercise("Testat 1", exerciseSchemes.get(0), false),
+                                new Exercise("Testat 2", exerciseSchemes.get(0),true),
+                                new Exercise("Testat 3", exerciseSchemes.get(0),true),
+                                new Exercise("Klausur", exerciseSchemes.get(2),false));
+                moduleRepository.save(new Module("Visuelle Trendanalyse", instituteSet3, userSet3, exerciseList,
+                                berechnungsRegel));
+
+                //gradeRepository.save(
+                        //new Grade(new Module("Mathematik I", instituteSet2, userSet2, exerciseList, berechnungsRegel), new Exercise("Testat 2", exerciseSchemes.get(0),true),
+                                //253642259, "bestanden", new Date().toInstant()));
+                        
                 LOGGER.info("refilling Database done.");
         }
 

@@ -1,23 +1,22 @@
 package de.bp2019.zentraldatei.service;
 
-import de.bp2019.zentraldatei.model.exercise.ExerciseInstance;
-import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
-import de.bp2019.zentraldatei.model.module.Module;
-import de.bp2019.zentraldatei.repository.ExerciseInstanceRepository;
-import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
-import de.bp2019.zentraldatei.repository.InstituteRepository;
-import de.bp2019.zentraldatei.repository.ModuleRepository;
-import de.bp2019.zentraldatei.repository.UserRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import de.bp2019.zentraldatei.model.module.Module;
+import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
+import de.bp2019.zentraldatei.repository.InstituteRepository;
+import de.bp2019.zentraldatei.repository.ModuleRepository;
+import de.bp2019.zentraldatei.repository.UserRepository;
 
 /**
  * Service providing relevant {@link Module}s
- * 
+ *
  * @author Leon Chemnitz
  */
 @Service
@@ -32,8 +31,6 @@ public class ModuleService {
     UserRepository userRepository;
     @Autowired
     ExerciseSchemeRepository exerciseSchemeRepository;
-    @Autowired
-    ExerciseInstanceRepository exerciseInstanceRepository;
 
     public ModuleService() {
     }
@@ -41,7 +38,7 @@ public class ModuleService {
     /**
      * Get a Module based on its Id. Only return Modules the User is authenticated
      * to see.
-     * 
+     *
      * @param id Id to search for
      * @return found Module with maching Id, null if none is found
      * @author Leon Chemnitz
@@ -60,7 +57,7 @@ public class ModuleService {
 
     /**
      * Get all Modules the User is authenticated to see.
-     * 
+     *
      * @return list of al module schemes
      * @author Leon Chemnitz
      */
@@ -81,17 +78,6 @@ public class ModuleService {
     }
 
     /**
-     * Update one Module in Database
-     * 
-     * @param module to update
-     * @author Leon Chemnitz
-     */
-    public void updateModule(Module module) {
-        // TODO: Data Validation
-        moduleRepository.save(module);
-    }
-
-    /**
      * Delete a Module
      *
      * @param module to delete
@@ -100,16 +86,4 @@ public class ModuleService {
     public void deleteModule(Module module) {
         moduleRepository.delete(module);
     }
-
-    /**
-     * 
-     * @param exerciseSchemes
-     * @author Leon Chemnitz
-     */
-    // TODO: proper implementation
-    public void newExercisesfromSchemes(Module module, List<ExerciseScheme> exerciseSchemes) {
-        List<ExerciseInstance> newInstances = new ArrayList<>();
-        exerciseSchemes.forEach(scheme -> newInstances.add(new ExerciseInstance(scheme, module)));
-        exerciseInstanceRepository.saveAll(newInstances);
-        module.setExercises(exerciseInstanceRepository.findByModule(module));
-    }}
+}

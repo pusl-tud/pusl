@@ -92,7 +92,7 @@ public class ManageModulesView extends BaseView {
     /**
      * Used to generate the Institutes field for each Grid item
      * 
-     * @param item entity to create unstitutes tag for
+     * @param item entity to create institutes tag for
      * @author Leon Chemnitz
      * @return institutes tag
      */

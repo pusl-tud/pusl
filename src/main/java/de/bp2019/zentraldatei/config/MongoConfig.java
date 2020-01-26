@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  */
 @Configuration
 @EnableMongoRepositories(basePackages = "de.bp2019.zentraldatei.repository")
+@SuppressWarnings("deprecation")
 class MongoConfig extends AbstractMongoConfiguration {
 
   @Override
