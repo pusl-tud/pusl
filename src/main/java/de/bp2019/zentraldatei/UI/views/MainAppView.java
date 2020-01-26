@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import de.bp2019.zentraldatei.UI.views.ExerciseScheme.ManageExerciseSchemesView;
 import de.bp2019.zentraldatei.UI.views.Institute.ManageInstitutesView;
 import de.bp2019.zentraldatei.UI.views.Module.ManageModulesView;
+import de.bp2019.zentraldatei.UI.views.User.ManageUserView;
 
 /**
  * Main View used as a overlay for all other Application views (excluding
@@ -52,6 +53,7 @@ public class MainAppView extends AppLayout {
         content.add(generateSectionLabel("Admin"));
         content.add(generateMenuButton("Veranstaltungen bearbeiten", ManageModulesView.ROUTE));
         content.add(generateMenuButton("Übungsschemas", ManageExerciseSchemesView.ROUTE));
+        content.add(generateMenuButton("Benutzer bearbeiten", ManageUserView.ROUTE));
         content.add(generateSeperator());
         content.add(generateSectionLabel("Global"));
         content.add(generateMenuButton("Institute", ManageInstitutesView.ROUTE));

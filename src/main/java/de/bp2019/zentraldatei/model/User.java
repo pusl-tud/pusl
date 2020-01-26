@@ -36,6 +36,10 @@ public class User {
 		this.institutes = institutes;
 		this.type = type;
 	}
+	
+	public User() {
+		
+	}
 
 	public String getId() {
 		return id;

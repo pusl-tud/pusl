@@ -1,6 +1,7 @@
 package de.bp2019.zentraldatei.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -63,4 +64,38 @@ public class UserService {
             return null;
         }
     }
+
+    /**
+     * Get a User based on its Id. Only return when a User isPressent
+     * 
+     * @param userid Id to search for
+     * @return found user with matching id, else return null 
+     * @author Fabio Costa
+     */
+	public Optional<User> getUserID(String userId) {
+
+		return userRepository.findById(userId);
+	}
+
+	/**
+     * Save a User
+     *
+     * @param user to save
+     * @author Fabio Costa
+     */
+	public void saveUser(User user) {
+		
+	    userRepository.save(user);
+	}
+
+	/**
+     * Delete a User
+     *
+     * @param user to delete
+     * @author Fabio Costa
+     */
+	public void deleteUser(User user) {
+		
+		userRepository.delete(user);
+	}
 }
