@@ -8,6 +8,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
@@ -15,6 +16,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 
+import de.bp2019.zentraldatei.model.Module;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.bp2019.zentraldatei.model.Exercise;
 import de.bp2019.zentraldatei.model.Grade;
 import de.bp2019.zentraldatei.model.Token;
-import de.bp2019.zentraldatei.model.Module;
-import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import de.bp2019.zentraldatei.service.GradeService;
 import de.bp2019.zentraldatei.service.ModuleService;
 
@@ -45,7 +45,7 @@ public class NoFlexExerciseDialog {
     Binder<Grade> binder;
 
     @Autowired
-    public NoFlexExerciseDialog(ModuleService moduleService, ExerciseSchemeService exerciseSchemeService, GradeService gradeService) {
+    public NoFlexExerciseDialog(ModuleService moduleService, GradeService gradeService) {
 
         Dialog dialog = new Dialog();
         dialog.setCloseOnOutsideClick(false);
@@ -84,7 +84,15 @@ public class NoFlexExerciseDialog {
         exerciseSelect.setItemLabelGenerator(Exercise::getName);
         exerciseSelect.setEnabled(false);
         exerciseSelect.setLabel("Übung");
+
         form.add(exerciseSelect);
+
+        Select<String> select = new Select<>();
+        select.setItems("hallo", "test");
+        select.setEmptySelectionCaption("Alle Anzeigen");
+        select.setEmptySelectionAllowed(true);
+        select.addComponents(null, new Hr());
+        form.add(select);
 
         TextField gradeField = new TextField();
         gradeField.setLabel("Note");
@@ -151,6 +159,8 @@ public class NoFlexExerciseDialog {
         binder.bind(exerciseSelect, Grade::getExercise,Grade::setExercise);
 
         binder.bind(gradeField, Grade::getGrade, Grade::setGrade);
+
+        binder.bind(datePicker, Grade::getHandIn, Grade::setHandIn);
 
         /* ########### Click Listeners for Buttons ########### */
 

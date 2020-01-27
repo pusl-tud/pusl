@@ -1,6 +1,6 @@
 package de.bp2019.zentraldatei.model;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 import com.mongodb.lang.NonNull;
 
@@ -40,12 +40,12 @@ public class Grade {
 	private String grade;
 
 	//@NonNull
-	private Instant handIn;
+	private LocalDate handIn;
 
 	public Grade() {
 	}
 
-	public Grade(Module module, Exercise exercise, long matrNumber, String grade, Instant handIn) {
+	public Grade(Module module, Exercise exercise, long matrNumber, String grade, LocalDate handIn) {
 		this.module = module;
 		this.exercise = exercise;
 		this.matrNumber = matrNumber;
@@ -85,11 +85,11 @@ public class Grade {
 		this.grade = grade;
 	}
 
-	public Instant getHandIn() {
+	public LocalDate getHandIn() {
 		return handIn;
 	}
 
-	public void setHandIn(Instant handIn) {
+	public void setHandIn(LocalDate handIn) {
 		this.handIn = handIn;
 	}
 
