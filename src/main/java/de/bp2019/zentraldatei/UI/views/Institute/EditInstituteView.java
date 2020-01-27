@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.ui.views.institute;
+package de.bp2019.zentraldatei.UI.views.Institute;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,10 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.bp2019.zentraldatei.ui.views.MainAppView;
+import de.bp2019.zentraldatei.UI.views.MainAppView;
 import de.bp2019.zentraldatei.model.Institute;
 import de.bp2019.zentraldatei.service.InstituteService;
-import de.bp2019.zentraldatei.ui.views.BaseView;
+import de.bp2019.zentraldatei.UI.views.BaseView;
 
 /**
  * View containing a form to edit a Institute

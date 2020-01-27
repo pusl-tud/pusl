@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.ui.components;
+package de.bp2019.zentraldatei.UI.components;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import de.bp2019.zentraldatei.model.Exercise;
 import de.bp2019.zentraldatei.model.ExerciseScheme;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
-import de.bp2019.zentraldatei.ui.views.module.EditModuleView;
+import de.bp2019.zentraldatei.UI.views.Module.EditModuleView;
 
 /**
  * Component used as a Field to add, remove and arrange {@link Exercise}s in a

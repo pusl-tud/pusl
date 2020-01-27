@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.ui.views.user;
+package de.bp2019.zentraldatei.UI.views.user;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -18,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.zentraldatei.model.User;
 import de.bp2019.zentraldatei.service.UserService;
-import de.bp2019.zentraldatei.ui.views.BaseView;
-import de.bp2019.zentraldatei.ui.views.MainAppView;
+import de.bp2019.zentraldatei.UI.views.BaseView;
+import de.bp2019.zentraldatei.UI.views.MainAppView;
 
 /**
  * View that displays a list of all Users

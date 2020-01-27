@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.ui.components;
+package de.bp2019.zentraldatei.UI.components;
 
 import java.time.LocalDate;
 import java.util.List;

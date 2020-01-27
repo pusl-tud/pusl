@@ -7,7 +7,7 @@ import com.vaadin.flow.server.VaadinServiceInitListener;
 
 import org.springframework.stereotype.Component;
 
-import de.bp2019.zentraldatei.ui.views.LoginView;
+import de.bp2019.zentraldatei.UI.views.LoginView;
 import de.bp2019.zentraldatei.util.SecurityUtils;
 
 /**

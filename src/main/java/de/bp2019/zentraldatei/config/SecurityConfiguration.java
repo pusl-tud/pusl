@@ -15,7 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-import de.bp2019.zentraldatei.ui.views.LoginView;
+import de.bp2019.zentraldatei.UI.views.LoginView;
 import de.bp2019.zentraldatei.util.CustomRequestCache;
 import de.bp2019.zentraldatei.util.SecurityUtils;
 

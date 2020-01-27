@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.ui.views;
+package de.bp2019.zentraldatei.UI.views;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,8 +20,8 @@ import de.bp2019.zentraldatei.model.Grade;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import de.bp2019.zentraldatei.service.GradeService;
 import de.bp2019.zentraldatei.service.ModuleService;
-import de.bp2019.zentraldatei.ui.components.NoFlexExerciseDialog;
-import de.bp2019.zentraldatei.ui.views.exercisescheme.EditExerciseSchemeView;
+import de.bp2019.zentraldatei.UI.components.NoFlexExerciseDialog;
+import de.bp2019.zentraldatei.UI.views.ExerciseScheme.EditExerciseSchemeView;
 
 /**
  *

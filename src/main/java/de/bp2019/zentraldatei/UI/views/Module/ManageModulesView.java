@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.ui.views.module;
+package de.bp2019.zentraldatei.UI.views.Module;
 
 import java.util.Optional;
 
@@ -21,8 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.bp2019.zentraldatei.model.Institute;
 import de.bp2019.zentraldatei.model.Module;
 import de.bp2019.zentraldatei.service.ModuleService;
-import de.bp2019.zentraldatei.ui.views.BaseView;
-import de.bp2019.zentraldatei.ui.views.MainAppView;
+import de.bp2019.zentraldatei.UI.views.BaseView;
+import de.bp2019.zentraldatei.UI.views.MainAppView;
 
 /**
  * View that displays a list of all Modules

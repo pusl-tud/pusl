@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.ui.views.module;
+package de.bp2019.zentraldatei.UI.views.Module;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,9 +37,9 @@ import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import de.bp2019.zentraldatei.service.InstituteService;
 import de.bp2019.zentraldatei.service.ModuleService;
 import de.bp2019.zentraldatei.service.UserService;
-import de.bp2019.zentraldatei.ui.components.ExerciseComposer;
-import de.bp2019.zentraldatei.ui.views.BaseView;
-import de.bp2019.zentraldatei.ui.views.MainAppView;
+import de.bp2019.zentraldatei.UI.components.ExerciseComposer;
+import de.bp2019.zentraldatei.UI.views.BaseView;
+import de.bp2019.zentraldatei.UI.views.MainAppView;
 
 /**
  * View containing a form to edit a Module

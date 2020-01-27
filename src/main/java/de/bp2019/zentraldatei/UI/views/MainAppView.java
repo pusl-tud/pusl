@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.ui.views;
+package de.bp2019.zentraldatei.UI.views;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -17,10 +17,10 @@ import com.vaadin.flow.server.PWA;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import de.bp2019.zentraldatei.ui.views.exercisescheme.ManageExerciseSchemesView;
-import de.bp2019.zentraldatei.ui.views.institute.ManageInstitutesView;
-import de.bp2019.zentraldatei.ui.views.module.ManageModulesView;
-import de.bp2019.zentraldatei.ui.views.user.ManageUsersView;
+import de.bp2019.zentraldatei.UI.views.ExerciseScheme.ManageExerciseSchemesView;
+import de.bp2019.zentraldatei.UI.views.Institute.ManageInstitutesView;
+import de.bp2019.zentraldatei.UI.views.Module.ManageModulesView;
+import de.bp2019.zentraldatei.UI.views.user.ManageUsersView;
 
 /**
  * Main View used as a overlay for all other Application views (excluding
