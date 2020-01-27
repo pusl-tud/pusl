@@ -45,6 +45,7 @@ public class WorkView extends BaseView {
     private static final Logger LOGGER = LoggerFactory.getLogger(EditExerciseSchemeView.class);
 
     public Grid<Grade> grid = new Grid<>();
+    public TextField gradeFilter;
     public TextField martrNumber;
     public Select<Module> moduleFilter;
     public Select<Exercise> exerciseFilter;
@@ -60,6 +61,9 @@ public class WorkView extends BaseView {
         super("Noten eintragen");
         LOGGER.debug("Started creation of WorkView");
 
+        filterCleanModule = new Module("Alle Anzeigen", null, null, null, null);
+        filterCleanExercise = new Exercise("Alle Anzeigen", null, false);
+
         /* ########### Create the filter-fields ########### */
 
         HorizontalLayout filterLayout = new HorizontalLayout();
@@ -71,16 +75,23 @@ public class WorkView extends BaseView {
         ListDataProvider<Grade> dataProvider = new ListDataProvider<>(gradeList);
         grid.setDataProvider(dataProvider);
 
+        VerticalLayout martrGradeLayout = new VerticalLayout();
+
         martrNumber = new TextField();
         martrNumber.setLabel("Matrikelnummer");
         martrNumber.setPlaceholder("Matrikelnummer");
         martrNumber.setValueChangeMode(ValueChangeMode.EAGER);
-        filterLayout.add(martrNumber);
+        martrGradeLayout.add(martrNumber);
+
+        gradeFilter = new TextField();
+        gradeFilter.setLabel("Note");
+        gradeFilter.setPlaceholder("Note");
+        gradeFilter.setValueChangeMode(ValueChangeMode.EAGER);
+        martrGradeLayout.add(gradeFilter);
+
+        filterLayout.add(martrGradeLayout);
 
         VerticalLayout moduleExerciseLayout = new VerticalLayout();
-
-        filterCleanModule = new Module("Alle Anzeigen", null, null, null, null);
-        filterCleanExercise = new Exercise("Alle Anzeigen", null, false);
 
         moduleFilter = new Select<>();
         moduleFilter.setItemLabelGenerator(Module::getName);
@@ -124,6 +135,7 @@ public class WorkView extends BaseView {
         grid.addColumn(item -> item.getGrade()).setHeader("Note").setAutoWidth(true).setKey("grade");
         add(grid);
 
+
         Button exerciseHandin = new Button("Übung eingeben");
         exerciseHandin.addClickListener(event -> {
             NoFlexExerciseDialog exerciseWindow = new NoFlexExerciseDialog(moduleService, gradeService);
@@ -134,6 +146,10 @@ public class WorkView extends BaseView {
         /* ########### ChangeListeners for the filter fields ########### */
 
         martrNumber.addValueChangeListener(event -> {
+            applyFilter(dataProvider);
+        });
+
+        gradeFilter.addValueChangeListener(event -> {
             applyFilter(dataProvider);
         });
 
@@ -179,8 +195,6 @@ public class WorkView extends BaseView {
             }
             applyFilter(dataProvider);
         });
-
-
     }
 
     /* ########### Filter Logic ########### */
@@ -190,6 +204,10 @@ public class WorkView extends BaseView {
 
         if(!martrNumber.isEmpty()){
             dataProvider.addFilter(grade -> StringUtils.containsIgnoreCase(String.valueOf(grade.getMatrNumber()), martrNumber.getValue()));
+        }
+
+        if(!gradeFilter.isEmpty()){
+            dataProvider.addFilter(grade -> StringUtils.containsIgnoreCase(grade.getGrade(), gradeFilter.getValue()));
         }
 
         if(!moduleFilter.isEmpty()) {
