@@ -1,5 +1,6 @@
 package de.bp2019.zentraldatei.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,9 +11,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-import de.bp2019.zentraldatei.UI.views.LoginView;
+import de.bp2019.zentraldatei.ui.views.LoginView;
 import de.bp2019.zentraldatei.util.CustomRequestCache;
 import de.bp2019.zentraldatei.util.SecurityUtils;
 
@@ -40,6 +43,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Bean
 	public CustomRequestCache requestCache() {
 		return new CustomRequestCache();
+	}
+
+	@Bean PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	@Bean
+	@Override
+	public UserDetailsService userDetailsService() {
+		UserDetails user = User.withUsername("user").password(passwordEncoder.encode("password")).roles("USER").build();
+
+		return new InMemoryUserDetailsManager(user);
 	}
 
 	/**
@@ -72,14 +90,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 				/* Configure logout */
 				.and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL);
-	}
-
-	@Bean
-	@Override
-	public UserDetailsService userDetailsService() {
-		UserDetails user = User.withUsername("user").password("{noop}password").roles("USER").build();
-
-		return new InMemoryUserDetailsManager(user);
 	}
 
 	/**

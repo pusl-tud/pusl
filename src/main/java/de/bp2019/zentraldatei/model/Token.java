@@ -1,7 +1,6 @@
-package de.bp2019.zentraldatei.model.exercise;
+package de.bp2019.zentraldatei.model;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-//import org.springframework.data.annotation.Id;
 
 /**
  * Encapsulates an token as a class for ease of handling

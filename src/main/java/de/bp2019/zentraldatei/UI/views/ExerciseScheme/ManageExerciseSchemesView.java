@@ -1,4 +1,6 @@
-package de.bp2019.zentraldatei.UI.views.ExerciseScheme;
+package de.bp2019.zentraldatei.ui.views.exercisescheme;
+
+import java.util.Optional;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -11,16 +13,16 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.bp2019.zentraldatei.UI.views.BaseView;
-import de.bp2019.zentraldatei.UI.views.MainAppView;
-import de.bp2019.zentraldatei.model.Institute;
-import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
-import de.bp2019.zentraldatei.service.ExerciseSchemeService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
+import de.bp2019.zentraldatei.model.ExerciseScheme;
+import de.bp2019.zentraldatei.model.Institute;
+import de.bp2019.zentraldatei.service.ExerciseSchemeService;
+import de.bp2019.zentraldatei.ui.views.BaseView;
+import de.bp2019.zentraldatei.ui.views.MainAppView;
 
 /**
  * View that displays a list of all Exercises

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.bp2019.zentraldatei.model.module.Module;
+import de.bp2019.zentraldatei.model.Module;
 import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
 import de.bp2019.zentraldatei.repository.InstituteRepository;
 import de.bp2019.zentraldatei.repository.ModuleRepository;
@@ -72,8 +72,9 @@ public class ModuleService {
      * @param module to persist
      * @author Leon Chemnitz
      */
-    public void saveModule(Module module) {
+    public void save(Module module) {
         // TODO: Data Validation
+        // TODO: Implement Authentication
         moduleRepository.save(module);
     }
 
@@ -83,7 +84,8 @@ public class ModuleService {
      * @param module to delete
      * @author Luca Dinies
      */
-    public void deleteModule(Module module) {
+    public void delete(Module module) {
+        // TODO: Implement Authentication
         moduleRepository.delete(module);
     }
 }

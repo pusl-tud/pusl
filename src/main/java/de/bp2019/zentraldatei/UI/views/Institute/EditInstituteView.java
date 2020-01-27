@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.UI.views.Institute;
+package de.bp2019.zentraldatei.ui.views.institute;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,14 +23,15 @@ import com.vaadin.flow.router.NotFoundException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.bp2019.zentraldatei.UI.views.BaseView;
-import de.bp2019.zentraldatei.UI.views.MainAppView;
+import de.bp2019.zentraldatei.ui.views.MainAppView;
 import de.bp2019.zentraldatei.model.Institute;
 import de.bp2019.zentraldatei.service.InstituteService;
+import de.bp2019.zentraldatei.ui.views.BaseView;
 
 /**
  * View containing a form to edit a Institute
@@ -57,10 +58,9 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
         private Binder<Institute> binder;
 
         /**
-         * set if a new Institute is being created, not set if an existing Institute is
-         * being edited
+         * null if a new Institute is being created
          */
-        private boolean isNewEntity;
+        private ObjectId objectId;
 
         @Autowired
         public EditInstituteView(InstituteService instituteService) {
@@ -82,7 +82,7 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
 
                 TextField name = new TextField();
                 name.setLabel("Name");
-                name.setPlaceholder("Name Des Instituts");
+                name.setPlaceholder("Name des Instituts");
                 name.setValueChangeMode(ValueChangeMode.EAGER);
                 form.add(name, 1);
 
@@ -94,15 +94,7 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                 actions.setHorizontalComponentAlignment(Alignment.END, save);
                 form.add(actions, 2);
 
-                /*
-                 * Hidden TextField to bind Id, if someone knows a cleaner Solution please
-                 * implement it!
-                 */
-                TextField id = new TextField("");
-
                 /* ########### Data Binding and validation ########### */
-
-                binder.bind(id, Institute::getId, Institute::setId);
 
                 binder.forField(name)
                                 .withValidator(new StringLengthValidator("Bitte Name des Instituts angeben", 1, null))
@@ -111,18 +103,20 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                 /* ########### Click Listeners for Buttons ########### */
 
                 save.addClickListener(event -> {
-                        Institute formData = new Institute();
-                        if (binder.writeBeanIfValid(formData)) {
-                                Dialog dialog = new Dialog();
-                                if (isNewEntity) {
-                                        instituteService.saveInstitute(formData);
-                                        dialog.add(new Text("Institut erfolgreich erstellt oder so..."));
-                                } else {
-                                        instituteService.updateInstitute(formData);
-                                        dialog.add(new Text("Institut erfolgreich verändert oder so..."));
+                        Institute institute = new Institute();
+                        if (binder.writeBeanIfValid(institute)) {
+                                if (objectId != null) {
+                                        institute.setId(objectId);
                                 }
-                                UI.getCurrent().navigate(ManageInstitutesView.ROUTE);
-                                dialog.open();
+                                try {
+                                        instituteService.save(institute);
+                                        Dialog dialog = new Dialog();
+                                        dialog.add(new Text("Institut erfolgreich gespeichert"));
+                                        UI.getCurrent().navigate(ManageInstitutesView.ROUTE);
+                                        dialog.open();
+                                } finally {
+                                        // TODO: implement ErrorHandeling
+                                }
                         } else {
                                 BinderValidationStatus<Institute> validate = binder.validate();
                                 String errorText = validate.getFieldValidationStatuses().stream()
@@ -142,7 +136,7 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
         @Override
         public void setParameter(BeforeEvent event, String instituteId) {
                 if (instituteId.equals("new")) {
-                        isNewEntity = true;
+                        objectId = null;
                         /* clear fields by setting null */
                         binder.readBean(null);
                 } else {
@@ -151,7 +145,7 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                         if (fetchedInstitute == null) {
                                 throw new NotFoundException();
                         } else {
-                                isNewEntity = false;
+                                objectId = fetchedInstitute.getId();
                                 binder.readBean(fetchedInstitute);
                         }
                 }

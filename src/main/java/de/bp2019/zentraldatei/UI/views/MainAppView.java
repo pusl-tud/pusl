@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.UI.views;
+package de.bp2019.zentraldatei.ui.views;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -9,17 +9,18 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.server.PWA;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import de.bp2019.zentraldatei.UI.views.ExerciseScheme.ManageExerciseSchemesView;
-import de.bp2019.zentraldatei.UI.views.Institute.ManageInstitutesView;
-import de.bp2019.zentraldatei.UI.views.Module.ManageModulesView;
+import de.bp2019.zentraldatei.ui.views.exercisescheme.ManageExerciseSchemesView;
+import de.bp2019.zentraldatei.ui.views.institute.ManageInstitutesView;
+import de.bp2019.zentraldatei.ui.views.module.ManageModulesView;
+import de.bp2019.zentraldatei.ui.views.user.ManageUsersView;
 
 /**
  * Main View used as a overlay for all other Application views (excluding
@@ -49,18 +50,16 @@ public class MainAppView extends AppLayout {
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(false);
 
-<<<<<<< HEAD
-        content.add(generateMenuButton("Dashboard", ""));
-=======
-        content.add(generateMenuButton("Noten einsehen", WorkView.ROUTE));
->>>>>>> c45dca96870e47ec6ca318f1d3688f2e3da68b6b
-        content.add(generateSectionLabel("Admin"));
-        content.add(generateMenuButton("Veranstaltungen bearbeiten", ManageModulesView.ROUTE));
+        content.add(generateMenuButton("Startseite", new Icon(VaadinIcon.HOME), ModulesView.ROUTE));
+        content.add(generateSeperator());
+        content.add(generateSectionLabel("Admin"));    
+        content.add(generateMenuButton("Nutzer", ManageUsersView.ROUTE));
+        content.add(generateMenuButton("Veranstaltungen", ManageModulesView.ROUTE));    
         content.add(generateMenuButton("Übungsschemas", ManageExerciseSchemesView.ROUTE));
         content.add(generateSeperator());
         content.add(generateSectionLabel("Global"));
         content.add(generateMenuButton("Institute", ManageInstitutesView.ROUTE));
-        content.add(generateMenuButton("Datenbank neu befüllen", DemoView.ROUTE));
+        content.add(generateMenuButton("Demo", DemoView.ROUTE));
         sidebar.add(content);
 
         VerticalLayout footer = new VerticalLayout();
@@ -79,14 +78,26 @@ public class MainAppView extends AppLayout {
      * 
      * @author Leon Chemnitz
      */
-    private Button generateMenuButton(String buttonText, String url) {
-        Button button = new Button(buttonText);
+    private Button generateMenuButton(String buttonText, Icon icon, String url) {
+        Button button;
+
+        if (icon != null) {
+            button = new Button(buttonText, icon);
+        } else {
+            button = new Button(buttonText);
+        }
+
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         button.addClickListener(event -> {
             UI.getCurrent().navigate(url);
         });
         button.getStyle().set("color", "white");
+        button.getStyle().set("margin", "0");
         return button;
+    }
+
+    private Button generateMenuButton(String buttonText, String url){
+        return generateMenuButton(buttonText, null, url);
     }
 
     /**
@@ -120,9 +131,9 @@ public class MainAppView extends AppLayout {
         return adminLabel;
     }
 
-    private Label generateSeperator(){
+    private Label generateSeperator() {
         Label separator = new Label(" - ");
         separator.getStyle().set("color", "var(--lumo-primary-color)");
-        return separator; 
+        return separator;
     }
 }

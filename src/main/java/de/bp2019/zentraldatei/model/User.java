@@ -2,43 +2,55 @@ package de.bp2019.zentraldatei.model;
 
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import de.bp2019.zentraldatei.enums.UserType;
 
 import java.util.Set;
 
+import com.mongodb.lang.NonNull;
+
 /**
- * A class to model a useser. Consists of a first and last name, an E-mail
- * adress, a password, a list of institutes the user belongs to, and the user
- * type
+ * Model of a user
  * 
- * @author Alex Späth
+ * @author Leon Chemnitz
  */
 @Document
 public class User {
 
 	@Id
-	private String id;
-	private String firstName;
+	private ObjectId id;
+	@NonNull
+	private String firstName;	
 	private String lastName;
-	private String eMail;
+	@NonNull
+	private String emailAddress;
+	@NonNull
 	private String password;
 	@DBRef
+	@NonNull
 	private Set<Institute> institutes;
+	@NonNull
 	private UserType type;
 
-	public User(String firstName, String lastName, String eMail, String password, Set<Institute> institutes,
+	public User(){}
+
+	public User(String firstName, String lastName, String emailAddress, String password, Set<Institute> institutes,
 			UserType type) {
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.eMail = eMail;
+		this.emailAddress = emailAddress;
 		this.password = password;
 		this.institutes = institutes;
 		this.type = type;
 	}
 
-	public String getId() {
+	public ObjectId getId() {
 		return id;
+	}
+
+	public void setId(ObjectId id){
+		this.id = id;
 	}
 
 	public String getFirstName() {
@@ -57,12 +69,12 @@ public class User {
 		this.lastName = lastName;
 	}
 
-	public String getEMail() {
-		return eMail;
+	public String getEmailAddress() {
+		return emailAddress;
 	}
 
-	public void setEMail(String eMail) {
-		this.eMail = eMail;
+	public void setEmailAddress(String eMail) {
+		this.emailAddress = eMail;
 	}
 
 	public String getPassword() {

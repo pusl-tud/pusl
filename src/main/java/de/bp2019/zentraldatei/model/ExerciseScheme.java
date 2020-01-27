@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.model.exercise;
+package de.bp2019.zentraldatei.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;

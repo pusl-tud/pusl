@@ -1,17 +1,18 @@
 package de.bp2019.zentraldatei.service;
 
-import de.bp2019.zentraldatei.model.exercise.Grade;
-import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
-import de.bp2019.zentraldatei.repository.GradeRepository;
-import de.bp2019.zentraldatei.repository.ModuleRepository;
-import de.bp2019.zentraldatei.repository.UserRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import de.bp2019.zentraldatei.model.Grade;
+import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
+import de.bp2019.zentraldatei.repository.GradeRepository;
+import de.bp2019.zentraldatei.repository.ModuleRepository;
+import de.bp2019.zentraldatei.repository.UserRepository;
 
 /**
  * Service providing relevant Grades
@@ -49,12 +50,12 @@ public class GradeService {
     }
 
     /**
-     * Save on Grade in Database
+     * Save one Grade in Database
      *
      * @param grade to Save
      * @author Luca Dinies
      */
-    public void saveGrade(Grade grade){
+    public void save(Grade grade){
         gradeRepository.save(grade);
     }
 
@@ -64,7 +65,7 @@ public class GradeService {
      * @param grade to update
      * @author Luca Dinies
      */
-    public void updateGrade(Grade grade){
+    public void update(Grade grade){
         gradeRepository.save(grade);
     }
 
@@ -74,7 +75,7 @@ public class GradeService {
      * @param grade to delete
      * @author Luca Dinies
      */
-    public void deleteGrade(Grade grade){
+    public void delete(Grade grade){
         gradeRepository.delete(grade);
     }
 

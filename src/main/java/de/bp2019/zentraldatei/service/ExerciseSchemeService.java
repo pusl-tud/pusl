@@ -1,18 +1,19 @@
 package de.bp2019.zentraldatei.service;
 
-import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
-import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
-import de.bp2019.zentraldatei.repository.InstituteRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import de.bp2019.zentraldatei.model.ExerciseScheme;
+import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
+import de.bp2019.zentraldatei.repository.InstituteRepository;
 
 /**
- * Service providing relevant ExerciseSchemes
+ * Service providing relevant {@link ExerciseScheme}s
  * 
  * @author Leon Chemnitz
  */

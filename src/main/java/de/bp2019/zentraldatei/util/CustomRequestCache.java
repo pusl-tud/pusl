@@ -10,7 +10,7 @@ import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 
-import de.bp2019.zentraldatei.UI.views.LoginView;
+import de.bp2019.zentraldatei.ui.views.LoginView;
 
 
 /**

@@ -1,7 +1,10 @@
-package de.bp2019.zentraldatei.UI.components;
+package de.bp2019.zentraldatei.ui.components;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -10,28 +13,20 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToLongConverter;
-
-import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.data.validator.LongRangeValidator;
 import com.vaadin.flow.data.validator.StringLengthValidator;
-import de.bp2019.zentraldatei.UI.views.WorkView;
-import de.bp2019.zentraldatei.model.exercise.Exercise;
-import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
-import de.bp2019.zentraldatei.model.exercise.Grade;
-import de.bp2019.zentraldatei.model.exercise.Token;
-import de.bp2019.zentraldatei.model.module.Module;
-import de.bp2019.zentraldatei.service.ExerciseSchemeService;
-import de.bp2019.zentraldatei.service.GradeService;
-import de.bp2019.zentraldatei.service.ModuleService;
 
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
+import de.bp2019.zentraldatei.model.Exercise;
+import de.bp2019.zentraldatei.model.Grade;
+import de.bp2019.zentraldatei.model.Token;
+import de.bp2019.zentraldatei.model.Module;
+import de.bp2019.zentraldatei.service.ExerciseSchemeService;
+import de.bp2019.zentraldatei.service.GradeService;
+import de.bp2019.zentraldatei.service.ModuleService;
 
 
 /**
@@ -142,7 +137,6 @@ public class NoFlexExerciseDialog {
         buttonBar.add(save);
         form.add(buttonBar);
         dialog.add(form);
-
         dialog.open();
 
         /* ########### Data Binding and validation ########### */
@@ -170,7 +164,7 @@ public class NoFlexExerciseDialog {
                 if(objectId != null){
                     grade.setId(objectId);
                 } try {
-                    gradeService.saveGrade(grade);
+                    gradeService.save(grade);
                     dialog.close();
                 } finally {
                     // TODO: implement ErrorHandling

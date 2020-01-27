@@ -1,4 +1,7 @@
-package de.bp2019.zentraldatei.UI.components;
+package de.bp2019.zentraldatei.ui.components;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -7,8 +10,8 @@ import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.Label;
@@ -18,15 +21,13 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
-import de.bp2019.zentraldatei.model.exercise.Exercise;
-import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
-import de.bp2019.zentraldatei.service.ExerciseSchemeService;
-import de.bp2019.zentraldatei.UI.views.Module.EditModuleView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import de.bp2019.zentraldatei.model.Exercise;
+import de.bp2019.zentraldatei.model.ExerciseScheme;
+import de.bp2019.zentraldatei.service.ExerciseSchemeService;
+import de.bp2019.zentraldatei.ui.views.module.EditModuleView;
 
 /**
  * Component used as a Field to add, remove and arrange {@link Exercise}s in a

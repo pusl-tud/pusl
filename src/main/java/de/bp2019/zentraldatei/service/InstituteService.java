@@ -2,7 +2,6 @@ package de.bp2019.zentraldatei.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,22 +39,11 @@ public class InstituteService {
     }
 
     /**
-     * Get just the Ids of all the Institutes the User is authenticated to see.
-     * 
-     * @return list of all institute ids
-     * @author Leon Chemnitz
-     */
-    public List<String> getAllInstituteIDs() {
-        // TODO: implement authentication
-        return instituteRepository.findAll().stream().map(Institute::getId).collect(Collectors.toList());
-    }
-
-    /**
-     * Get a Institute based on its Id. Only returns Institutes the User is
+     * Get a {@link Institute} based on its Id. Only returns {@link Institute}s the active User is
      * authenticated to see.
      * 
      * @param id Id to search for
-     * @return found Institute with maching Id, null if none is found
+     * @return found Institute with matching Id, null if none is found
      * @author Leon Chemnitz
      */
     public Institute getInstituteById(String id) {
@@ -76,7 +64,7 @@ public class InstituteService {
      * @param institute to persist
      * @author Leon Chemnitz
      */
-    public void saveInstitute(Institute institute) {
+    public void save(Institute institute) {
         // TODO: Data Validation
         instituteRepository.save(institute);
     }
@@ -87,7 +75,7 @@ public class InstituteService {
      * @param institute to update
      * @author Leon Chemnitz
      */
-    public void updateInstitute(Institute institute) {
+    public void update(Institute institute) {
         // TODO: Data Validation
         instituteRepository.save(institute);
     }

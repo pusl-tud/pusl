@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.model.module;
+package de.bp2019.zentraldatei.model;
 
 /**
  * Under Development

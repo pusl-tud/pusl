@@ -1,18 +1,12 @@
-package de.bp2019.zentraldatei.model.module;
-
-import com.fasterxml.jackson.databind.ser.impl.PropertySerializerMap;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import de.bp2019.zentraldatei.model.Institute;
-import de.bp2019.zentraldatei.model.User;
-import de.bp2019.zentraldatei.model.exercise.Exercise;
-
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
+package de.bp2019.zentraldatei.model;
 
 import java.util.List;
 import java.util.Set;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * A class to model a Module. Consists of a name, a list of responsible

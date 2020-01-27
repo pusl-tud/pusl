@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.UI.views.Module;
+package de.bp2019.zentraldatei.ui.views.module;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,16 +30,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
-import de.bp2019.zentraldatei.UI.components.ExerciseComposer;
-import de.bp2019.zentraldatei.UI.views.BaseView;
-import de.bp2019.zentraldatei.UI.views.MainAppView;
 import de.bp2019.zentraldatei.model.Institute;
+import de.bp2019.zentraldatei.model.Module;
 import de.bp2019.zentraldatei.model.User;
-import de.bp2019.zentraldatei.model.module.Module;
 import de.bp2019.zentraldatei.service.ExerciseSchemeService;
 import de.bp2019.zentraldatei.service.InstituteService;
 import de.bp2019.zentraldatei.service.ModuleService;
 import de.bp2019.zentraldatei.service.UserService;
+import de.bp2019.zentraldatei.ui.components.ExerciseComposer;
+import de.bp2019.zentraldatei.ui.views.BaseView;
+import de.bp2019.zentraldatei.ui.views.MainAppView;
 
 /**
  * View containing a form to edit a Module
@@ -157,7 +157,7 @@ public class EditModuleView extends BaseView implements HasUrlParameter<String> 
                                         module.setId(objectId);
                                 }
                                 try {
-                                        moduleService.saveModule(module);
+                                        moduleService.save(module);
                                         Dialog dialog = new Dialog();
                                         dialog.add(new Text("Veranstaltungsschema erfolgreich gespeichert"));
                                         UI.getCurrent().navigate(ManageModulesView.ROUTE);
@@ -181,7 +181,8 @@ public class EditModuleView extends BaseView implements HasUrlParameter<String> 
 
         @Override
         public void setParameter(BeforeEvent event, String moduleId) {
-                if (moduleId.equals("new")) {
+                if (moduleId.equals("new")) {                        
+                        objectId = null;
                         /* clear fields by setting null */
                         binder.readBean(null);
                 } else {

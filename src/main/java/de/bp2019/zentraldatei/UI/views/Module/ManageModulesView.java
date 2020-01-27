@@ -1,4 +1,6 @@
-package de.bp2019.zentraldatei.UI.views.Module;
+package de.bp2019.zentraldatei.ui.views.module;
+
+import java.util.Optional;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -12,16 +14,15 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import de.bp2019.zentraldatei.UI.views.BaseView;
-import de.bp2019.zentraldatei.UI.views.MainAppView;
-import de.bp2019.zentraldatei.model.Institute;
-import de.bp2019.zentraldatei.model.module.Module;
-import de.bp2019.zentraldatei.service.ModuleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
+import de.bp2019.zentraldatei.model.Institute;
+import de.bp2019.zentraldatei.model.Module;
+import de.bp2019.zentraldatei.service.ModuleService;
+import de.bp2019.zentraldatei.ui.views.BaseView;
+import de.bp2019.zentraldatei.ui.views.MainAppView;
 
 /**
  * View that displays a list of all Modules
@@ -44,7 +45,7 @@ public class ManageModulesView extends BaseView {
 
     @Autowired
     public ManageModulesView(ModuleService moduleService) {
-        super("Veranstaltungen verwalten");
+        super("Veranstaltungen");
         LOGGER.debug("started creation of ManageModulesView");
 
         this.moduleService = moduleService;
@@ -122,7 +123,7 @@ public class ManageModulesView extends BaseView {
             dialog.setCloseOnOutsideClick(false);
 
             Button confirmButton = new Button("Löschen", event -> {
-                moduleService.deleteModule(item);
+                moduleService.delete(item);
                 ListDataProvider<Module> dataProvider = (ListDataProvider<Module>) grid.getDataProvider();
                 dataProvider.getItems().remove(item);
                 dataProvider.refreshAll();

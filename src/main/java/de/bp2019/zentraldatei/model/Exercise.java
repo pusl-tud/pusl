@@ -1,4 +1,4 @@
-package de.bp2019.zentraldatei.model.exercise;
+package de.bp2019.zentraldatei.model;
 
 import com.mongodb.lang.NonNull;
 

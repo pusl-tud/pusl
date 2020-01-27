@@ -1,13 +1,15 @@
 package de.bp2019.zentraldatei.service;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.bp2019.zentraldatei.enums.UserType;
 import de.bp2019.zentraldatei.model.User;
 import de.bp2019.zentraldatei.repository.UserRepository;
 
@@ -39,20 +41,9 @@ public class UserService {
     }
 
     /**
-     * Get just the Ids of all the Users the User is authenticated to see.
+     * Get the full name of a user
      * 
-     * @return list of all user ids
-     * @author Leon Chemnitz
-     */
-    public List<String> getAllUserIDs() {
-        // TODO: authentication
-        return userRepository.findAll().stream().map(User::getId).collect(Collectors.toList());
-    }
-
-    /**
-     * Get the full name of a user based on their ID.
-     * 
-     * @param id User.id
+     * @param user User
      * @return Full name of the found User as a String. null if no user is found
      * @author Leon Chemnitz
      */
@@ -62,5 +53,51 @@ public class UserService {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Delete a User
+     *
+     * @param user to delete
+     * @author Leon Chemnitz
+     */
+    public void delete(User user) {
+        // TODO: Implement Authentication
+        userRepository.delete(user);
+    }
+
+    /**
+     * Save one User
+     *
+     * @param user to Save
+     * @author Leon Chemnitz
+     */
+    public void save(User user) {
+        // TODO: Implement Authentication
+        userRepository.save(user);
+    }
+
+    /**
+     * Get a User based on its Id. Only returns Users the active User is
+     * authenticated to see.
+     * 
+     * @param id Id to search for
+     * @return found User with matching Id, null if none is found
+     * @author Leon Chemnitz
+     */
+    public User getUserById(String id) {
+        // TODO: implement authentication
+        Optional<User> foundUser = userRepository.findById(id);
+
+        if (foundUser.isPresent()) {
+            return foundUser.get();
+        } else {
+            LOGGER.warn("Tried to get User which doesn't exist in Database! User ID was: " + id);
+            return null;
+        }
+    }
+
+    public List<UserType> getUserTypes(){
+        return Arrays.asList(UserType.values());
     }
 }

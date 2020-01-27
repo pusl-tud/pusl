@@ -1,20 +1,14 @@
-package de.bp2019.zentraldatei.model.exercise;
+package de.bp2019.zentraldatei.model;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Date;
 
 import com.mongodb.lang.NonNull;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.convert.Jsr310Converters;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import de.bp2019.zentraldatei.model.User;
-import de.bp2019.zentraldatei.model.module.Module;
 
 /**
  * A class to model a single grade entry

@@ -1,7 +1,7 @@
 package de.bp2019.zentraldatei.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import de.bp2019.zentraldatei.model.module.Module;
+import de.bp2019.zentraldatei.model.Module;
 
 /**
  * Repository for access of {@link Module}s

@@ -1,4 +1,7 @@
-package de.bp2019.zentraldatei.UI.views.ExerciseScheme;
+package de.bp2019.zentraldatei.ui.views.exercisescheme;
+
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -16,21 +19,24 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.router.*;
-import de.bp2019.zentraldatei.UI.components.TokenEditor;
-import de.bp2019.zentraldatei.UI.views.BaseView;
-import de.bp2019.zentraldatei.UI.views.MainAppView;
-import de.bp2019.zentraldatei.model.Institute;
-import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
-import de.bp2019.zentraldatei.service.ExerciseSchemeService;
-import de.bp2019.zentraldatei.service.InstituteService;
+import com.vaadin.flow.router.BeforeEvent;
+import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.NotFoundException;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
+import de.bp2019.zentraldatei.model.ExerciseScheme;
+import de.bp2019.zentraldatei.model.Institute;
+import de.bp2019.zentraldatei.service.ExerciseSchemeService;
+import de.bp2019.zentraldatei.service.InstituteService;
+import de.bp2019.zentraldatei.ui.components.TokenEditor;
+import de.bp2019.zentraldatei.ui.views.BaseView;
+import de.bp2019.zentraldatei.ui.views.MainAppView;
 
 /**
  *

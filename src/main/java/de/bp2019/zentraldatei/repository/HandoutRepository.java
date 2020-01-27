@@ -2,7 +2,7 @@ package de.bp2019.zentraldatei.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import de.bp2019.zentraldatei.model.exercise.Handout;
+import de.bp2019.zentraldatei.model.Handout;
 
 /**
  * Repository for access of {@link Handout}s

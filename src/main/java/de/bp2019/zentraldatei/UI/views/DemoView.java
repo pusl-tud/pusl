@@ -1,22 +1,25 @@
-package de.bp2019.zentraldatei.UI.views;
+package de.bp2019.zentraldatei.ui.views;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 
-import de.bp2019.zentraldatei.model.exercise.Grade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import de.bp2019.zentraldatei.model.Exercise;
+import de.bp2019.zentraldatei.model.ExerciseScheme;
+import de.bp2019.zentraldatei.model.Grade;
 import de.bp2019.zentraldatei.model.Institute;
+import de.bp2019.zentraldatei.model.Module;
+import de.bp2019.zentraldatei.model.Token;
 import de.bp2019.zentraldatei.model.User;
-import de.bp2019.zentraldatei.model.exercise.Exercise;
-import de.bp2019.zentraldatei.model.exercise.ExerciseScheme;
-import de.bp2019.zentraldatei.model.exercise.Token;
-import de.bp2019.zentraldatei.model.module.Module;
 import de.bp2019.zentraldatei.repository.ExerciseSchemeRepository;
 import de.bp2019.zentraldatei.repository.GradeRepository;
 import de.bp2019.zentraldatei.repository.HandoutRepository;
@@ -139,10 +142,23 @@ public class DemoView extends VerticalLayout {
                 moduleRepository.save(new Module("Visuelle Trendanalyse", instituteSet3, userSet3, exerciseList,
                                 berechnungsRegel));
 
-                //gradeRepository.save(
-                        //new Grade(new Module("Mathematik I", instituteSet2, userSet2, exerciseList, berechnungsRegel), new Exercise("Testat 2", exerciseSchemes.get(0),true),
-                                //253642259, "bestanden", new Date().toInstant()));
-                        
+                List<Module> modules = moduleRepository.findAll();
+
+                Grade grade = new Grade(modules.get(0), modules.get(0).getExercises().get(0), 17762563, "2,4", null);
+                gradeRepository.save(grade);
+
+                grade = new Grade(modules.get(1), modules.get(1).getExercises().get(1), 17793563, "1,3", null);
+                gradeRepository.save(grade);
+
+                grade = new Grade(modules.get(0), modules.get(0).getExercises().get(2), 17762563, "2,4", null);
+                gradeRepository.save(grade);
+
+                grade = new Grade(modules.get(2), modules.get(2).getExercises().get(0), 28362563, "4,4", null);
+                gradeRepository.save(grade);
+
+                grade = new Grade(modules.get(0), modules.get(0).getExercises().get(2), 17762563, "1.0", null);
+                gradeRepository.save(grade);
+
                 LOGGER.info("refilling Database done.");
         }
 
