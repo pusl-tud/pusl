@@ -8,7 +8,7 @@
     <relativePath />
   </parent>
   <groupId>de.bp2019</groupId>
-  <artifactId>zentraldatei</artifactId>
+  <artifactId>pusl</artifactId>
   <version>0.0.1</version>
   <name>zentraldatei</name>
   <description>Management system for the Institutes of Transportation at TU Darmstadt</description>
