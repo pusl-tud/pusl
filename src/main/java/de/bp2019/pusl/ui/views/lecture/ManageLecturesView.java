@@ -14,8 +14,6 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.config.AppConfig;
@@ -40,8 +38,6 @@ public class ManageLecturesView extends BaseView {
 
     public static final String ROUTE = "manage-lectures";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ManageLecturesView.class);
-
     private LectureService lectureService;
 
     private Grid<Lecture> grid = new Grid<>();
@@ -50,7 +46,6 @@ public class ManageLecturesView extends BaseView {
     @Autowired
     public ManageLecturesView(LectureService lectureService) {
         super("Veranstaltungen");
-        LOGGER.debug("started creation of ManageLecturesView");
 
         this.lectureService = lectureService;
 
@@ -77,7 +72,6 @@ public class ManageLecturesView extends BaseView {
 
         newLectureButton.addClickListener(event -> UI.getCurrent().navigate(EditLectureView.ROUTE + "/new"));
 
-        LOGGER.debug("finished creation of ManageLecturesView");
     }
 
     /**

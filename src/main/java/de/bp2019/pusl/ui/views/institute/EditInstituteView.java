@@ -24,8 +24,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.config.AppConfig;
@@ -47,8 +45,6 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
 
         public static final String ROUTE = "edit-institute";
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(EditInstituteView.class);
-
         /*
          * no @Autowire because service is injected by constructor. Vaadin likes it
          * better this way...
@@ -68,8 +64,6 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                 super("Institut bearbeiten");
 
                 this.instituteService = instituteService;
-
-                LOGGER.debug("Started creation of InstituteView");
 
                 FormLayout form = new FormLayout();
                 form.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
@@ -131,7 +125,6 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                 /* ########### Add Layout to Component ########### */
 
                 add(form);
-                LOGGER.debug("Finished creation of InstituteView");
         }
 
         @Override

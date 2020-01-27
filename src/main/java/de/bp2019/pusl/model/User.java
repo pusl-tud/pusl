@@ -2,8 +2,6 @@ package de.bp2019.pusl.model;
 
 import java.util.Set;
 
-import com.mongodb.lang.NonNull;
-
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;

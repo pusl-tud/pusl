@@ -89,7 +89,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.and().formLogin().loginPage("/" + LoginView.ROUTE).permitAll()
 
 				/* Configure logout */
-				.and().logout().logoutSuccessUrl(LoginView.ROUTE);
+				.and().logout().logoutSuccessUrl("/" + LoginView.ROUTE);
 	}
 
 	/**

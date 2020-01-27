@@ -10,8 +10,6 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.config.AppConfig;
@@ -20,7 +18,6 @@ import de.bp2019.pusl.service.ExerciseSchemeService;
 import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.ui.components.NoFlexExerciseDialog;
-import de.bp2019.pusl.ui.views.exercisescheme.EditExerciseSchemeView;
 
 /**
  *
@@ -33,8 +30,8 @@ import de.bp2019.pusl.ui.views.exercisescheme.EditExerciseSchemeView;
 public class WorkView extends BaseView {
 
     private static final long serialVersionUID = 1L;
+
     public static final String ROUTE = "edit-Grades";
-    private static final Logger LOGGER = LoggerFactory.getLogger(EditExerciseSchemeView.class);
 
     public Grid<Grade> grid = new Grid<>();
 
@@ -42,7 +39,6 @@ public class WorkView extends BaseView {
     public WorkView(GradeService gradeService, ExerciseSchemeService exerciseSchemeService,
             LectureService lectureService) {
         super("Noten eintragen");
-        LOGGER.debug("Started creation of WorkView");
 
         /* ########### Create the Grid ########### */
 

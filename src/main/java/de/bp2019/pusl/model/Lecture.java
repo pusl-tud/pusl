@@ -9,11 +9,9 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * A class to model a Lecture. Consists of a name, a list of responsible
- * {@link institute}s, a list of {@link Exercise}s, a {@link Grade}, a
- * calcuation rule and a list of privileged {@link user}s
+ * Model of a Lecture
  * 
- * @author Alex Späth
+ * @author Leon Chemnitz
  */
 @Document
 public class Lecture {

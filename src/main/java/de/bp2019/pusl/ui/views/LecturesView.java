@@ -12,9 +12,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.bp2019.pusl.config.AppConfig;
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.Lecture;
@@ -33,11 +30,8 @@ public class LecturesView extends BaseView {
 
     public static final String ROUTE = "";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LecturesView.class);
-
     public LecturesView(LectureService lectureService) {
         super("Meine Veranstaltungen");
-        LOGGER.debug("started creation of LecturesView");
 
         List<Lecture> lectures = new ArrayList<>();
         lectures.addAll(lectureService.getAll());
@@ -48,8 +42,6 @@ public class LecturesView extends BaseView {
                 item -> accordion.add(item.getName(), fillAccordions(item)).addThemeVariants(DetailsVariant.FILLED));
 
         add(accordion);
-
-        LOGGER.debug("finished creation of LecturesView");
     }
 
     private VerticalLayout fillAccordions(Lecture lecture) {

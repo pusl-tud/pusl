@@ -25,8 +25,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
@@ -55,8 +53,6 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
         public static final String ROUTE = "edit-lecture";
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(EditLectureView.class);
-
         /*
          * no @Autowire because service is injected by constructor. Vaadin likes it
          * better this way...
@@ -76,8 +72,6 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                         LectureService lectureService, ExerciseSchemeService exerciseSchemeService) {
 
                 super("Veranstaltung bearbeiten");
-
-                LOGGER.debug("Started creation of EditLectureView");
 
                 this.lectureService = lectureService;
 
@@ -176,8 +170,6 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                                 LOGGER.debug("There are errors: " + errorText);
                         }
                 });
-
-                LOGGER.debug("Finished creation of ManageLecturesView");
         }
 
         @Override

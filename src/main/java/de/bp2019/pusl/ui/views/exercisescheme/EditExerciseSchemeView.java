@@ -25,8 +25,6 @@ import com.vaadin.flow.router.NotFoundException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
@@ -53,8 +51,6 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
 
     public static final String ROUTE = "edit-exerciseScheme";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EditExerciseSchemeView.class);
-
     private Binder<ExerciseScheme> binder;
 
     /* Binder to bind the form Data to an Object */
@@ -69,7 +65,6 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
     @Autowired
     public EditExerciseSchemeView(ExerciseSchemeService exerciseSchemeService, InstituteService instituteService) {
         super("Übungsschema bearbeiten");
-        LOGGER.debug("Started creation of ExerciseSchemeView");
 
         this.exerciseSchemeService = exerciseSchemeService;
 
@@ -174,8 +169,6 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         /* Add Layout to Component */
 
         add(form);
-        LOGGER.debug("Finished creation of ManageExerciseSchemesView");
-
     }
 
     @Override

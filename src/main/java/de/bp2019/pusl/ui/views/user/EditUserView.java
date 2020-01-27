@@ -28,8 +28,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.vaadin.gatanaso.MultiselectComboBox;
@@ -56,8 +54,6 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
 
         public static final String ROUTE = "edit-user";
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(EditUserView.class);
-
         /*
          * no @Autowire because service is injected by constructor. Vaadin likes it
          * better this way...
@@ -80,8 +76,6 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                 super("Nutzer bearbeiten");
 
                 this.userService = userService;
-
-                LOGGER.debug("Started creation of UserView");
 
                 FormLayout form = new FormLayout();
                 form.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
@@ -207,7 +201,6 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                 /* ########### Add Layout to Component ########### */
 
                 add(form);
-                LOGGER.debug("Finished creation of UserView");
         }
 
         @Override

@@ -12,8 +12,6 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.config.AppConfig;
@@ -35,8 +33,6 @@ public class ManageUsersView extends BaseView {
 
     public static final String ROUTE = "manage-users";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ManageUsersView.class);
-
     private UserService userService;
 
     private Grid<User> grid = new Grid<>();
@@ -44,7 +40,6 @@ public class ManageUsersView extends BaseView {
     @Autowired
     public ManageUsersView(UserService userService) {
         super("Benutzer");
-        LOGGER.debug("started creation of ManageUsersView");
 
         this.userService = userService;
 
@@ -68,7 +63,6 @@ public class ManageUsersView extends BaseView {
 
         newUserButton.addClickListener(event -> UI.getCurrent().navigate(EditUserView.ROUTE + "/new"));
 
-        LOGGER.debug("finished creation of ManageUsersView");
     }
 
     /**

@@ -14,8 +14,6 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.config.AppConfig;
@@ -38,8 +36,6 @@ public class ManageExerciseSchemesView extends BaseView {
 
     public static final String ROUTE = "manage-exerciseSchemes";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ManageExerciseSchemesView.class);
-
     private ExerciseSchemeService exerciseSchemeService;
 
     Grid<ExerciseScheme> grid = new Grid<>();
@@ -47,8 +43,6 @@ public class ManageExerciseSchemesView extends BaseView {
     @Autowired
     public ManageExerciseSchemesView(ExerciseSchemeService exerciseSchemeService) {
         super("Übungsschemas");
-
-        LOGGER.debug("started creation of ManageExerciseSchemesView");
 
         this.exerciseSchemeService = exerciseSchemeService;
 
@@ -70,8 +64,6 @@ public class ManageExerciseSchemesView extends BaseView {
 
         newExerciseSchemeButton
                 .addClickListener(event -> UI.getCurrent().navigate(EditExerciseSchemeView.ROUTE + "/new"));
-
-        LOGGER.debug("finished creation of ManageExerciseSchemesView");
 
     }
 

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 
 import org.slf4j.Logger;
@@ -32,7 +31,7 @@ import de.bp2019.pusl.repository.UserRepository;
  * @author Leon Chemnitz
  */
 @Route(value = DemoView.ROUTE, layout = MainAppView.class)
-public class DemoView extends VerticalLayout {
+public class DemoView extends BaseView  {
 
         private static final long serialVersionUID = 1240260329860093364L;
 
@@ -41,9 +40,10 @@ public class DemoView extends VerticalLayout {
         private static final Logger LOGGER = LoggerFactory.getLogger(DemoView.class);
 
         @Autowired
-        public DemoView(InstituteRepository instituteRepository, UserRepository userRepository,
+        public DemoView (InstituteRepository instituteRepository, UserRepository userRepository,
                         ExerciseSchemeRepository exerciseSchemeRepository, LectureRepository lectureRepository,
-                        GradeRepository gradeRepository) {
+                        GradeRepository gradeRepository){
+                super("Demo");
 
                 add(new Text("Befülle die Datenbank mit Testdaten!"));
 

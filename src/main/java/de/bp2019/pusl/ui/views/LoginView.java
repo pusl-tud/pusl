@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import de.bp2019.pusl.config.AppConfig;
 import de.bp2019.pusl.util.CustomRequestCache;
 
 /**
@@ -34,8 +35,8 @@ public class LoginView extends VerticalLayout {
 	public LoginView(AuthenticationManager authenticationManager, CustomRequestCache requestCache) {
 		/* configures login dialog and adds it to the main view */
 		login.setOpened(true);
-		login.setTitle("Zentraldatei");
-		login.setDescription("Managementsystem für studentische Leistungen");
+		login.setTitle(AppConfig.NAME);
+		login.setDescription("System für Prüfungen und studentische Leistungen");
 
 		add(login);
 
