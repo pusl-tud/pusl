@@ -14,6 +14,11 @@ import com.vaadin.flow.component.tabs.Tabs.Orientation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A Vertical Tab component, to ease use with Vaadin tabs..
+ * 
+ * @author Leon Chemnitz
+ */
 public class VerticalTabs extends HorizontalLayout {
 
     private static final long serialVersionUID = -7178002559265490929L;
@@ -47,6 +52,13 @@ public class VerticalTabs extends HorizontalLayout {
         });
     }
 
+    /**
+     * add one tab to the Tabs
+     * 
+     * @param title displayed as the tab  title
+     * @param component displayed when tab is selected
+     * @author Leon Chemnitz
+     */
     public void addTab(String title, Component component) {
         if (pages.size() > 0) {
             component.setVisible(false);
