@@ -52,6 +52,12 @@ public class WorkView extends BaseView {
     public DatePicker startDateFilter;
     public DatePicker endDateFilter;
 
+    private GradeService gradeService;
+
+    private ListDataProvider<Grade> dataProvider;
+
+    private Grade filter;
+
     public Lecture filterCleanLecture;
     public Exercise filterCleanExercise;
 
@@ -60,6 +66,8 @@ public class WorkView extends BaseView {
                     LectureService moduleService) {
         super("Noten eintragen");
         LOGGER.debug("Started creation of WorkView");
+
+        this.gradeService = gradeService;
 
         filterCleanLecture = new Lecture("Alle Anzeigen", null, null, null, null);
         filterCleanExercise = new Exercise("Alle Anzeigen", null, false);
@@ -70,10 +78,9 @@ public class WorkView extends BaseView {
         filterLayout.setWidth("100%");
         filterLayout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
-        List<Grade> gradeList = gradeService.getAll();
+        dataProvider = new ListDataProvider<>(gradeService.getAll());
 
-        ListDataProvider<Grade> dataProvider = new ListDataProvider<>(gradeList);
-        grid.setDataProvider(dataProvider);
+        filter = new Grade();
 
         VerticalLayout martrGradeLayout = new VerticalLayout();
 
@@ -127,6 +134,7 @@ public class WorkView extends BaseView {
 
         /* ########### Create the Grid ########### */
 
+        grid.setDataProvider(dataProvider);
         grid.setWidth("100%");
         grid.addColumn(Grade::getMatrNumber).setHeader("Matr. Nr.").setAutoWidth(true).setKey("matrikelNum");
         grid.addColumn(item -> item.getLecture().getName()).setHeader("Modul").setAutoWidth(true).setKey("modul");
@@ -146,26 +154,35 @@ public class WorkView extends BaseView {
         /* ########### ChangeListeners for the filter fields ########### */
 
         martrNumber.addValueChangeListener(event -> {
-            applyFilter(dataProvider);
+            filter.setMatrNumber(event.getValue());
+            reloadFilter();
         });
 
         gradeFilter.addValueChangeListener(event -> {
-            applyFilter(dataProvider);
+            filter.setGrade(event.getValue());
+            reloadFilter();
         });
 
         lectureFilter.addValueChangeListener(event -> {
-            applyFilter(dataProvider);
-
             if(!lectureFilter.getValue().getName().equalsIgnoreCase("Alle Anzeigen")) {
+                filter.setLecture(event.getValue());
+                reloadFilter();
+
                 Lecture selectedLecture = lectureFilter.getValue();
                 List<Exercise> exercises = selectedLecture.getExercises();
+
                 if (!exercises.get(0).getName().contains("Alle Anzeigen")) {
                     exercises.add(0, filterCleanExercise);
                 }
+
                 exerciseFilter.setItems(exercises);
                 exerciseFilter.setEnabled(true);
                 exerciseFilter.setValue(filterCleanExercise);
+            } else {
+                filter.setLecture(null);
+                reloadFilter();
             }
+
         });
 
         exerciseFilter.addValueChangeListener((event -> {
@@ -202,25 +219,6 @@ public class WorkView extends BaseView {
     public void applyFilter(ListDataProvider<Grade> dataProvider){
         dataProvider.clearFilters();
 
-        if(!martrNumber.isEmpty()){
-            dataProvider.addFilter(grade -> StringUtils.containsIgnoreCase(String.valueOf(grade.getMatrNumber()), martrNumber.getValue()));
-        }
-
-        if(!gradeFilter.isEmpty()){
-            dataProvider.addFilter(grade -> StringUtils.containsIgnoreCase(grade.getGrade(), gradeFilter.getValue()));
-        }
-
-        if(!lectureFilter.isEmpty()) {
-            if (!lectureFilter.getValue().getName().equalsIgnoreCase("Alle Anzeigen")) {
-                dataProvider.addFilter(grade -> StringUtils.containsIgnoreCase(grade.getLecture().getName(), lectureFilter.getValue().getName()));
-                grid.getColumnByKey("modul").setVisible(false);
-            } else {
-                grid.getColumnByKey("modul").setVisible(true);
-                exerciseFilter.setValue(filterCleanExercise);
-                exerciseFilter.setEnabled(false);
-            }
-        }
-
         if (!exerciseFilter.isEmpty()) {
             if (exerciseFilter.getValue().getName().contains("Alle Anzeigen")) {
                 grid.getColumnByKey("exercise").setVisible(true);
@@ -238,6 +236,13 @@ public class WorkView extends BaseView {
             dataProvider.addFilter(grade -> grade.getHandIn().isBefore(endDateFilter.getValue().plusDays(1)));
         }
 
+    }
+
+    private void reloadFilter(){
+        LOGGER.debug(filter.toString());
+        dataProvider.getItems().clear();
+        dataProvider.getItems().addAll(gradeService.getAll());
+        dataProvider.refreshAll();
     }
 
 }
