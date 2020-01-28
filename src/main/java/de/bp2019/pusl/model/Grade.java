@@ -1,6 +1,7 @@
 package de.bp2019.pusl.model;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -34,12 +35,12 @@ public class Grade {
 	/** Grade is stored as a string to enable non-numeric entries */
 	private String grade;
 
-	private Instant handIn;
+	private LocalDate handIn;
 
 	public Grade() {
 	}
 
-	public Grade(Lecture lecture, Exercise exercise, String matrNumber, String grade, Instant handIn) {
+	public Grade(Lecture lecture, Exercise exercise, String matrNumber, String grade, LocalDate handIn) {
 		this.lectureRef = lecture;
 		this.lectureEmb = lecture;
 		this.exercise = exercise;
@@ -77,11 +78,11 @@ public class Grade {
 		this.grade = grade;
 	}
 
-	public Instant getHandIn() {
+	public LocalDate getHandIn() {
 		return handIn;
 	}
 
-	public void setHandIn(Instant handIn) {
+	public void setHandIn(LocalDate handIn) {
 		this.handIn = handIn;
 	}
 
