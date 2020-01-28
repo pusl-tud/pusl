@@ -35,7 +35,7 @@ public class DemoView extends BaseView  {
 
         private static final long serialVersionUID = 1240260329860093364L;
 
-        public static final String ROUTE = "demo";
+        public static final String ROUTE = "admin/demo";
 
         private static final Logger LOGGER = LoggerFactory.getLogger(DemoView.class);
 
@@ -142,19 +142,19 @@ public class DemoView extends BaseView  {
 
                 List<Lecture> lectures = lectureRepository.findAll();
 
-                Grade grade = new Grade(lectures.get(0), lectures.get(0).getExercises().get(0), 17762563, "2,4", null);
+                Grade grade = new Grade(lectures.get(0), lectures.get(0).getExercises().get(0), "17762563", "2,4", null);
                 gradeRepository.save(grade);
 
-                grade = new Grade(lectures.get(1), lectures.get(1).getExercises().get(1), 17793563, "1,3", null);
+                grade = new Grade(lectures.get(1), lectures.get(1).getExercises().get(1), "17793563", "1,3", null);
                 gradeRepository.save(grade);
 
-                grade = new Grade(lectures.get(0), lectures.get(0).getExercises().get(2), 17762563, "2,4", null);
+                grade = new Grade(lectures.get(0), lectures.get(0).getExercises().get(2), "17762563", "2,4", null);
                 gradeRepository.save(grade);
 
-                grade = new Grade(lectures.get(2), lectures.get(2).getExercises().get(0), 28362563, "4,4", null);
+                grade = new Grade(lectures.get(2), lectures.get(2).getExercises().get(0), "28362563", "4,4", null);
                 gradeRepository.save(grade);
 
-                grade = new Grade(lectures.get(0), lectures.get(0).getExercises().get(2), 17762563, "1.0", null);
+                grade = new Grade(lectures.get(0), lectures.get(0).getExercises().get(2), "17762563", "1.0", null);
                 gradeRepository.save(grade);
 
                 LOGGER.info("refilling Database done.");

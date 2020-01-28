@@ -34,21 +34,26 @@ public class ManageExerciseSchemesView extends BaseView {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String ROUTE = "manage-exerciseSchemes";
+    public static final String ROUTE = "admin/exerciseSchemes";
 
     private ExerciseSchemeService exerciseSchemeService;
 
-    Grid<ExerciseScheme> grid = new Grid<>();
+    private ListDataProvider<ExerciseScheme> exerciseSchemeDataProvider;
 
     @Autowired
     public ManageExerciseSchemesView(ExerciseSchemeService exerciseSchemeService) {
         super("Übungsschemas");
 
         this.exerciseSchemeService = exerciseSchemeService;
+ 
+        exerciseSchemeDataProvider = new ListDataProvider<>(exerciseSchemeService.getAllExerciseSchemes());
 
-        /* Table for the existing ExerciseSchemes */
+        /* -- Create Components -- */
+
+        Grid<ExerciseScheme> grid = new Grid<>();
+
         grid.setWidth("100%");
-        grid.setItems(exerciseSchemeService.getAllExerciseSchemes());
+        grid.setDataProvider(exerciseSchemeDataProvider);
 
         grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true);
         grid.addComponentColumn(item -> createInstitutesTag(item)).setAutoWidth(true);
@@ -104,30 +109,35 @@ public class ManageExerciseSchemesView extends BaseView {
     /**
      * Used to generate the delete button for each Grid Item
      *
-     * @param item
+     * @param exerciseScheme
      * @return
      * @author Luca Dinies
      */
-    private Button createDeleteButton(ExerciseScheme item) {
+    private Button createDeleteButton(ExerciseScheme exerciseScheme) {
 
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {
             Dialog dialog = new Dialog();
-            exerciseSchemeService.deleteExerciseScheme(item);
+            exerciseSchemeService.deleteExerciseScheme(exerciseScheme);
             dialog.add(new Text("Wirklich Löschen?"));
             dialog.setCloseOnEsc(false);
             dialog.setCloseOnOutsideClick(false);
 
             Button confirmButton = new Button("Löschen", event -> {
-                exerciseSchemeService.deleteExerciseScheme(item);
-                ListDataProvider<ExerciseScheme> dataProvider = (ListDataProvider<ExerciseScheme>) grid
-                        .getDataProvider();
-                dataProvider.getItems().remove(item);
-                dataProvider.refreshAll();
+                try {
+                    exerciseSchemeService.deleteExerciseScheme(exerciseScheme);
+                    exerciseSchemeDataProvider.getItems().remove(exerciseScheme);
+                    exerciseSchemeDataProvider.refreshAll();
 
-                dialog.close();
-                Dialog answerDialog = new Dialog();
-                answerDialog.add(new Text("Übungsschema '" + item.getName() + "' gelöscht"));
-                answerDialog.open();
+                    dialog.close();
+                    Dialog answerDialog = new Dialog();
+                    answerDialog.add(new Text("Übungsschema '" + exerciseScheme.getName() + "' gelöscht"));
+                    answerDialog.open();
+                } catch (Exception e) {
+                    Dialog answerDialog = new Dialog();
+                    answerDialog.add(new Text("Fehler beim Löschen des Übungsschemas!"));
+                    answerDialog.open();
+                    LOGGER.error("Could not delete ExerciseScheme! ExerciseScheme ID was: " + exerciseScheme.getId());
+                }
             });
 
             Button cancelButton = new Button("Abbruch", event -> {

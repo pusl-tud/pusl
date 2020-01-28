@@ -31,11 +31,11 @@ public class ManageInstitutesView extends BaseView {
 
     private static final long serialVersionUID = -5763725756205681478L;
 
-    public static final String ROUTE = "manage-institutes";
+    public static final String ROUTE = "admin/institutes";
 
     private InstituteService instituteService;
 
-    private Grid<Institute> grid = new Grid<>();
+    private ListDataProvider<Institute> instituteDataProvider;
 
     @Autowired
     public ManageInstitutesView(InstituteService instituteService) {
@@ -43,12 +43,14 @@ public class ManageInstitutesView extends BaseView {
 
         this.instituteService = instituteService;
 
+        instituteDataProvider = new ListDataProvider<>(instituteService.getAllInstitutes());
+
         /* -- Create Components -- */
 
         Grid<Institute> grid = new Grid<>();
 
         grid.setWidth("100%");
-        grid.setItems(instituteService.getAllInstitutes());
+        grid.setDataProvider(instituteDataProvider);
 
         grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true);
         grid.addComponentColumn(item -> createDeleteButton(item)).setFlexGrow(0).setWidth("4em");
@@ -84,11 +86,11 @@ public class ManageInstitutesView extends BaseView {
     /**
      * Used to generate the delete button for each Grid Item
      * 
-     * @param item entity to create button for
+     * @param institute to create button for
      * @author Leon Chemnitz
      * @return delete button
      */
-    protected Button createDeleteButton(Institute item) {
+    protected Button createDeleteButton(Institute institute) {
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {
             Dialog dialog = new Dialog();
             dialog.add(new Text("Wirklich Löschen?"));
@@ -96,15 +98,21 @@ public class ManageInstitutesView extends BaseView {
             dialog.setCloseOnOutsideClick(false);
 
             Button confirmButton = new Button("Löschen", event -> {
-                instituteService.deleteInstitute(item);
-                ListDataProvider<Institute> dataProvider = (ListDataProvider<Institute>) grid.getDataProvider();
-                dataProvider.getItems().remove(item);
-                dataProvider.refreshAll();
+                try {
+                    instituteService.deleteInstitute(institute);
+                    instituteDataProvider.getItems().remove(institute);
+                    instituteDataProvider.refreshAll();
 
-                dialog.close();
-                Dialog answerDialog = new Dialog();
-                answerDialog.add(new Text("Institut '" + item.getName() + "' gelöscht"));
-                answerDialog.open();
+                    dialog.close();
+                    Dialog answerDialog = new Dialog();
+                    answerDialog.add(new Text("Institut '" + institute.getName() + "' gelöscht"));
+                    answerDialog.open();
+                } catch (Exception e) {
+                    Dialog answerDialog = new Dialog();
+                    answerDialog.add(new Text("Fehler beim Löschen des Institutes!"));
+                    answerDialog.open();
+                    LOGGER.error("Could not delete Institute! Institute ID was: " + institute.getId());
+                }
             });
 
             Button cancelButton = new Button("Abbruch", event -> {

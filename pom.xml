@@ -10,7 +10,7 @@
   <groupId>de.bp2019</groupId>
   <artifactId>pusl</artifactId>
   <version>0.0.1</version>
-  <name>zentraldatei</name>
+  <name>pusl</name>
   <description>Management system for the Institutes of Transportation at TU Darmstadt</description>
   <properties>
     <java.version>11</java.version>

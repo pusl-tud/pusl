@@ -1,5 +1,6 @@
 package de.bp2019.pusl.model;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -18,14 +19,20 @@ public class Lecture {
 
     @Id
     private ObjectId id;
+
     private String name;
+
     @DBRef
     private Set<Institute> institutes;
+
     @DBRef
     private Set<User> hasAccess;
+
     private List<Exercise> exercises;
 
     private List<PerformanceScheme> performanceSchemes;
+
+    private Instant lastModified;
 
     /** Temporary field TODO: replace with PerformanceSchemes */
     private String calculationRule;
@@ -37,9 +44,11 @@ public class Lecture {
         this.exercises = exercises;
         this.calculationRule = calculationRule;
         this.hasAccess = hasAccess;
+        this.lastModified = Instant.now();
     }
 
     public Lecture() {
+        this.lastModified = Instant.now();
     }
 
     public ObjectId getId() {
@@ -96,6 +105,14 @@ public class Lecture {
 
     public void setCalculationRule(String calculationRule) {
         this.calculationRule = calculationRule;
+    }
+
+    public Instant getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Instant lastModified) {
+        this.lastModified = lastModified;
     }
 
 }

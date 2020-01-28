@@ -6,6 +6,10 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.model.Grade;
@@ -41,8 +45,24 @@ public class GradeService {
      * @return list of all grades
      * @author Luca Dinies
      */
-    public List<Grade> getAllGrades() {
-        return gradeRepository.findAll();
+    public List<Grade> getAll() {
+        return getAll(null);
+    }
+
+    /**
+     * Get all Grades.
+     *
+     * @return list of all {@link Grade}s
+     * @author Leon Chemnitz
+     */
+    public List<Grade> getAll(Grade filter) {
+        if(filter == null){
+            filter = new Grade();
+        }       
+        ExampleMatcher matcher = ExampleMatcher.matching()
+        .withMatcher("matrNumber", GenericPropertyMatchers.contains());
+
+        return gradeRepository.findAll(Example.of(filter, matcher));
     }
 
     /**

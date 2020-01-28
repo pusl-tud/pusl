@@ -51,7 +51,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
         private static final long serialVersionUID = -7352842685521794385L;
 
-        public static final String ROUTE = "edit-lecture";
+        public static final String ROUTE = "admin/lecture";
 
         /*
          * no @Autowire because service is injected by constructor. Vaadin likes it
@@ -99,7 +99,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
                 MultiselectComboBox<User> hasAccess = new MultiselectComboBox<User>();
                 hasAccess.setLabel("Zugriff");
-                hasAccess.setItems(userService.getAllUsers());
+                hasAccess.setItems(userService.getAll());
                 hasAccess.setItemLabelGenerator(item -> UserService.getFullName(item));
                 formLayout.add(hasAccess, 2);
 

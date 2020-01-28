@@ -19,13 +19,14 @@ public class Grade {
 	private ObjectId id;
 
 	@DBRef
-	private Lecture lecture;
+	private Lecture lectureRef;
+
+	private Lecture lectureEmb;
 
 	private Exercise exercise;
 
 	@Indexed(unique = false)
-
-	private long matrNumber;
+	private String matrNumber;
 
 	@DBRef
 	private User gradedBy;
@@ -38,35 +39,33 @@ public class Grade {
 	public Grade() {
 	}
 
-	public Grade(Lecture lecture, Exercise exercise, long matrNumber, String grade, Instant handIn) {
-		this.lecture = lecture;
+	public Grade(Lecture lecture, Exercise exercise, String matrNumber, String grade, Instant handIn) {
+		this.lectureRef = lecture;
+		this.lectureEmb = lecture;
 		this.exercise = exercise;
 		this.matrNumber = matrNumber;
 		this.grade = grade;
 		this.handIn = handIn;
 	}
 
-	public Lecture getLecture() {
-		return lecture;
+	public void setLecture(Lecture lecture){
+		this.lectureEmb = lecture;
+		this.lectureRef = lecture;
 	}
 
-	public void setLecture(Lecture lecture) {
-		this.lecture = lecture;
+	public Lecture getLecture(){
+		if(lectureRef != null){
+			return lectureRef;
+		}else{
+			return lectureEmb;
+		}
 	}
 
-	public Exercise getExercise() {
-		return exercise;
-	}
-
-	public void setExercise(Exercise exercise) {
-		this.exercise = exercise;
-	}
-
-	public long getMatrNumber() {
+	public String getMatrNumber() {
 		return matrNumber;
 	}
 
-	public void setMatrNumber(long matrNumber) {
+	public void setMatrNumber(String matrNumber) {
 		this.matrNumber = matrNumber;
 	}
 
@@ -92,5 +91,43 @@ public class Grade {
 
 	public void setId(ObjectId id) {
 		this.id = id;
+	}
+
+	public Lecture getLectureRef() {
+		return lectureRef;
+	}
+
+	public void setLectureRef(Lecture lectureRef) {
+		this.lectureRef = lectureRef;
+	}
+
+	public Lecture getLectureEmb() {
+		return lectureEmb;
+	}
+
+	public void setLectureEmb(Lecture lectureEmb) {
+		this.lectureEmb = lectureEmb;
+	}
+
+	public User getGradedBy() {
+		return gradedBy;
+	}
+
+	public void setGradedBy(User gradedBy) {
+		this.gradedBy = gradedBy;
+	}
+
+	public Exercise getExercise() {
+		return exercise;
+	}
+
+	public void setExercise(Exercise exercise) {
+		this.exercise = exercise;
+	}
+
+	@Override
+	public String toString() {
+		return "Grade [exercise=" + exercise + ", grade=" + grade + ", gradedBy=" + gradedBy + ", handIn="
+				+ handIn + ", lectureEmb=" + lectureEmb + ", matrNumber=" + matrNumber + "]";
 	}
 }

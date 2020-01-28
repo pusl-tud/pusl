@@ -43,7 +43,7 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
 
         private static final long serialVersionUID = 1L;
 
-        public static final String ROUTE = "edit-institute";
+        public static final String ROUTE = "admin/institute";
 
         /*
          * no @Autowire because service is injected by constructor. Vaadin likes it

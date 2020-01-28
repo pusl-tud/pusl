@@ -12,7 +12,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 
 import org.bson.types.ObjectId;
@@ -141,7 +140,7 @@ public class NoFlexExerciseDialog {
 
         // TODO: Validator
         binder.forField(matrikelNum).withValidator(new StringLengthValidator("Bitte Matrikelnummer eingeben", 1, null))
-                .withConverter(new StringToLongConverter("Bitte eine Zahl eingeben!"))
+                // .withConverter(new StringToLongConverter("Bitte eine Zahl eingeben!")) hier muss ja eh der MatrNummerAlgo rein
                 .bind(Grade::getMatrNumber, Grade::setMatrNumber);
 
         binder.bind(lectureSelect, Grade::getLecture, Grade::setLecture);

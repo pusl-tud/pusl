@@ -11,8 +11,10 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 public class Exercise {
 
 	private String name;
+	
 	@DBRef
 	private ExerciseScheme scheme;
+
 	private boolean assignableByHIWI;
 
 	public Exercise(String name, ExerciseScheme scheme, boolean assignableByHIWI) {

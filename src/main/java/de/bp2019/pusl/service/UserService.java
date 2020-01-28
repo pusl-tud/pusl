@@ -35,7 +35,7 @@ public class UserService {
      * @return list of all users
      * @author Leon Chemnitz
      */
-    public List<User> getAllUsers() {
+    public List<User> getAll() {
         // TODO: implement authentication
         return userRepository.findAll();
     }
@@ -85,7 +85,7 @@ public class UserService {
      * @return found User with matching Id, null if none is found
      * @author Leon Chemnitz
      */
-    public User getUserById(String id) {
+    public User getById(String id) {
         // TODO: implement authentication
         Optional<User> foundUser = userRepository.findById(id);
 

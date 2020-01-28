@@ -52,7 +52,7 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
 
         private static final long serialVersionUID = 1L;
 
-        public static final String ROUTE = "edit-user";
+        public static final String ROUTE = "admin/user";
 
         /*
          * no @Autowire because service is injected by constructor. Vaadin likes it
@@ -210,7 +210,7 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                         /* clear fields by setting null */
                         binder.readBean(null);
                 } else {
-                        User fetchedUser = userService.getUserById(userId);
+                        User fetchedUser = userService.getById(userId);
                         /* getUserById returns null if no matching User is found */
                         if (fetchedUser == null) {
                                 throw new NotFoundException();

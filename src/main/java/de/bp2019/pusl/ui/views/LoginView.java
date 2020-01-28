@@ -22,7 +22,7 @@ import de.bp2019.pusl.util.CustomRequestCache;
  * @author Leon Chemnitz
  */
 @Route(value = LoginView.ROUTE)
-@PageTitle("Login")
+@PageTitle(AppConfig.NAME + " | Login")
 public class LoginView extends VerticalLayout {
 
 	private static final long serialVersionUID = -8376096237409998816L;

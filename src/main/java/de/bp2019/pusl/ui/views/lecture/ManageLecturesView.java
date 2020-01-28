@@ -36,11 +36,9 @@ public class ManageLecturesView extends BaseView {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String ROUTE = "manage-lectures";
+    public static final String ROUTE = "admin/lectures";
 
     private LectureService lectureService;
-
-    private Grid<Lecture> grid = new Grid<>();
     private ListDataProvider<Lecture> lectureDataProvider;
 
     @Autowired
@@ -56,7 +54,7 @@ public class ManageLecturesView extends BaseView {
         Grid<Lecture> grid = new Grid<>();
 
         grid.setWidth("100%");
-        grid.setItems(lectureService.getAll());
+        grid.setDataProvider(lectureDataProvider);
 
         grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true);
         grid.addComponentColumn(item -> createInstitutesTag(item)).setAutoWidth(true);
@@ -132,7 +130,7 @@ public class ManageLecturesView extends BaseView {
                     Dialog answerDialog = new Dialog();
                     answerDialog.add(new Text("Veranstaltung '" + lecture.getName() + "' gelöscht"));
                     answerDialog.open();
-                } finally {
+                } catch(Exception e){                    
                     Dialog answerDialog = new Dialog();
                     answerDialog.add(new Text("Fehler beim Löschen der Veranstaltung!"));
                     answerDialog.open();

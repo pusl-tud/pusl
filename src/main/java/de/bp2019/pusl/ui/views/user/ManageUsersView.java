@@ -31,11 +31,11 @@ public class ManageUsersView extends BaseView {
 
     private static final long serialVersionUID = -5763725756205681478L;
 
-    public static final String ROUTE = "manage-users";
+    public static final String ROUTE = "admin/users";
 
     private UserService userService;
-
-    private Grid<User> grid = new Grid<>();
+    
+    private ListDataProvider<User> userDataProvider;
 
     @Autowired
     public ManageUsersView(UserService userService) {
@@ -43,12 +43,14 @@ public class ManageUsersView extends BaseView {
 
         this.userService = userService;
 
+        userDataProvider = new ListDataProvider<>(userService.getAll());
+
         /* -- Create Components -- */
 
         Grid<User> grid = new Grid<>();
 
         grid.setWidth("100%");
-        grid.setItems(userService.getAllUsers());
+        grid.setDataProvider(userDataProvider);
 
         grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true);
         grid.addComponentColumn(item -> createDeleteButton(item)).setFlexGrow(0).setWidth("4em");
@@ -96,15 +98,21 @@ public class ManageUsersView extends BaseView {
             dialog.setCloseOnOutsideClick(false);
 
             Button confirmButton = new Button("Löschen", event -> {
-                userService.delete(user);
-                ListDataProvider<User> dataProvider = (ListDataProvider<User>) grid.getDataProvider();
-                dataProvider.getItems().remove(user);
-                dataProvider.refreshAll();
-
-                dialog.close();
-                Dialog answerDialog = new Dialog();
-                answerDialog.add(new Text("Nutzer '" + UserService.getFullName(user) + "' gelöscht"));
-                answerDialog.open();
+                try {
+                    userService.delete(user);
+                    userDataProvider.getItems().remove(user);
+                    userDataProvider.refreshAll();
+    
+                    dialog.close();
+                    Dialog answerDialog = new Dialog();
+                    answerDialog.add(new Text("Nutzer '" + UserService.getFullName(user) + "' gelöscht"));
+                    answerDialog.open();
+                } catch(Exception e){                    
+                    Dialog answerDialog = new Dialog();
+                    answerDialog.add(new Text("Fehler beim Löschen des Nutzers!"));
+                    answerDialog.open();
+                    LOGGER.error("Could not delete User! User ID was: " + user.getId());
+                }
             });
 
             Button cancelButton = new Button("Abbruch", event -> {

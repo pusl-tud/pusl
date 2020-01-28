@@ -49,7 +49,7 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
 
     private static final long serialVersionUID = -1771968129664884637L;
 
-    public static final String ROUTE = "edit-exerciseScheme";
+    public static final String ROUTE = "admin/exerciseScheme";
 
     private Binder<ExerciseScheme> binder;
 
