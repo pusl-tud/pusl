@@ -23,6 +23,7 @@ import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.ui.components.NoFlexExerciseDialog;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -42,7 +43,6 @@ public class WorkView extends BaseView {
     private ListDataProvider<Grade> gradeDataProvider;
 
     private GradeService gradeService;
-
 
     /** Filter for the Database Query, lookup Spring Data Query by Example! */
     private Grade filter;
@@ -158,6 +158,7 @@ public class WorkView extends BaseView {
                 filter.setLecture(null);
                 reloadFilter();
                 grid.getColumnByKey("lecture").setVisible(true);
+                grid.getColumnByKey("exercise").setVisible(true);
 
                 exerciseFilter.setValue(filterCleanExercise);
                 exerciseFilter.setEnabled(false);
@@ -168,10 +169,10 @@ public class WorkView extends BaseView {
                 reloadFilter();
 
                 grid.getColumnByKey("lecture").setVisible(false);
+                exerciseFilter.setValue(filterCleanExercise);
 
                 List<Exercise> lectureExercises = event.getValue().getExercises();
 
-                //lectureExercises.add(0, filterCleanExercise);
                 exerciseFilter.setItems(lectureExercises);
                 exerciseFilter.setEnabled(true);
             }
@@ -189,6 +190,35 @@ public class WorkView extends BaseView {
                 }
             }
         });
+
+        startDateFilter.addValueChangeListener(event -> {
+            LocalDate selectedDate = event.getValue();
+            LocalDate endDate = endDateFilter.getValue();
+            if(selectedDate != null){
+                endDateFilter.setMin(selectedDate);
+                gradeDataProvider.addFilter(grade -> grade.getHandIn().isAfter(startDateFilter.getValue()));
+                if(endDate == null){
+                    endDateFilter.setOpened(true);
+                }
+            } else {
+                endDateFilter.setMin(null);
+            }
+        });
+
+        endDateFilter.addValueChangeListener(event -> {
+            LocalDate selectedDate = event.getValue();
+            LocalDate startDate = startDateFilter.getValue();
+            if(selectedDate != null){
+                startDateFilter.setMax(selectedDate);
+                gradeDataProvider.addFilter(grade -> grade.getHandIn().isBefore(endDateFilter.getValue()));
+                if(startDate == null){
+                    startDateFilter.setOpened(true);
+                }
+            } else {
+                startDateFilter.setMax(null);
+            }
+        });
+
     }
 
     /**
