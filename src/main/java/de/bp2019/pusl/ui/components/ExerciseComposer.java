@@ -72,7 +72,7 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
         add(grid);
 
         FormLayout formLayout = new FormLayout();
-        formLayout.setResponsiveSteps(new ResponsiveStep("1em", 1), new ResponsiveStep("1em", 2));
+        formLayout.setResponsiveSteps(new ResponsiveStep("1em", 1), new ResponsiveStep("1em", 2), new ResponsiveStep("1em", 3));
 
         nameTextField = new TextField();
         nameTextField.setPlaceholder("Prüfung");
@@ -86,9 +86,7 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
         exerciseSchemeSelect.setValue(allExerciseSchemes.get(0));
         formLayout.add(exerciseSchemeSelect, 1);
 
-        add(formLayout);
-
-        Button exerciseSchemesButton = new Button("Prüfung hinzufügen", new Icon(VaadinIcon.PLUS_CIRCLE));
+        Button exerciseSchemesButton = new Button("hinzufügen", new Icon(VaadinIcon.PLUS_CIRCLE));
         exerciseSchemesButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
         exerciseSchemesButton.setWidth(WIDTH);
         exerciseSchemesButton.addClickListener(event -> {
@@ -97,7 +95,9 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
             setValue(new ArrayList<>(gridItems));
         });
 
-        add(exerciseSchemesButton);
+        formLayout.add(exerciseSchemesButton, 1);
+        
+        add(formLayout);
 
         /* ########### Drag and Drop Logic ########### */
 
