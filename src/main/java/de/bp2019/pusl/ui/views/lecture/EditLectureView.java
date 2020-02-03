@@ -37,6 +37,7 @@ import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.components.ExerciseComposer;
+import de.bp2019.pusl.ui.components.VerticalTabs;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.MainAppView;
 
@@ -97,14 +98,21 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 institutes.setItemLabelGenerator(item -> item.getName());
                 formLayout.add(institutes, 1);
 
+                VerticalTabs verticalTabs = new VerticalTabs();
+                verticalTabs.setHeight("25em");
+                verticalTabs.setWidth("100%");
+
+
                 MultiselectComboBox<User> hasAccess = new MultiselectComboBox<User>();
+                hasAccess.setWidth("100%");
+                hasAccess.setHeight("10em");
                 hasAccess.setLabel("Zugriff");
                 hasAccess.setItems(userService.getAll());
                 hasAccess.setItemLabelGenerator(item -> UserService.getFullName(item));
-                formLayout.add(hasAccess, 2);
+                verticalTabs.addTab("Zugriff", hasAccess);
 
                 ExerciseComposer exercises = new ExerciseComposer(exerciseSchemeService);
-                formLayout.add(exercises, 2);
+                verticalTabs.addTab("Prüfungen", exercises);
 
                 TextArea calculationRule = new TextArea();
                 calculationRule.setValueChangeMode(ValueChangeMode.EAGER);
@@ -113,7 +121,9 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 calculationRule.setHeight("15em");
                 calculationRule.setWidthFull();
 
-                formLayout.add(calculationRule);
+                verticalTabs.addTab("Leistungen", calculationRule);
+
+                formLayout.add(verticalTabs, 2);
 
                 Button save = new Button("Speichern");
                 save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
