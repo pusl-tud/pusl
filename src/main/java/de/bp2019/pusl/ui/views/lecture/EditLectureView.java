@@ -11,7 +11,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -37,6 +36,7 @@ import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.components.ExerciseComposer;
+import de.bp2019.pusl.ui.components.PerformanceSchemeComposer;
 import de.bp2019.pusl.ui.components.VerticalTabs;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.MainAppView;
@@ -102,6 +102,17 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 verticalTabs.setHeight("25em");
                 verticalTabs.setWidth("100%");
 
+                ExerciseComposer exercises = new ExerciseComposer(exerciseSchemeService);
+                verticalTabs.addTab("Prüfungen", exercises);
+
+                // TextArea calculationRule = new TextArea();
+                // calculationRule.setValueChangeMode(ValueChangeMode.EAGER);
+                // calculationRule.setLabel("Berechnungsregel");
+                // calculationRule.setPlaceholder("Platzhalter");
+                // calculationRule.setHeight("15em");
+                // calculationRule.setWidthFull();
+                PerformanceSchemeComposer performanceSchemes = new PerformanceSchemeComposer();
+                verticalTabs.addTab("Leistungen", performanceSchemes);
 
                 MultiselectComboBox<User> hasAccess = new MultiselectComboBox<User>();
                 hasAccess.setWidth("100%");
@@ -110,18 +121,6 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 hasAccess.setItems(userService.getAll());
                 hasAccess.setItemLabelGenerator(item -> UserService.getFullName(item));
                 verticalTabs.addTab("Zugriff", hasAccess);
-
-                ExerciseComposer exercises = new ExerciseComposer(exerciseSchemeService);
-                verticalTabs.addTab("Prüfungen", exercises);
-
-                TextArea calculationRule = new TextArea();
-                calculationRule.setValueChangeMode(ValueChangeMode.EAGER);
-                calculationRule.setLabel("Berechnungsregel");
-                calculationRule.setPlaceholder("Platzhalter");
-                calculationRule.setHeight("15em");
-                calculationRule.setWidthFull();
-
-                verticalTabs.addTab("Leistungen", calculationRule);
 
                 formLayout.add(verticalTabs, 2);
 
@@ -147,7 +146,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
                 binder.bind(exercises, Lecture::getExercises, Lecture::setExercises);
 
-                binder.bind(calculationRule, Lecture::getCalculationRule, Lecture::setCalculationRule);
+                binder.bind(performanceSchemes, Lecture::getPerformanceSchemes, Lecture::setPerformanceSchemes);
 
                 /* ########### Add Layout to Component ########### */
 

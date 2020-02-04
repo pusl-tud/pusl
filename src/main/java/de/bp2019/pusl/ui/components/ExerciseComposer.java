@@ -41,8 +41,6 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExerciseComposer.class);
 
-    private static final String WIDTH = "35em";
-
     private Grid<Exercise> grid;
     private Exercise draggedItem;
     private List<Exercise> gridItems;
@@ -53,8 +51,8 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
     private List<ExerciseScheme> allExerciseSchemes;
 
     public ExerciseComposer(ExerciseSchemeService exerciseSchemeService) {
-        Label label = new Label("Prüfungen");
-        add(label);
+        setLabel("Prüfungen");
+        setWidth("100%");
 
         grid = new Grid<>();
         gridItems = new ArrayList<>();
@@ -68,7 +66,7 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
         grid.setRowsDraggable(true);
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         grid.setHeight("20em");
-        grid.setWidth(WIDTH);
+        grid.setWidth("100%");
         add(grid);
 
         FormLayout formLayout = new FormLayout();
@@ -88,7 +86,6 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
 
         Button exerciseSchemesButton = new Button("hinzufügen", new Icon(VaadinIcon.PLUS_CIRCLE));
         exerciseSchemesButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-        exerciseSchemesButton.setWidth(WIDTH);
         exerciseSchemesButton.addClickListener(event -> {
             Exercise exercise = new Exercise(nameTextField.getValue(), exerciseSchemeSelect.getValue(), false);
             gridItems.add(exercise);
