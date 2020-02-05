@@ -10,7 +10,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -78,7 +77,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
                 FormLayout formLayout = new FormLayout();
                 formLayout.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
-                formLayout.setWidth("100%");
+                formLayout.setWidth("calc(100% - 1em)");
                 formLayout.getStyle().set("marginLeft", "1em");
                 formLayout.getStyle().set("marginTop", "-0.5em");
 
@@ -105,12 +104,6 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 ExerciseComposer exercises = new ExerciseComposer(exerciseSchemeService);
                 verticalTabs.addTab("Prüfungen", exercises);
 
-                // TextArea calculationRule = new TextArea();
-                // calculationRule.setValueChangeMode(ValueChangeMode.EAGER);
-                // calculationRule.setLabel("Berechnungsregel");
-                // calculationRule.setPlaceholder("Platzhalter");
-                // calculationRule.setHeight("15em");
-                // calculationRule.setWidthFull();
                 PerformanceSchemeComposer performanceSchemes = new PerformanceSchemeComposer();
                 verticalTabs.addTab("Leistungen", performanceSchemes);
 
@@ -124,13 +117,13 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
                 formLayout.add(verticalTabs, 2);
 
+                add(formLayout);
+
                 Button save = new Button("Speichern");
                 save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-                VerticalLayout actions = new VerticalLayout();
-                actions.add(save);
-                actions.setHorizontalComponentAlignment(Alignment.END, save);
-                formLayout.add(actions, 2);
+                add(save);
+                setHorizontalComponentAlignment(Alignment.END, save);
 
                 /* ########### Data Binding and validation ########### */
                 binder.forField(name).withValidator(
@@ -147,10 +140,6 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 binder.bind(exercises, Lecture::getExercises, Lecture::setExercises);
 
                 binder.bind(performanceSchemes, Lecture::getPerformanceSchemes, Lecture::setPerformanceSchemes);
-
-                /* ########### Add Layout to Component ########### */
-
-                add(formLayout);
 
                 /* ########### Click Listeners for Buttons ########### */
 

@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A Vertical Tab component, to ease use with Vaadin tabs..
+ * A Vertical Tab component, to ease use with Vaadin tabs
  * 
  * @author Leon Chemnitz
  */

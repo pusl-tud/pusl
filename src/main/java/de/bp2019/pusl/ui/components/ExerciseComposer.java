@@ -51,9 +51,7 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
     private List<ExerciseScheme> allExerciseSchemes;
 
     public ExerciseComposer(ExerciseSchemeService exerciseSchemeService) {
-        setLabel("Prüfungen");
         setWidth("100%");
-
         grid = new Grid<>();
         gridItems = new ArrayList<>();
         grid.setItems(gridItems);
@@ -65,8 +63,9 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
         grid.setSelectionMode(SelectionMode.SINGLE);
         grid.setRowsDraggable(true);
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-        grid.setHeight("20em");
+        grid.setHeight("21em");
         grid.setWidth("100%");
+        grid.getStyle().set("margin-top", "2em");
         add(grid);
 
         FormLayout formLayout = new FormLayout();

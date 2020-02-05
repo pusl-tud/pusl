@@ -34,16 +34,13 @@ public class Lecture {
 
     private Instant lastModified;
 
-    /** Temporary field TODO: replace with PerformanceSchemes */
-    private String calculationRule;
-
     public Lecture(String name, Set<Institute> institutes, Set<User> hasAccess, List<Exercise> exercises,
-            String calculationRule) {
+            List<PerformanceScheme> performanceSchemes) {
         this.name = name;
         this.institutes = institutes;
         this.exercises = exercises;
-        this.calculationRule = calculationRule;
         this.hasAccess = hasAccess;
+        this.performanceSchemes = performanceSchemes;
         this.lastModified = Instant.now();
     }
 
@@ -97,14 +94,6 @@ public class Lecture {
 
     public void setPerformanceSchemes(List<PerformanceScheme> performanceSchemes) {
         this.performanceSchemes = performanceSchemes;
-    }
-
-    public String getCalculationRule() {
-        return calculationRule;
-    }
-
-    public void setCalculationRule(String calculationRule) {
-        this.calculationRule = calculationRule;
     }
 
     public Instant getLastModified() {
