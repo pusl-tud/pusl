@@ -30,6 +30,19 @@ public class LecturesView extends BaseView {
 
     public static final String ROUTE = "";
 
+    /*private class MyAccordion{
+    	
+    	public MyAccordion() {
+    		VerticalLayout myAccordion = new VerticalLayout();
+    		myAccordion.setWidth("500%");
+    		
+    	}
+    	
+    	public void add(Button button) {
+    		return;
+    	}
+    }*/
+    
     public LecturesView(LectureService lectureService) {
         super("Meine Veranstaltungen");
 
@@ -61,4 +74,5 @@ public class LecturesView extends BaseView {
         button.getStyle().set("margin", "0");
         return button;
     }
+    
 }
