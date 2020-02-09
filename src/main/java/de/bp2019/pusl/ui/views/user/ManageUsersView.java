@@ -58,6 +58,7 @@ public class ManageUsersView extends BaseView {
         add(grid);
 
         Button newUserButton = new Button("Neuer Nutzer");
+        newUserButton.setId("new-user");
         newUserButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         add(newUserButton);
