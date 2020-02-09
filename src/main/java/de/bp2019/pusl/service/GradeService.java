@@ -59,7 +59,10 @@ public class GradeService {
             filter = new Grade();
         }       
         ExampleMatcher matcher = ExampleMatcher.matching()
-        .withMatcher("matrNumber", GenericPropertyMatchers.contains());
+        .withMatcher("matrNumber", GenericPropertyMatchers.contains())
+                .withMatcher("grade", GenericPropertyMatchers.contains())
+                .withMatcher("lecture", GenericPropertyMatchers.contains())
+                .withMatcher("exercise", GenericPropertyMatchers.contains());
 
         return gradeRepository.findAll(Example.of(filter, matcher));
     }

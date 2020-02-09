@@ -1,5 +1,6 @@
 package de.bp2019.pusl.ui.views;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -142,19 +143,19 @@ public class DemoView extends BaseView  {
 
                 List<Lecture> lectures = lectureRepository.findAll();
 
-                Grade grade = new Grade(lectures.get(0), lectures.get(0).getExercises().get(0), "17762563", "2,4", null);
+                Grade grade = new Grade(lectures.get(0), lectures.get(0).getExercises().get(0), "17762563", "2,4", LocalDate.of(2019, 12, 24));
                 gradeRepository.save(grade);
 
-                grade = new Grade(lectures.get(1), lectures.get(1).getExercises().get(1), "17793563", "1,3", null);
+                grade = new Grade(lectures.get(1), lectures.get(1).getExercises().get(1), "17793563", "1,3", LocalDate.of(2019, 11, 20));
                 gradeRepository.save(grade);
 
-                grade = new Grade(lectures.get(0), lectures.get(0).getExercises().get(2), "17762563", "2,4", null);
+                grade = new Grade(lectures.get(0), lectures.get(0).getExercises().get(2), "17762563", "2,4", LocalDate.of(2020, 01, 13));
                 gradeRepository.save(grade);
 
-                grade = new Grade(lectures.get(2), lectures.get(2).getExercises().get(0), "28362563", "4,4", null);
+                grade = new Grade(lectures.get(2), lectures.get(2).getExercises().get(0), "28362563", "4,4", LocalDate.of(2019, 11, 29));
                 gradeRepository.save(grade);
 
-                grade = new Grade(lectures.get(0), lectures.get(0).getExercises().get(2), "17762563", "1.0", null);
+                grade = new Grade(lectures.get(0), lectures.get(0).getExercises().get(2), "17762563", "1.0", LocalDate.of(2019, 12, 03));
                 gradeRepository.save(grade);
 
                 LOGGER.info("refilling Database done.");
