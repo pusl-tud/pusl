@@ -18,6 +18,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
+import com.vaadin.flow.data.binder.ValidationResult;
+import com.vaadin.flow.data.binder.Binder.Binding;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -161,15 +163,27 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                 binder.forField(userType).withValidator(ut -> ut != null, "Bitte Nutzer Typ wählen").bind(User::getType,
                                 User::setType);
 
-                binder.forField(password)
-                                .withValidator(new StringLengthValidator("Muss mindestens 8 Zeichen lang sein", 8,
-                                                null))
-                                .withValidator(passwordString -> passwordString.equals(repeatPassword.getValue()),
-                                                "Passwörter stimmen nicht überein!")
-                                .bind(user -> {
-                                        repeatPassword.setValue("not shown");
-                                        return "not shown";
-                                }, (user, passwordString) -> user.setPassword(passwordEncoder.encode(passwordString)));
+                Binding<User, String> passwordBinder = binder.forField(password)
+                                .withValidator((enteredPassword, valueContext) -> {
+
+                                        if (objectId != null && enteredPassword == "") {
+                                                /*
+                                                 * User already exists and has entered no new password, therefore a new password
+                                                 * is not needed
+                                                 */
+                                        } else {
+                                                if(enteredPassword.length() < 8){
+                                                        return ValidationResult.error("Passwort muss länger als 8 Zeichen sein!");
+                                                }
+
+                                                if(!enteredPassword.equals(repeatPassword.getValue())){
+                                                        return ValidationResult.error("Passwörter stimmen nicht überein!");
+                                                }
+                                        }
+
+                                        return ValidationResult.ok();
+                                }).bind(pwd -> null, (user, pwd) -> user.setPassword(passwordEncoder.encode(pwd)));
+                password.addValueChangeListener(e -> passwordBinder.validate());
 
                 /* ########### Click Listeners for Buttons ########### */
 
@@ -180,6 +194,11 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                                         user.setId(objectId);
                                 }
                                 try {
+
+                                        if (!password.getValue().equals("")) {
+                                                user.setPassword(passwordEncoder.encode(password.getValue()));
+                                        }
+
                                         userService.save(user);
                                         Dialog dialog = new Dialog();
                                         dialog.add(new Text("Nutzer erfolgreich gespeichert"));
