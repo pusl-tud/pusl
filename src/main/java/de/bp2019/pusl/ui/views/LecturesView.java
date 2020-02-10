@@ -4,18 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.details.DetailsVariant;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import de.bp2019.pusl.config.AppConfig;
-import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.service.LectureService;
+import de.bp2019.pusl.ui.views.lecture.EditLectureView;
 
 /**
  * View that displays a Dashboard
@@ -29,50 +26,34 @@ public class LecturesView extends BaseView {
     private static final long serialVersionUID = 1L;
 
     public static final String ROUTE = "";
-
-    /*private class MyAccordion{
-    	
-    	public MyAccordion() {
-    		VerticalLayout myAccordion = new VerticalLayout();
-    		myAccordion.setWidth("500%");
-    		
-    	}
-    	
-    	public void add(Button button) {
-    		return;
-    	}
-    }*/
+    
+    private LectureService lectureService;
     
     public LecturesView(LectureService lectureService) {
         super("Meine Veranstaltungen");
-
-        List<Lecture> lectures = new ArrayList<>();
-        lectures.addAll(lectureService.getAll());
-
-        Accordion accordion = new Accordion();
-
-        lectures.stream().forEach(
-                item -> accordion.add(item.getName(), fillAccordions(item)).addThemeVariants(DetailsVariant.FILLED));
-
-        add(accordion);
+        
+        this.lectureService = lectureService;
+        
+        List<Lecture> lecturesList = new ArrayList<>();
+        
+        lecturesList.addAll(lectureService.getAll());
+        
+        lecturesList.forEach(lecture -> add(createLectureNameButton(lecture), createExerciseButton(lecture)));
     }
+ 
+	private Button createLectureNameButton(Lecture lecture) {
+		Button button = new Button(lecture.getName(), clickEvent -> {
+			UI.getCurrent().navigate(EditLectureView.ROUTE + "/" + lecture.getId());
+		});
+		button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+		return button;
+	}
 
-    private VerticalLayout fillAccordions(Lecture lecture) {
-
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setWidth("300%");
-        lecture.getExercises().stream().forEach(item -> verticalLayout.add(createNameButton(item)));
-
-        return verticalLayout;
-    }
-
-    private Button createNameButton(Exercise exercise) {
-        Button button = new Button(exercise.getName(), clickEvent -> {
-            UI.getCurrent().navigate(WorkView.ROUTE);
-        });
-        button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+	private Button createExerciseButton(Lecture lecture) {
+		Button button = new Button("Übungen anzeigen", clickEvent -> {
+			UI.getCurrent().navigate(WorkView.ROUTE + "/?lectureFilter=" + lecture.getName());
+		});
         button.getStyle().set("margin", "0");
-        return button;
-    }
-    
+		return button;
+	}
 }
