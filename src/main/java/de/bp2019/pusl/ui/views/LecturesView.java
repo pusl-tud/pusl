@@ -1,16 +1,20 @@
 package de.bp2019.pusl.ui.views;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.config.AppConfig;
 import de.bp2019.pusl.model.Exercise;
@@ -30,18 +34,41 @@ public class LecturesView extends BaseView {
 
     public static final String ROUTE = "";
 
+    @Autowired
     public LecturesView(LectureService lectureService) {
         super("Meine Veranstaltungen");
 
         List<Lecture> lectures = new ArrayList<>();
         lectures.addAll(lectureService.getAll());
 
-        Accordion accordion = new Accordion();
+        for (Lecture l : lectures) {
+            Button lectureButton = new Button(l.getName());
+            lectureButton.addClickListener(event -> {
+                var parameterMap = new HashMap<String, List<String>>();
+                parameterMap.put("lecture", Arrays.asList(l.getId().toString()));
+                QueryParameters parameters = new QueryParameters(parameterMap);
+                UI.getCurrent().navigate(WorkView.ROUTE, parameters);
+            });
+            add(lectureButton);
 
-        lectures.stream().forEach(
-                item -> accordion.add(item.getName(), fillAccordions(item)).addThemeVariants(DetailsVariant.FILLED));
+            VerticalLayout layout = new VerticalLayout();
+            for (Exercise e : l.getExercises()) {
+                Button exerciseButton = new Button(e.getName());
+                exerciseButton.addClickListener(event -> {
+                    var parameterMap = new HashMap<String, List<String>>();
+                    parameterMap.put("lecture", Arrays.asList(l.getId().toString()));
+                    parameterMap.put("exercise", Arrays.asList(e.getName()));
+                    QueryParameters parameters = new QueryParameters(parameterMap);
+                    UI.getCurrent().navigate(WorkView.ROUTE, parameters);
+                });
+                layout.add(exerciseButton);
+            }
 
-        add(accordion);
+            Accordion accordion = new Accordion();
+            accordion.add("Übungen", layout);
+            add(accordion);
+        }
+
     }
 
     private VerticalLayout fillAccordions(Lecture lecture) {

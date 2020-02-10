@@ -115,4 +115,10 @@ public class Lecture {
         this.lastModified = lastModified;
     }
 
+    @Override
+    public String toString() {
+        return "Lecture [institutes=" + institutes + ", lastModified=" + lastModified + ", name=" + name
+                + ", performanceSchemes=" + performanceSchemes + "]";
+    }
+
 }
