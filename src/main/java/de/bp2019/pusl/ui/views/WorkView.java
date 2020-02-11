@@ -27,7 +27,9 @@ import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -37,7 +39,7 @@ import java.util.List;
 
 @PageTitle(AppConfig.NAME + " | Noten eintragen")
 @Route(value = WorkView.ROUTE, layout = MainAppView.class)
-public class WorkView extends BaseView /*implements HasUrlParameter<String> */{
+public class WorkView extends BaseView implements HasUrlParameter<String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -50,6 +52,15 @@ public class WorkView extends BaseView /*implements HasUrlParameter<String> */{
     private ObjectId objectId;
 
     private Binder<Grade> binder;
+
+    @Autowired
+    private LectureService lectureService;
+
+    private Select<Lecture> lectureFilter;
+    private Select<Exercise> exerciseFilter;
+    private TextField martrNumberFilter;
+
+    private Map<String, List<String>> parametersMap;
 
     /** Filter for the Database Query, lookup Spring Data Query by Example! */
     private Grade filter;
@@ -82,11 +93,11 @@ public class WorkView extends BaseView /*implements HasUrlParameter<String> */{
 
         VerticalLayout martrGradeLayout = new VerticalLayout();
 
-        TextField martrNumber = new TextField();
-        martrNumber.setLabel("Matrikelnummer");
-        martrNumber.setPlaceholder("Matrikelnummer");
-        martrNumber.setValueChangeMode(ValueChangeMode.EAGER);
-        martrGradeLayout.add(martrNumber);
+        martrNumberFilter = new TextField();
+        martrNumberFilter.setLabel("Matrikelnummer");
+        martrNumberFilter.setPlaceholder("Matrikelnummer");
+        martrNumberFilter.setValueChangeMode(ValueChangeMode.EAGER);
+        martrGradeLayout.add(martrNumberFilter);
 
         TextField gradeFilter = new TextField();
         gradeFilter.setLabel("Note");
@@ -98,7 +109,7 @@ public class WorkView extends BaseView /*implements HasUrlParameter<String> */{
 
         VerticalLayout moduleExerciseLayout = new VerticalLayout();
 
-        Select<Lecture> lectureFilter = new Select<>();
+        lectureFilter = new Select<>();
         lectureFilter.setItemLabelGenerator(Lecture::getName);
         List<Lecture> allLectures = lectureService.getAll();
         allLectures.add(0, filterCleanModule);
@@ -107,7 +118,7 @@ public class WorkView extends BaseView /*implements HasUrlParameter<String> */{
         lectureFilter.setLabel("Modul");
         moduleExerciseLayout.add(lectureFilter);
 
-        Select<Exercise> exerciseFilter = new Select<>();
+        exerciseFilter = new Select<>();
         exerciseFilter.setItemLabelGenerator(Exercise::getName);
         exerciseFilter.setEnabled(false);
         exerciseFilter.setLabel("Übung");
@@ -150,9 +161,10 @@ public class WorkView extends BaseView /*implements HasUrlParameter<String> */{
 
         /*############## CHANGE LISTENERS ############# */
 
-        martrNumber.addValueChangeListener(event -> {
+        martrNumberFilter.addValueChangeListener(event -> {
             filter.setMatrNumber(event.getValue());
             reloadFilter();
+
         });
 
         gradeFilter.addValueChangeListener(event -> {
@@ -183,6 +195,7 @@ public class WorkView extends BaseView /*implements HasUrlParameter<String> */{
 
                 exerciseFilter.setItems(lectureExercises);
                 exerciseFilter.setEnabled(true);
+
 
             }
 
@@ -355,15 +368,37 @@ public class WorkView extends BaseView /*implements HasUrlParameter<String> */{
         gradeDataProvider.getItems().addAll(gradeService.getAll(filter));
         gradeDataProvider.refreshAll();
     }
-/*
+
+
     @Override
-    public void setParameter(BeforeEvent event, String parameter) {
+    public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
         Location location = event.getLocation();
         QueryParameters queryParameters = location
                 .getQueryParameters();
 
-        Map<String, List<String>> parametersMap =
-                queryParameters.getParameters();
+        parametersMap = queryParameters.getParameters();
 
-    }*/
+        if(parametersMap.get("lecture") != null){
+            Lecture parameterLecture = lectureService.getById(parametersMap.get("lecture").get(0));
+            lectureFilter.setValue(parameterLecture);
+            reloadFilter();
+
+            if (parametersMap.get("exercise") != null){
+                String parameterExerciseName = parametersMap.get("exercise").get(0);
+                Exercise parameterExercise = parameterLecture.getExercises().stream()
+                        .filter(exercise -> exercise.getName().equals(parameterExerciseName))
+                        .findFirst().get();
+
+                exerciseFilter.setValue(parameterExercise);
+                reloadFilter();
+            }
+        }
+
+        if (parametersMap.get("matrNumber") != null){
+            String parameterMatrikelNumber = parametersMap.get("matrNumber").get(0);
+            martrNumberFilter.setValue(parameterMatrikelNumber);
+            reloadFilter();
+        }
+
+    }
 }
