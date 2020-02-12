@@ -33,6 +33,8 @@ import java.util.Map;
 
 /**
  *
+ * View that displays all Grades and contains a form to add New Grades
+ *
  * @author Luca Dinies
  *
  **/
@@ -195,7 +197,6 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
                 exerciseFilter.setItems(lectureExercises);
                 exerciseFilter.setEnabled(true);
-
 
             }
 
@@ -381,7 +382,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         if(parametersMap.get("lecture") != null){
             Lecture parameterLecture = lectureService.getById(parametersMap.get("lecture").get(0));
             lectureFilter.setValue(parameterLecture);
-            reloadFilter();
+            lectureFilter.setPlaceholder(parameterLecture.getName());
 
             if (parametersMap.get("exercise") != null){
                 String parameterExerciseName = parametersMap.get("exercise").get(0);
@@ -390,14 +391,12 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
                         .findFirst().get();
 
                 exerciseFilter.setValue(parameterExercise);
-                reloadFilter();
             }
         }
 
-        if (parametersMap.get("matrNumber") != null){
-            String parameterMatrikelNumber = parametersMap.get("matrNumber").get(0);
-            martrNumberFilter.setValue(parameterMatrikelNumber);
-            reloadFilter();
+        if (parametersMap.get("martrNumber") != null){
+            String parameterMartrikelNumber = parametersMap.get("martrNumber").get(0);
+            martrNumberFilter.setValue(parameterMartrikelNumber);
         }
 
     }
