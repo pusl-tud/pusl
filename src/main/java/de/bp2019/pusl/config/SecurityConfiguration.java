@@ -55,7 +55,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	public UserDetailsService userDetailsService() {
 		// TODO: change...
-		UserDetails user = User.withUsername("user").password(passwordEncoder.encode("password")).roles("USER").build();
+		//ToTo: ich habe den Nutzernamen nur fuers testen vom AccountView geändert
+		UserDetails user = User.withUsername("Test User").password(passwordEncoder.encode("password")).roles("USER").build();
 
 		return new InMemoryUserDetailsManager(user);
 	}
