@@ -35,6 +35,10 @@
       <artifactId>vaadin-spring-boot-starter</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-testbench</artifactId>
+  </dependency>
+    <dependency>
       <groupId>org.vaadin.gatanaso</groupId>
       <artifactId>multiselect-combo-box-flow</artifactId>
       <version>2.3.0</version>
