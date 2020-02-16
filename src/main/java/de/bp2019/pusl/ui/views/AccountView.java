@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -68,25 +69,25 @@ public class AccountView extends BaseView {
 		TextField firstNameField = new TextField("Vorname", "Vornamen eingeben");
 		firstNameField.setValueChangeMode(ValueChangeMode.EAGER);
 		
-		TextField lastName = new TextField("Nachname", "Nachnamen eingeben");
-		lastName.setValueChangeMode(ValueChangeMode.EAGER);
+		TextField lastNameField = new TextField("Nachname", "Nachnamen eingeben");
+		lastNameField.setValueChangeMode(ValueChangeMode.EAGER);
 		
-		TextField emailAddress = new TextField("Email-Adresse", "Mail-Adresse eingeben");
-		emailAddress.setValueChangeMode(ValueChangeMode.EAGER);
+		TextField emailAddressField = new TextField("Email-Adresse", "Mail-Adresse eingeben");
+		emailAddressField.setValueChangeMode(ValueChangeMode.EAGER);
 		
-		PasswordField password = new PasswordField("Passwort", "Passwort eingeben");
-		password.setValueChangeMode(ValueChangeMode.EAGER);
+		PasswordField passwordField = new PasswordField("Passwort", "Passwort eingeben");
+		passwordField.setValueChangeMode(ValueChangeMode.EAGER);
 		
-		PasswordField confirmPassword = new PasswordField("Passwort wiederholen", "Passwort wiederholen");
-		confirmPassword.setValueChangeMode(ValueChangeMode.EAGER);
+		PasswordField confirmPasswordField = new PasswordField("Passwort wiederholen", "Passwort wiederholen");
+		confirmPasswordField.setValueChangeMode(ValueChangeMode.EAGER);
 		
 		
 		form.add(firstNameField, 1);
-		form.add(lastName, 1);
-		form.add(emailAddress, 1);
+		form.add(lastNameField, 1);
+		form.add(emailAddressField, 1);
 		form.add(new Label(""), 1);
-		form.add(password, 1);
-		form.add(confirmPassword, 1);
+		form.add(passwordField, 1);
+		form.add(confirmPasswordField, 1);
 		
 		
 		//Getting current logged in user to bind to a pusl User instance 
@@ -106,22 +107,21 @@ public class AccountView extends BaseView {
 		binder.setBean(currentUser);
 		
 		binder.forField(firstNameField).bind(User::getFirstName, User::setFirstName);
-		binder.forField(lastName).bind(User::getLastName, User::setLastName);
-		binder.forField(emailAddress).
+		binder.forField(lastNameField).bind(User::getLastName, User::setLastName);
+		binder.forField(emailAddressField).
 			withValidator(new EmailValidator("Bitte korrekte Mailadresse eingeben")).
 				bind(User::getEmailAddress, User::setEmailAddress);
 		//TODO: nach Speichern in diesem View oder im EditUserView wird passwort mit encoder überschrieben, jedoch soll hier das nicht encodete Passwort angezeigt werden.
-		binder.forField(password)
+		binder.forField(passwordField)
 			.withValidator(new StringLengthValidator(
 							"Passwort muss mind. 8 Zeichen lang sein", 8, null))
 			.withValidator(passwordString -> 
-							passwordString.equals(confirmPassword.getValue()), 
+							passwordString.equals(confirmPasswordField.getValue()), 
 													"Passwörter stimmen nicht überein!")
 			.bind(user -> {
-				//ToTo: die nächste Zeile blockiert die Validation im Save-Button, die soll eigentlich den confirmPassword PasswordField füllen.
-				//confirmPassword.setValue(user.getPassword());
-				return user.getPassword();
-				}, User::setPassword);
+				confirmPasswordField.setValue("not shown");
+				return "not shown";
+			}, User::setPassword);
 
 		
 		//Creating the Savebutton and adding click listener to it
@@ -131,13 +131,17 @@ public class AccountView extends BaseView {
 		
 		saveButton.addClickListener(event -> {
 			User user = new User();
+			Authentication newAuthentication = SecurityContextHolder.getContext().getAuthentication();
             if (binder.writeBeanIfValid(user)) {
             	user.setId(objectId);
             	try {
             		userService.save(user);
+            		newAuthentication = new UsernamePasswordAuthenticationToken(firstNameField.getValue() + " " + lastNameField.getValue(),
+            																	passwordField.getValue());
+            		//SecurityContextHolder.getContext().setAuthentication(newAuthentication);
                     Dialog dialog = new Dialog();
-                    dialog.add(new Text("Nutzer erfolgreich überarbeitet!"));
-                    UI.getCurrent().navigate(LecturesView.ROUTE);
+                    dialog.add(new Text("Nutzer erfolgreich überarbeitet! Bestätigen Sie die Änderung indem Sie sich erneut einloggen."));
+                    UI.getCurrent().navigate(LoginView.ROUTE);
                     dialog.open();
                     } finally {
                             // TODO: implement ErrorHandeling
