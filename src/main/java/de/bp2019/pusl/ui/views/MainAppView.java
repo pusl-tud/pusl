@@ -52,6 +52,7 @@ public class MainAppView extends AppLayout {
         content.setSpacing(false);
 
         content.add(generateMenuButton("Startseite", new Icon(VaadinIcon.HOME), LecturesView.ROUTE));
+        content.add(generateMenuButton("Mein Account", new Icon(VaadinIcon.USER), AccountView.ROUTE));
         content.add(generateSeperator());
         content.add(generateSectionLabel("Admin"));    
         content.add(generateMenuButton("Nutzer", ManageUsersView.ROUTE));

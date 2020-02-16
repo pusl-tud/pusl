@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Grade;
@@ -73,6 +74,7 @@ public class DemoView extends BaseView {
                 instituteSet3.add(institutes.get(1));
                 instituteSet3.add(institutes.get(0));
 
+                userRepository.save(new User("Test", "User", "example@gmail.com", "password", instituteSet2, UserType.ADMIN));
                 userRepository.save(new User("Walter", "Frosch", null, null, instituteSet3, null));
                 userRepository.save(new User("Peter", "Pan", null, null, instituteSet1, null));
                 userRepository.save(new User("Angela", "Merkel", null, null, instituteSet3, null));

@@ -43,7 +43,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		return new BCryptPasswordEncoder();
 	}
 
-
 	/**
 	 * Require login to access internal pages and configure login form.
 	 * 
