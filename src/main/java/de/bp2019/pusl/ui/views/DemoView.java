@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Grade;
@@ -32,7 +33,7 @@ import de.bp2019.pusl.repository.UserRepository;
  * @author Leon Chemnitz
  */
 @Route(value = DemoView.ROUTE, layout = MainAppView.class)
-public class DemoView extends BaseView  {
+public class DemoView extends BaseView {
 
         private static final long serialVersionUID = 1240260329860093364L;
 
@@ -41,9 +42,9 @@ public class DemoView extends BaseView  {
         private static final Logger LOGGER = LoggerFactory.getLogger(DemoView.class);
 
         @Autowired
-        public DemoView (InstituteRepository instituteRepository, UserRepository userRepository,
+        public DemoView(InstituteRepository instituteRepository, UserRepository userRepository,
                         ExerciseSchemeRepository exerciseSchemeRepository, LectureRepository lectureRepository,
-                        GradeRepository gradeRepository){
+                        GradeRepository gradeRepository) {
                 super("Demo");
 
                 add(new Text("Befülle die Datenbank mit Testdaten!"));
@@ -73,6 +74,7 @@ public class DemoView extends BaseView  {
                 instituteSet3.add(institutes.get(1));
                 instituteSet3.add(institutes.get(0));
 
+                userRepository.save(new User("Test", "User", "example@gmail.com", "password", instituteSet2, UserType.ADMIN));
                 userRepository.save(new User("Walter", "Frosch", null, null, instituteSet3, null));
                 userRepository.save(new User("Peter", "Pan", null, null, instituteSet1, null));
                 userRepository.save(new User("Angela", "Merkel", null, null, instituteSet3, null));
@@ -111,18 +113,13 @@ public class DemoView extends BaseView  {
 
                 List<ExerciseScheme> exerciseSchemes = exerciseSchemeRepository.findAll();
 
-                String berechnungsRegel = "function calcuate(results) { \n";
-                berechnungsRegel += "    //ziemlich komplizierte Berechnungsregel... \n";
-                berechnungsRegel += "    return ergebnis;\n";
-                berechnungsRegel += "}";
-
                 List<Exercise> exerciseList = Arrays.asList(new Exercise("Übung 1", exerciseSchemes.get(1), true),
                                 new Exercise("1. Testat", exerciseSchemes.get(0), true),
                                 new Exercise("2. Testat", exerciseSchemes.get(0), true),
                                 new Exercise("Klausur", exerciseSchemes.get(2), false));
 
                 lectureRepository.save(new Lecture("Einführung in den Compilerbau", instituteSet1, userSet1,
-                                exerciseList, berechnungsRegel));
+                                exerciseList, null));
 
                 exerciseList = Arrays.asList(new Exercise("1. Übung", exerciseSchemes.get(1), true),
                                 new Exercise("2.Übung", exerciseSchemes.get(1), true),
@@ -131,15 +128,14 @@ public class DemoView extends BaseView  {
                                 new Exercise("4.Übung", exerciseSchemes.get(1), false),
                                 new Exercise("Klausur", exerciseSchemes.get(2), false));
 
-                lectureRepository.save(
-                                new Lecture("Mathematik I", instituteSet2, userSet2, exerciseList, berechnungsRegel));
+                lectureRepository.save(new Lecture("Mathematik I", instituteSet2, userSet2, exerciseList, null));
 
                 exerciseList = Arrays.asList(new Exercise("Testat 1", exerciseSchemes.get(0), false),
                                 new Exercise("Testat 2", exerciseSchemes.get(0), true),
                                 new Exercise("Testat 3", exerciseSchemes.get(0), true),
                                 new Exercise("Klausur", exerciseSchemes.get(2), false));
-                lectureRepository.save(new Lecture("Visuelle Trendanalyse", instituteSet3, userSet3, exerciseList,
-                                berechnungsRegel));
+                lectureRepository.save(
+                                new Lecture("Visuelle Trendanalyse", instituteSet3, userSet3, exerciseList, null));
 
                 List<Lecture> lectures = lectureRepository.findAll();
 

@@ -77,7 +77,14 @@ public class ManageUsersView extends BaseView {
      * @author Leon Chemnitz
      */
     private Button createNameButton(User user) {
-        Button button = new Button(UserService.getFullName(user), clickEvent -> {
+        var name = UserService.getFullName(user);
+
+        /* initial admin has no name */
+        if(user.getFirstName() == null){
+            name = user.getEmailAddress();
+        }
+
+        Button button = new Button(name, clickEvent -> {
             UI.getCurrent().navigate(EditUserView.ROUTE + "/" + user.getId());
         });
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
