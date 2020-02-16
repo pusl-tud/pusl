@@ -25,7 +25,7 @@ public class BaseView extends VerticalLayout {
         LOGGER.debug("started creation of " + this.getClass().getSimpleName());
 
         setWidth("90%");
-        setMaxWidth("50em");
+        setMaxWidth("52em");
         getStyle().set("marginLeft", "2em");
 
         Label titleLabel = new Label(title);

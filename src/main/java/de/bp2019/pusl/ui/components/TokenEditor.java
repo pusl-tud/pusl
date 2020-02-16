@@ -14,6 +14,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.textfield.TextField;
 
+import de.bp2019.pusl.ui.views.exercisescheme.EditExerciseSchemeView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ import de.bp2019.pusl.service.ExerciseSchemeService;
 
 /**
  * Component used as a Field to add and remove {@link Token}s in a list. Used in
- * {@link ExerciseSchemeView}.
+ * {@link EditExerciseSchemeView}.
  *
  * @author Luca Dinies
  */

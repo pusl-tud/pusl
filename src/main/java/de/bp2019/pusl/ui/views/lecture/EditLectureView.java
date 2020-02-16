@@ -10,8 +10,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -37,6 +35,8 @@ import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.components.ExerciseComposer;
+import de.bp2019.pusl.ui.components.PerformanceSchemeComposer;
+import de.bp2019.pusl.ui.components.VerticalTabs;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.MainAppView;
 
@@ -77,7 +77,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
                 FormLayout formLayout = new FormLayout();
                 formLayout.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
-                formLayout.setWidth("100%");
+                formLayout.setWidth("calc(100% - 1em)");
                 formLayout.getStyle().set("marginLeft", "1em");
                 formLayout.getStyle().set("marginTop", "-0.5em");
 
@@ -97,31 +97,33 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 institutes.setItemLabelGenerator(item -> item.getName());
                 formLayout.add(institutes, 1);
 
+                VerticalTabs verticalTabs = new VerticalTabs();
+                verticalTabs.setHeight("25em");
+                verticalTabs.setWidth("100%");
+
+                ExerciseComposer exercises = new ExerciseComposer(exerciseSchemeService);
+                verticalTabs.addTab("Prüfungen", exercises);
+
+                PerformanceSchemeComposer performanceSchemes = new PerformanceSchemeComposer();
+                verticalTabs.addTab("Leistungen", performanceSchemes);
+
                 MultiselectComboBox<User> hasAccess = new MultiselectComboBox<User>();
+                hasAccess.setWidth("100%");
+                hasAccess.setHeight("10em");
                 hasAccess.setLabel("Zugriff");
                 hasAccess.setItems(userService.getAll());
                 hasAccess.setItemLabelGenerator(item -> UserService.getFullName(item));
-                formLayout.add(hasAccess, 2);
+                verticalTabs.addTab("Zugriff", hasAccess);
 
-                ExerciseComposer exercises = new ExerciseComposer(exerciseSchemeService);
-                formLayout.add(exercises, 2);
+                formLayout.add(verticalTabs, 2);
 
-                TextArea calculationRule = new TextArea();
-                calculationRule.setValueChangeMode(ValueChangeMode.EAGER);
-                calculationRule.setLabel("Berechnungsregel");
-                calculationRule.setPlaceholder("Platzhalter");
-                calculationRule.setHeight("15em");
-                calculationRule.setWidthFull();
-
-                formLayout.add(calculationRule);
+                add(formLayout);
 
                 Button save = new Button("Speichern");
                 save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-                VerticalLayout actions = new VerticalLayout();
-                actions.add(save);
-                actions.setHorizontalComponentAlignment(Alignment.END, save);
-                formLayout.add(actions, 2);
+                add(save);
+                setHorizontalComponentAlignment(Alignment.END, save);
 
                 /* ########### Data Binding and validation ########### */
                 binder.forField(name).withValidator(
@@ -137,11 +139,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
                 binder.bind(exercises, Lecture::getExercises, Lecture::setExercises);
 
-                binder.bind(calculationRule, Lecture::getCalculationRule, Lecture::setCalculationRule);
-
-                /* ########### Add Layout to Component ########### */
-
-                add(formLayout);
+                binder.bind(performanceSchemes, Lecture::getPerformanceSchemes, Lecture::setPerformanceSchemes);
 
                 /* ########### Click Listeners for Buttons ########### */
 

@@ -8,12 +8,15 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 
+import de.bp2019.pusl.model.Lecture;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.Grade;
-import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.model.Token;
-import de.bp2019.pusl.service.ExerciseSchemeService;
 import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
+
 
 /**
  * Creates a dialog window to start an exercise for one student.
@@ -33,7 +35,9 @@ import de.bp2019.pusl.service.LectureService;
  * @author Luca Dinies
  */
 public class NoFlexExerciseDialog {
-    
+
+    private static final long serialVersionUID = 254687622689916454L;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TokenEditor.class);
 
     private ObjectId objectId;
@@ -41,10 +45,7 @@ public class NoFlexExerciseDialog {
     Binder<Grade> binder;
 
     @Autowired
-    public NoFlexExerciseDialog(LectureService lectureService, ExerciseSchemeService exerciseSchemeService,
-            GradeService gradeService) {
-
-        LOGGER.debug("started creation of NoFlexExerciseDialog");
+    public NoFlexExerciseDialog(LectureService moduleService, GradeService gradeService) {
 
         Dialog dialog = new Dialog();
         dialog.setCloseOnOutsideClick(false);
@@ -54,7 +55,8 @@ public class NoFlexExerciseDialog {
         /* ########### Create the Fields ########### */
 
         FormLayout form = new FormLayout();
-        form.setResponsiveSteps(new FormLayout.ResponsiveStep("5em", 1), new FormLayout.ResponsiveStep("5em", 2));
+        form.setResponsiveSteps(new FormLayout.ResponsiveStep("5em", 1),
+                new FormLayout.ResponsiveStep("5em", 2));
         form.setWidth("100%");
         form.getStyle().set("marginLeft", "1em");
         form.getStyle().set("marginTop", "-0.5em");
@@ -66,9 +68,10 @@ public class NoFlexExerciseDialog {
 
         Select<Lecture> lectureSelect = new Select<>();
         lectureSelect.setItemLabelGenerator(Lecture::getName);
-        lectureSelect.setItems(lectureService.getAll());
-        lectureSelect.setPlaceholder("Veranstaltung");
-        lectureSelect.setLabel("Veranstaltung");
+        List<Lecture> allModules = moduleService.getAll();
+        lectureSelect.setItems(allModules);
+        lectureSelect.setPlaceholder("Modul");
+        lectureSelect.setLabel("Modul");
         form.add(lectureSelect);
 
         DatePicker datePicker = new DatePicker();
@@ -81,7 +84,15 @@ public class NoFlexExerciseDialog {
         exerciseSelect.setItemLabelGenerator(Exercise::getName);
         exerciseSelect.setEnabled(false);
         exerciseSelect.setLabel("Übung");
+
         form.add(exerciseSelect);
+
+        Select<String> select = new Select<>();
+        select.setItems("hallo", "test");
+        select.setEmptySelectionCaption("Alle Anzeigen");
+        select.setEmptySelectionAllowed(true);
+        select.addComponents(null, new Hr());
+        form.add(select);
 
         TextField gradeField = new TextField();
         gradeField.setLabel("Note");
@@ -105,7 +116,7 @@ public class NoFlexExerciseDialog {
         });
 
         exerciseSelect.addValueChangeListener(event -> {
-            if (!exerciseSelect.isEmpty()) {
+            if(!exerciseSelect.isEmpty()) {
                 Exercise selectedExercise = exerciseSelect.getValue();
                 Set<Token> token = selectedExercise.getScheme().getTokens();
                 tokenSelect.setItems(token);
@@ -138,18 +149,17 @@ public class NoFlexExerciseDialog {
 
         /* ########### Data Binding and validation ########### */
 
-        // TODO: Validator
+        //TODO: Validator
         binder.forField(matrikelNum).withValidator(new StringLengthValidator("Bitte Matrikelnummer eingeben", 1, null))
-                // .withConverter(new StringToLongConverter("Bitte eine Zahl eingeben!")) hier muss ja eh der MatrNummerAlgo rein
                 .bind(Grade::getMatrNumber, Grade::setMatrNumber);
 
         binder.bind(lectureSelect, Grade::getLecture, Grade::setLecture);
 
-        binder.bind(exerciseSelect, Grade::getExercise, Grade::setExercise);
+        binder.bind(exerciseSelect, Grade::getExercise,Grade::setExercise);
 
         binder.bind(gradeField, Grade::getGrade, Grade::setGrade);
 
-        // binder.bind(datePicker, grade -> LocalDate.now(), grade -> {});
+        binder.bind(datePicker, Grade::getHandIn, Grade::setHandIn);
 
         /* ########### Click Listeners for Buttons ########### */
 
@@ -160,10 +170,9 @@ public class NoFlexExerciseDialog {
         save.addClickListener(event -> {
             Grade grade = new Grade();
             if (binder.writeBeanIfValid(grade)) {
-                if (objectId != null) {
+                if(objectId != null){
                     grade.setId(objectId);
-                }
-                try {
+                } try {
                     gradeService.save(grade);
                     dialog.close();
                 } finally {
@@ -172,9 +181,6 @@ public class NoFlexExerciseDialog {
             }
         });
 
-
-        
-        LOGGER.debug("finished creation of NoFlexExerciseDialog");
     }
 
 }

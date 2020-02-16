@@ -1,6 +1,5 @@
 package de.bp2019.pusl.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,12 +7,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 import de.bp2019.pusl.ui.views.LoginView;
 import de.bp2019.pusl.util.CustomRequestCache;
@@ -46,19 +41,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
-	}
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
-	@Bean
-	@Override
-	public UserDetailsService userDetailsService() {
-		// TODO: change...
-		//ToTo: ich habe den Nutzernamen nur fuers testen vom AccountView geändert
-		UserDetails user = User.withUsername("Test User").password(passwordEncoder.encode("password")).roles("USER").build();
-
-		return new InMemoryUserDetailsManager(user);
 	}
 
 	/**
