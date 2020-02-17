@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.enums.UserType;
@@ -30,6 +32,27 @@ public class UserService {
     }
 
     /**
+     * 
+     * @return current User
+     * @author Leon Chemnitz
+     */
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        return userRepository.findByEmailAddress(email);
+    }
+
+    /**
+     * 
+     * @return Full name of current user
+     * @author Leon Chemnitz
+     */
+    public String getCurrentUserFullName() {
+        return getFullName(getCurrentUser());
+    }
+
+    /**
      * Get all Users the User is authenticated to see.
      * 
      * @return list of all users
@@ -49,6 +72,10 @@ public class UserService {
      */
     public static String getFullName(User user) {
         if (user != null) {
+            /* initial admin has no name */
+            if (user.getFirstName() == null) {
+                return user.getEmailAddress();
+            }
             return user.getFirstName() + " " + user.getLastName();
         } else {
             return null;

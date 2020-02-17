@@ -12,6 +12,7 @@ import com.vaadin.flow.router.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Exercise;
@@ -44,7 +45,7 @@ public class DemoView extends BaseView {
         @Autowired
         public DemoView(InstituteRepository instituteRepository, UserRepository userRepository,
                         ExerciseSchemeRepository exerciseSchemeRepository, LectureRepository lectureRepository,
-                        GradeRepository gradeRepository) {
+                        GradeRepository gradeRepository, PasswordEncoder passwordEncoder) {
                 super("Demo");
 
                 add(new Text("Befülle die Datenbank mit Testdaten!"));
@@ -74,13 +75,16 @@ public class DemoView extends BaseView {
                 instituteSet3.add(institutes.get(1));
                 instituteSet3.add(institutes.get(0));
 
-                userRepository.save(new User("Test", "User", "example@gmail.com", "password", instituteSet2, UserType.ADMIN));
-                userRepository.save(new User("Walter", "Frosch", null, null, instituteSet3, null));
-                userRepository.save(new User("Peter", "Pan", null, null, instituteSet1, null));
-                userRepository.save(new User("Angela", "Merkel", null, null, instituteSet3, null));
-                userRepository.save(new User("John", "Lennon", null, null, instituteSet1, null));
-                userRepository.save(new User("Helene", "Fischer", null, null, instituteSet1, null));
-                userRepository.save(new User("Walter", "Gropius", null, null, instituteSet2, null));
+                String password = passwordEncoder.encode("password");
+                String adminPassword = passwordEncoder.encode("admin");
+
+                userRepository.save(new User(null, null, "admin", adminPassword, new HashSet<Institute>(), UserType.SUPERADMIN));
+                userRepository.save(new User("Walter", "Frosch", "wf@test.de", password, instituteSet3, UserType.WIMI));
+                userRepository.save(new User("Peter", "Pan", "pp@tu-darmstadt.de", password, instituteSet1, UserType.WIMI));
+                userRepository.save(new User("Angela", "Merkel", "angie.m@deutschland.com", password, instituteSet3, UserType.WIMI));
+                userRepository.save(new User("John", "Lennon", "johnny@aol.de", password, instituteSet1, UserType.WIMI));
+                userRepository.save(new User("Helene", "Fischer", "helene@yahoo.com", password, instituteSet1, UserType.WIMI));
+                userRepository.save(new User("Walter", "Gropius", "wg@walter.de", password, instituteSet2, UserType.WIMI));
 
                 List<User> users = userRepository.findAll();
 

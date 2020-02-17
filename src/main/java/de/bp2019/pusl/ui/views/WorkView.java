@@ -1,5 +1,11 @@
 package de.bp2019.pusl.ui.views;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -9,27 +15,29 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.router.BeforeEvent;
+import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.Location;
+import com.vaadin.flow.router.OptionalParameter;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.QueryParameters;
+import com.vaadin.flow.router.Route;
 
-import de.bp2019.pusl.model.Exercise;
-import de.bp2019.pusl.model.Lecture;
-import de.bp2019.pusl.ui.components.VerticalTabs;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.Grade;
+import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
-
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import de.bp2019.pusl.ui.components.VerticalTabs;
 
 /**
  *
@@ -48,15 +56,14 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
     public static final String ROUTE = "grades";
 
     private ListDataProvider<Grade> gradeDataProvider;
+    private ListDataProvider<Lecture> lectureDataProvider  = new ListDataProvider<Lecture>(new ArrayList<>());
 
     private GradeService gradeService;
+    private LectureService lectureService;
 
     private ObjectId objectId;
 
     private Binder<Grade> binder;
-
-    @Autowired
-    private LectureService lectureService;
 
     private Select<Lecture> lectureFilter;
     private Select<Exercise> exerciseFilter;
@@ -73,12 +80,12 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         LOGGER.debug("Started creation of WorkView");
 
         this.gradeService = gradeService;
+        this.lectureService = lectureService;
 
         gradeDataProvider = new ListDataProvider<Grade>(gradeService.getAll());
 
-        filter = new Grade();;
+        filter = new Grade();
 
-        Lecture filterCleanModule = new Lecture("Alle Anzeigen", null, null, null, null);
         Exercise filterCleanExercise = new Exercise("Alle Anzeigen", null, false);
 
         VerticalTabs verticalTabs = new VerticalTabs();
@@ -113,10 +120,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         lectureFilter = new Select<>();
         lectureFilter.setItemLabelGenerator(Lecture::getName);
-        List<Lecture> allLectures = lectureService.getAll();
-        allLectures.add(0, filterCleanModule);
-        lectureFilter.setItems(allLectures);
-        lectureFilter.setValue(allLectures.get(0));
+        lectureFilter.setDataProvider(lectureDataProvider);
         lectureFilter.setLabel("Modul");
         moduleExerciseLayout.add(lectureFilter);
 
@@ -152,7 +156,8 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         grid.setDataProvider(gradeDataProvider);
 
         grid.addColumn(Grade::getMatrNumber).setHeader("Matr. Nr.").setAutoWidth(true).setKey("matrikelNum");
-        grid.addColumn(item -> item.getLecture().getName()).setHeader("Veranstaltung").setAutoWidth(true).setKey("lecture");
+        grid.addColumn(item -> item.getLecture().getName()).setHeader("Veranstaltung").setAutoWidth(true)
+                .setKey("lecture");
         grid.addColumn(item -> item.getExercise().getName()).setHeader("Übung").setAutoWidth(true).setKey("exercise");
         grid.addColumn(item -> item.getHandIn()).setHeader("Abgabedatum").setAutoWidth(true).setKey("handin");
         grid.addColumn(item -> item.getGrade()).setHeader("Note").setAutoWidth(true).setKey("grade");
@@ -161,7 +166,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         verticalTabs.addTab("Alle Noten", gridAndFilter);
 
-        /*############## CHANGE LISTENERS ############# */
+        /* ############## CHANGE LISTENERS ############# */
 
         martrNumberFilter.addValueChangeListener(event -> {
             filter.setMatrNumber(event.getValue());
@@ -175,7 +180,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         });
 
         lectureFilter.addValueChangeListener(event -> {
-            if(event.getValue().getId() == null){
+            if (event.getValue().getId() == null) {
                 filter.setLecture(null);
                 reloadFilter();
                 grid.getColumnByKey("lecture").setVisible(true);
@@ -203,7 +208,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         });
 
         exerciseFilter.addValueChangeListener(event -> {
-            if(!exerciseFilter.isEmpty()) {
+            if (!exerciseFilter.isEmpty()) {
                 if (exerciseFilter.getValue().getName().contains("Alle Anzeigen")) {
                     filter.setExercise(null);
                     reloadFilter();
@@ -218,10 +223,10 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         startDateFilter.addValueChangeListener(event -> {
             LocalDate selectedDate = event.getValue();
             LocalDate endDate = endDateFilter.getValue();
-            if(selectedDate != null){
+            if (selectedDate != null) {
                 endDateFilter.setMin(selectedDate);
                 gradeDataProvider.addFilter(grade -> grade.getHandIn().isAfter(startDateFilter.getValue()));
-                if(endDate == null){
+                if (endDate == null) {
                     endDateFilter.setOpened(true);
                 }
             } else {
@@ -232,10 +237,10 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         endDateFilter.addValueChangeListener(event -> {
             LocalDate selectedDate = event.getValue();
             LocalDate startDate = startDateFilter.getValue();
-            if(selectedDate != null){
+            if (selectedDate != null) {
                 startDateFilter.setMax(selectedDate);
                 gradeDataProvider.addFilter(grade -> grade.getHandIn().isBefore(endDateFilter.getValue()));
-                if(startDate == null){
+                if (startDate == null) {
                     startDateFilter.setOpened(true);
                 }
             } else {
@@ -243,14 +248,12 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             }
         });
 
-
-        /*############## FORM TO INPUT A NEW GRADE ############# */
+        /* ############## FORM TO INPUT A NEW GRADE ############# */
 
         binder = new Binder<>();
 
         FormLayout form = new FormLayout();
-        form.setResponsiveSteps(new FormLayout.ResponsiveStep("5em", 1),
-                new FormLayout.ResponsiveStep("5em", 2));
+        form.setResponsiveSteps(new FormLayout.ResponsiveStep("5em", 1), new FormLayout.ResponsiveStep("5em", 2));
         form.setWidth("100%");
         form.getStyle().set("marginLeft", "1em");
         form.getStyle().set("marginTop", "-0.5em");
@@ -258,6 +261,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         TextField matrikelNum = new TextField();
         matrikelNum.setPlaceholder("Matrikel Nummer");
         matrikelNum.setLabel("Matrikel Nummer");
+        matrikelNum.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         form.add(matrikelNum);
 
         Select<Lecture> lectureSelect = new Select<>();
@@ -283,6 +287,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         TextField gradeField = new TextField();
         gradeField.setLabel("Note");
         gradeField.setPlaceholder("Note");
+        gradeField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         form.add(gradeField);
 
         /* ########### Save Button and Layout ########### */
@@ -302,12 +307,11 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         add(verticalTabs);
 
-
         /* ########### Change Listeners for Selects ########### */
 
         lectureSelect.addValueChangeListener(event -> {
             Lecture selectedLecture = lectureSelect.getValue();
-            if(event.getValue() != null){
+            if (event.getValue() != null) {
                 List<Exercise> exercises = selectedLecture.getExercises();
                 exerciseSelect.setItems(exercises);
                 exerciseSelect.setEnabled(true);
@@ -319,15 +323,15 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         });
 
-
         /* ########### Click Listeners for Buttons ########### */
 
         save.addClickListener(event -> {
             Grade grade = new Grade();
             if (binder.writeBeanIfValid(grade)) {
-                if(objectId != null){
+                if (objectId != null) {
                     grade.setId(objectId);
-                } try {
+                }
+                try {
                     gradeService.save(grade);
                 } finally {
                     // TODO: implement ErrorHandling
@@ -341,16 +345,15 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             gradeField.clear();
         });
 
-
         /* ########### Data Binding and validation ########### */
 
-        //TODO: Validator
+        // TODO: Validator
         binder.forField(matrikelNum).withValidator(new StringLengthValidator("Bitte Matrikelnummer eingeben", 1, null))
                 .bind(Grade::getMatrNumber, Grade::setMatrNumber);
 
         binder.bind(lectureSelect, Grade::getLecture, Grade::setLecture);
 
-        binder.bind(exerciseSelect, Grade::getExercise,Grade::setExercise);
+        binder.bind(exerciseSelect, Grade::getExercise, Grade::setExercise);
 
         binder.bind(gradeField, Grade::getGrade, Grade::setGrade);
 
@@ -370,31 +373,42 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         gradeDataProvider.refreshAll();
     }
 
-
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
         Location location = event.getLocation();
-        QueryParameters queryParameters = location
-                .getQueryParameters();
+        QueryParameters queryParameters = location.getQueryParameters();
+
+        List<Lecture> allLectures = lectureService.getAll();
+        Lecture cleanLecture = new Lecture("Alle Anzeigen", null, null, null, null);
+        allLectures.add(0, cleanLecture);
+        lectureDataProvider.getItems().addAll(allLectures);
+        lectureDataProvider.refreshAll();
 
         parametersMap = queryParameters.getParameters();
 
-        if(parametersMap.get("lecture") != null){
-            Lecture parameterLecture = lectureService.getById(parametersMap.get("lecture").get(0));
-            lectureFilter.setValue(parameterLecture);
-            lectureFilter.setPlaceholder(parameterLecture.getName());
+        if (parametersMap.get("lecture") != null) {
+            String lectureId = parametersMap.get("lecture").get(0);
+            Optional<Lecture> parameterLecture = lectureDataProvider.getItems().stream()
+                    .filter(lecture -> lecture.getId() != null)                    
+                    .filter(lecture -> lecture.getId().equals( new ObjectId(lectureId)))
+                    .findFirst();
 
-            if (parametersMap.get("exercise") != null){
-                String parameterExerciseName = parametersMap.get("exercise").get(0);
-                Exercise parameterExercise = parameterLecture.getExercises().stream()
-                        .filter(exercise -> exercise.getName().equals(parameterExerciseName))
-                        .findFirst().get();
+            if (parameterLecture.isPresent()) {
+                lectureFilter.setValue(parameterLecture.get());
+                lectureFilter.setPlaceholder(parameterLecture.get().getName());
 
-                exerciseFilter.setValue(parameterExercise);
+                if (parametersMap.get("exercise") != null) {
+                    String parameterExerciseName = parametersMap.get("exercise").get(0);
+                    Exercise parameterExercise = parameterLecture.get().getExercises().stream()
+                            .filter(exercise -> exercise.getName().equals(parameterExerciseName)).findFirst().get();
+
+                    exerciseFilter.setValue(parameterExercise);
+                }
             }
+
         }
 
-        if (parametersMap.get("martrNumber") != null){
+        if (parametersMap.get("martrNumber") != null) {
             String parameterMartrikelNumber = parametersMap.get("martrNumber").get(0);
             martrNumberFilter.setValue(parameterMartrikelNumber);
         }

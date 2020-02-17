@@ -1,6 +1,5 @@
 package de.bp2019.pusl.model;
 
-import java.time.Instant;
 import java.time.LocalDate;
 
 import org.bson.types.ObjectId;

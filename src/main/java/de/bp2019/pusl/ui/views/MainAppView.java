@@ -15,13 +15,15 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.server.PWA;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
 import de.bp2019.pusl.ui.views.institute.ManageInstitutesView;
-import de.bp2019.pusl.ui.views.user.ManageUsersView;
 import de.bp2019.pusl.ui.views.lecture.ManageLecturesView;
+import de.bp2019.pusl.ui.views.user.ManageUsersView;
 
 /**
  * Main View used as a overlay for all other Application views (excluding
@@ -36,12 +38,25 @@ public class MainAppView extends AppLayout {
 
     private static final long serialVersionUID = 1L;
 
-    public MainAppView() {
+    @Autowired
+    public MainAppView(UserService userService) {
         HorizontalLayout titleLayout = new HorizontalLayout();
         Label title = new Label(AppConfig.NAME);
         titleLayout.add(title);
         titleLayout.addClickListener(event -> UI.getCurrent().navigate(""));
-        addToNavbar(new DrawerToggle(), titleLayout);
+
+        VerticalLayout userLayout = new VerticalLayout();
+        Button name = new Button(userService.getCurrentUserFullName());
+        name.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+        name.addThemeVariants(ButtonVariant.LUMO_SMALL);
+        userLayout.getStyle().set("margin", "0");
+        userLayout.getStyle().set("margin-right", "1.5em");
+        userLayout.getStyle().set("padding", "0");
+        userLayout.setWidthFull();        
+        userLayout.add(name);
+        userLayout.setHorizontalComponentAlignment(Alignment.END, name);
+
+        addToNavbar(new DrawerToggle(), titleLayout, userLayout);
 
         VerticalLayout sidebar = new VerticalLayout();
         sidebar.setHeightFull();
@@ -54,9 +69,9 @@ public class MainAppView extends AppLayout {
         content.add(generateMenuButton("Startseite", new Icon(VaadinIcon.HOME), LecturesView.ROUTE));
         content.add(generateMenuButton("Mein Account", new Icon(VaadinIcon.USER), AccountView.ROUTE));
         content.add(generateSeperator());
-        content.add(generateSectionLabel("Admin"));    
+        content.add(generateSectionLabel("Admin"));
         content.add(generateMenuButton("Nutzer", ManageUsersView.ROUTE));
-        content.add(generateMenuButton("Veranstaltungen", ManageLecturesView.ROUTE));    
+        content.add(generateMenuButton("Veranstaltungen", ManageLecturesView.ROUTE));
         content.add(generateMenuButton("Übungsschemas", ManageExerciseSchemesView.ROUTE));
         content.add(generateSeperator());
         content.add(generateSectionLabel("Global"));
@@ -70,6 +85,12 @@ public class MainAppView extends AppLayout {
         footer.setAlignSelf(Alignment.END);
 
         addToDrawer(sidebar);
+
+        /* ############ LISTENERS ############*/
+
+        name.addClickListener(event -> {
+            UI.getCurrent().navigate(AccountView.ROUTE);
+        });
     }
 
     /**
@@ -98,7 +119,7 @@ public class MainAppView extends AppLayout {
         return button;
     }
 
-    private Button generateMenuButton(String buttonText, String url){
+    private Button generateMenuButton(String buttonText, String url) {
         return generateMenuButton(buttonText, null, url);
     }
 

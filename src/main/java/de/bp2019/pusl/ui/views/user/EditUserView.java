@@ -168,21 +168,27 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
 
                                         if (objectId != null && enteredPassword == "") {
                                                 /*
-                                                 * User already exists and has entered no new password, therefore a new password
-                                                 * is not needed
+                                                 * User already exists and has entered no new password, therefore a new
+                                                 * password is not needed
                                                  */
                                         } else {
-                                                if(enteredPassword.length() < 8){
-                                                        return ValidationResult.error("Passwort muss länger als 8 Zeichen sein!");
+                                                if (enteredPassword.length() < 8) {
+                                                        return ValidationResult.error(
+                                                                        "Passwort muss länger als 8 Zeichen sein!");
                                                 }
 
-                                                if(!enteredPassword.equals(repeatPassword.getValue())){
-                                                        return ValidationResult.error("Passwörter stimmen nicht überein!");
+                                                if (!enteredPassword.equals(repeatPassword.getValue())) {
+                                                        return ValidationResult
+                                                                        .error("Passwörter stimmen nicht überein!");
                                                 }
                                         }
 
                                         return ValidationResult.ok();
-                                }).bind(pwd -> null, (user, pwd) -> user.setPassword(passwordEncoder.encode(pwd)));
+                                }).bind(pwd -> "", (user, pwd) -> {
+                                        if (pwd != "") {
+                                                user.setPassword(passwordEncoder.encode(pwd));
+                                        }
+                                });
                 password.addValueChangeListener(e -> passwordBinder.validate());
 
                 /* ########### Click Listeners for Buttons ########### */

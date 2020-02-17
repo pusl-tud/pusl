@@ -13,10 +13,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.converter.StringToLongConverter;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 
-import de.bp2019.pusl.model.Lecture;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.Grade;
+import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.model.Token;
 import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
@@ -35,9 +34,6 @@ import de.bp2019.pusl.service.LectureService;
  * @author Luca Dinies
  */
 public class NoFlexExerciseDialog {
-
-    private static final long serialVersionUID = 254687622689916454L;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(TokenEditor.class);
 
     private ObjectId objectId;

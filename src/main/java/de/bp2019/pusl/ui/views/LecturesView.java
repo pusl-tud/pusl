@@ -6,24 +6,28 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.accordion.Accordion;
+import com.vaadin.flow.component.accordion.AccordionPanel;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.details.DetailsVariant;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.service.LectureService;
-import de.bp2019.pusl.ui.views.lecture.EditLectureView;
 
 /**
- * View that displays a Dashboard
+ * View displaying a list of all {@link Lecture}s
  * 
- * @author Tomoki Tokuyama
+ * @author Leon Chemnitz
  */
 @PageTitle(AppConfig.NAME + " | Meine Veranstaltungen")
 @Route(value = LecturesView.ROUTE, layout = MainAppView.class)
@@ -32,7 +36,7 @@ public class LecturesView extends BaseView {
     private static final long serialVersionUID = 1L;
 
     public static final String ROUTE = "";
-  
+
     public LecturesView(LectureService lectureService) {
         super("Meine Veranstaltungen");
 
@@ -40,18 +44,23 @@ public class LecturesView extends BaseView {
         lectures.addAll(lectureService.getAll());
 
         for (Lecture l : lectures) {
-            Button lectureButton = new Button(l.getName());
+
+            VerticalLayout horizontalLayout = new VerticalLayout();
+
+            Button lectureButton = new Button(l.getName(), new Icon(VaadinIcon.ACADEMY_CAP));
+            lectureButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
             lectureButton.addClickListener(event -> {
                 var parameterMap = new HashMap<String, List<String>>();
                 parameterMap.put("lecture", Arrays.asList(l.getId().toString()));
                 QueryParameters parameters = new QueryParameters(parameterMap);
                 UI.getCurrent().navigate(WorkView.ROUTE, parameters);
             });
-            add(lectureButton);
+            horizontalLayout.add(lectureButton);
 
             VerticalLayout layout = new VerticalLayout();
             for (Exercise e : l.getExercises()) {
                 Button exerciseButton = new Button(e.getName());
+                exerciseButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
                 exerciseButton.addClickListener(event -> {
                     var parameterMap = new HashMap<String, List<String>>();
                     parameterMap.put("lecture", Arrays.asList(l.getId().toString()));
@@ -63,25 +72,14 @@ public class LecturesView extends BaseView {
             }
 
             Accordion accordion = new Accordion();
-            accordion.add("Übungen", layout);
-            add(accordion);
+            AccordionPanel panel = accordion.add("Übungen", layout);
+            panel.addThemeVariants(DetailsVariant.SMALL);
+            panel.addThemeVariants(DetailsVariant.FILLED);
+            accordion.close();
+            horizontalLayout.add(accordion);
+            add(horizontalLayout);
         }
 
     }
- 
-	private Button createLectureNameButton(Lecture lecture) {
-		Button button = new Button(lecture.getName(), clickEvent -> {
-			UI.getCurrent().navigate(EditLectureView.ROUTE + "/" + lecture.getId());
-		});
-		button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-		return button;
-	}
 
-	private Button createExerciseButton(Lecture lecture) {
-		Button button = new Button("Übungen anzeigen", clickEvent -> {
-			UI.getCurrent().navigate(WorkView.ROUTE + "/?lectureFilter=" + lecture.getName());
-		});
-        button.getStyle().set("margin", "0");
-		return button;
-	}
 }

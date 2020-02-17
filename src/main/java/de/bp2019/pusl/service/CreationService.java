@@ -1,5 +1,7 @@
 package de.bp2019.pusl.service;
 
+import java.util.HashSet;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.enums.UserType;
+import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
 
@@ -32,6 +35,7 @@ public class CreationService {
             admin.setEmailAddress("admin");
             admin.setPassword(passwordEncoder.encode("admin"));
             admin.setType(UserType.SUPERADMIN);
+            admin.setInstitutes(new HashSet<Institute>());
             userRepository.save(admin);
         }
     }
