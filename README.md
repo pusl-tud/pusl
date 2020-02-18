@@ -1,4 +1,4 @@
-<h1 align=center>pusl</p>
-System for managing student achievements for the institutes of transportation at __TU Darmstadt__
+<h1 align=center>pusl</h1>
+System for managing student achievements for the institutes of transportation at **TU Darmstadt**
 
 javadoc: https://leonchemnitz.github.io/pusl/apidocs/
