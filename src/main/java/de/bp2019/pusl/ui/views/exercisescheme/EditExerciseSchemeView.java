@@ -28,7 +28,7 @@ import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
-import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.service.ExerciseSchemeService;
@@ -43,7 +43,7 @@ import de.bp2019.pusl.ui.views.MainAppView;
  *
  **/
 
-@PageTitle(AppConfig.NAME + " | Übungsschema bearbeiten")
+@PageTitle(PuslProperties.NAME + " | Übungsschema bearbeiten")
 @Route(value = EditExerciseSchemeView.ROUTE, layout = MainAppView.class)
 public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<String> {
 

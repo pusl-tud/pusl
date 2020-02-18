@@ -26,18 +26,18 @@ import com.vaadin.flow.router.Route;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.MainAppView;
 
 /**
- * View containing a form to edit a Institute
+ * View containing a form to edit a {@link Institute}
  * 
  * @author Leon Chemnitz
  */
-@PageTitle(AppConfig.NAME + " | Institut bearbeiten")
+@PageTitle(PuslProperties.NAME + " | Institut bearbeiten")
 @Route(value = EditInstituteView.ROUTE, layout = MainAppView.class)
 public class EditInstituteView extends BaseView implements HasUrlParameter<String> {
 

@@ -16,7 +16,7 @@ import com.vaadin.flow.router.Route;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.service.ExerciseSchemeService;
@@ -28,7 +28,7 @@ import de.bp2019.pusl.ui.views.MainAppView;
  *
  * @author Luca Dinies
  **/
-@PageTitle(AppConfig.NAME + " | Übungsschemas")
+@PageTitle(PuslProperties.NAME + " | Übungsschemas")
 @Route(value = ManageExerciseSchemesView.ROUTE, layout = MainAppView.class)
 public class ManageExerciseSchemesView extends BaseView {
 

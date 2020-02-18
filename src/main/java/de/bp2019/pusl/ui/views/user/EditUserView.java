@@ -16,10 +16,10 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.Binder.Binding;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.binder.ValidationResult;
-import com.vaadin.flow.data.binder.Binder.Binding;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
-import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
@@ -48,7 +48,7 @@ import de.bp2019.pusl.ui.views.MainAppView;
  * 
  * @author Leon Chemnitz
  */
-@PageTitle(AppConfig.NAME + " | Nutzer bearbeiten")
+@PageTitle(PuslProperties.NAME + " | Nutzer bearbeiten")
 @Route(value = EditUserView.ROUTE, layout = MainAppView.class)
 public class EditUserView extends BaseView implements HasUrlParameter<String> {
 

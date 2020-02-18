@@ -29,7 +29,7 @@ import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.service.UserService;
 
@@ -37,7 +37,7 @@ import de.bp2019.pusl.service.UserService;
  * @author Godot_Blend102
  *
  */
-@PageTitle(AppConfig.NAME)
+@PageTitle(PuslProperties.NAME + " | Mein Account")
 @Route(value = AccountView.ROUTE, layout = MainAppView.class)
 public class AccountView extends BaseView {
 

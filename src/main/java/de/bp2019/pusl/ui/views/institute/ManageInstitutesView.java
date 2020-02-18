@@ -14,18 +14,18 @@ import com.vaadin.flow.router.Route;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.MainAppView;
 
 /**
- * View that displays a list of all Institutes
+ * View that displays a list of all {@link Institute}s
  * 
  * @author Leon Chemnitz
  */
-@PageTitle(AppConfig.NAME + " | Institute")
+@PageTitle(PuslProperties.NAME + " | Institute")
 @Route(value = ManageInstitutesView.ROUTE, layout = MainAppView.class)
 public class ManageInstitutesView extends BaseView {
 

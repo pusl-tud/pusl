@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.util.CustomRequestCache;
 
 /**
@@ -22,7 +22,7 @@ import de.bp2019.pusl.util.CustomRequestCache;
  * @author Leon Chemnitz
  */
 @Route(value = LoginView.ROUTE)
-@PageTitle(AppConfig.NAME + " | Login")
+@PageTitle(PuslProperties.NAME + " | Login")
 public class LoginView extends VerticalLayout {
 
 	private static final long serialVersionUID = -8376096237409998816L;
@@ -35,7 +35,7 @@ public class LoginView extends VerticalLayout {
 	public LoginView(AuthenticationManager authenticationManager, CustomRequestCache requestCache) {
 		/* configures login dialog and adds it to the main view */
 		login.setOpened(true);
-		login.setTitle(AppConfig.NAME);
+		login.setTitle(PuslProperties.NAME);
 		login.setDescription("System für Prüfungen und studentische Leistungen");
 
 		add(login);

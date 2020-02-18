@@ -18,7 +18,8 @@ import com.vaadin.flow.server.PWA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.config.PuslProperties;
+import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
 import de.bp2019.pusl.ui.views.institute.ManageInstitutesView;
@@ -33,30 +34,37 @@ import de.bp2019.pusl.ui.views.user.ManageUsersView;
  */
 @CssImport("./styles/global.css")
 @Viewport("width=device-width, minimum-scale=0.5, initial-scale=1, user-scalable=yes, viewport-fit=cover")
-@PWA(name = AppConfig.NAME, shortName = AppConfig.NAME)
+@PWA(name = PuslProperties.NAME, shortName = PuslProperties.NAME)
 public class MainAppView extends AppLayout {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 5473180730294862712L;
 
     @Autowired
     public MainAppView(UserService userService) {
         HorizontalLayout titleLayout = new HorizontalLayout();
-        Label title = new Label(AppConfig.NAME);
+        Label title = new Label(PuslProperties.NAME);
+        title.getStyle().set("font-size", "1.2em");
         titleLayout.add(title);
         titleLayout.addClickListener(event -> UI.getCurrent().navigate(""));
 
-        VerticalLayout userLayout = new VerticalLayout();
-        Button name = new Button(userService.getCurrentUserFullName());
-        name.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-        name.addThemeVariants(ButtonVariant.LUMO_SMALL);
-        userLayout.getStyle().set("margin", "0");
-        userLayout.getStyle().set("margin-right", "1.5em");
-        userLayout.getStyle().set("padding", "0");
-        userLayout.setWidthFull();        
-        userLayout.add(name);
-        userLayout.setHorizontalComponentAlignment(Alignment.END, name);
+        VerticalLayout navbarRight = new VerticalLayout();
 
-        addToNavbar(new DrawerToggle(), titleLayout, userLayout);
+        HorizontalLayout userInfo = new HorizontalLayout();
+        userInfo.setDefaultVerticalComponentAlignment(Alignment.END);
+
+        userInfo.add(generateUserTypeLabel(userService.getCurrentUserType()));
+        userInfo.add(generateUserNameButton(userService.getCurrentUserFullName()));
+        userInfo.add(generateLogoutButton());
+
+
+        navbarRight.getStyle().set("margin", "0");
+        navbarRight.getStyle().set("margin-right", "1.5em");
+        navbarRight.getStyle().set("padding", "0");
+        navbarRight.setWidthFull();        
+        navbarRight.add(userInfo);
+        navbarRight.setHorizontalComponentAlignment(Alignment.END, userInfo);
+
+        addToNavbar(new DrawerToggle(), titleLayout, navbarRight);
 
         VerticalLayout sidebar = new VerticalLayout();
         sidebar.setHeightFull();
@@ -70,27 +78,16 @@ public class MainAppView extends AppLayout {
         content.add(generateMenuButton("Mein Account", new Icon(VaadinIcon.USER), AccountView.ROUTE));
         content.add(generateSeperator());
         content.add(generateSectionLabel("Admin"));
-        content.add(generateMenuButton("Nutzer", ManageUsersView.ROUTE));
-        content.add(generateMenuButton("Veranstaltungen", ManageLecturesView.ROUTE));
-        content.add(generateMenuButton("Übungsschemas", ManageExerciseSchemesView.ROUTE));
+        content.add(generateMenuButton("Nutzer",  new Icon(VaadinIcon.USERS), ManageUsersView.ROUTE));
+        content.add(generateMenuButton("Veranstaltungen", new Icon(VaadinIcon.ACADEMY_CAP), ManageLecturesView.ROUTE));
+        content.add(generateMenuButton("Übungsschemas", new Icon(VaadinIcon.NOTEBOOK) ,ManageExerciseSchemesView.ROUTE));
         content.add(generateSeperator());
         content.add(generateSectionLabel("Global"));
-        content.add(generateMenuButton("Institute", ManageInstitutesView.ROUTE));
-        content.add(generateMenuButton("Demo", DemoView.ROUTE));
+        content.add(generateMenuButton("Institute", new Icon(VaadinIcon.WORKPLACE), ManageInstitutesView.ROUTE));
+        content.add(generateMenuButton("Demo", new Icon(VaadinIcon.BUG), DemoView.ROUTE));
         sidebar.add(content);
 
-        VerticalLayout footer = new VerticalLayout();
-        footer.add(generateLogoutButton());
-        sidebar.add(footer);
-        footer.setAlignSelf(Alignment.END);
-
         addToDrawer(sidebar);
-
-        /* ############ LISTENERS ############*/
-
-        name.addClickListener(event -> {
-            UI.getCurrent().navigate(AccountView.ROUTE);
-        });
     }
 
     /**
@@ -116,11 +113,8 @@ public class MainAppView extends AppLayout {
         });
         button.getStyle().set("color", "white");
         button.getStyle().set("margin", "0");
+        button.getStyle().set("font-weight", "200");
         return button;
-    }
-
-    private Button generateMenuButton(String buttonText, String url) {
-        return generateMenuButton(buttonText, null, url);
     }
 
     /**
@@ -128,7 +122,7 @@ public class MainAppView extends AppLayout {
      * @return
      */
     private Button generateLogoutButton() {
-        Button button = new Button("logout", new Icon(VaadinIcon.KEY));
+        Button button = new Button("logout");
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         button.addClickListener(event -> {
             /* Clear the Spring Authentication */
@@ -138,7 +132,32 @@ public class MainAppView extends AppLayout {
             /* Redirect to avoid keeping the removed UI open in the browser */
             UI.getCurrent().navigate(LoginView.ROUTE);
         });
-        button.getStyle().set("color", "white");
+        button.getStyle().set("font-weight", "200");
+        button.getStyle().set("padding-left", "0");
+
+        return button;
+    }
+
+
+    private Label generateUserTypeLabel(UserType type){
+        Label label = new Label(type.toString());
+        label.getStyle().set("font-weight", "200");               
+        label.getStyle().set("font-size", "0.8em");
+        label.getStyle().set("padding-right", "0");
+        label.getStyle().set("padding-bottom", "0.75em"); 
+        return label;
+    }
+
+    private Button generateUserNameButton(String name){
+        Button button = new Button(name);
+        button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        button.getStyle().set("color", "dark-grey");
+        button.getStyle().set("padding-right", "0");
+        button.getStyle().set("padding-left", "0");
+
+        button.addClickListener(event -> {
+            UI.getCurrent().navigate(AccountView.ROUTE);
+        });
 
         return button;
     }
@@ -149,6 +168,7 @@ public class MainAppView extends AppLayout {
     private Label generateSectionLabel(String labelText) {
         Label adminLabel = new Label(labelText);
         adminLabel.getStyle().set("color", "white");
+        adminLabel.getStyle().set("opacity", "0.8");
         adminLabel.getStyle().set("font-size", "1.5em");
 
         return adminLabel;

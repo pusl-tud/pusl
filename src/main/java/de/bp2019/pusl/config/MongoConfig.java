@@ -1,9 +1,15 @@
 package de.bp2019.pusl.config;
 
-import com.mongodb.MongoClient;
+import java.util.Arrays;
 
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
+import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 /**
@@ -12,22 +18,35 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  * @author Leon Chemnitz
  */
 @Configuration
-@EnableMongoRepositories(basePackages = AppConfig.BASE_PACKAGE + ".repository")
-@SuppressWarnings("deprecation")
-class MongoConfig extends AbstractMongoConfiguration {
+@EnableMongoRepositories(basePackages = PuslProperties.BASE_PACKAGE + ".repository")
+class MongoConfig extends AbstractMongoClientConfiguration {
+
+  @Autowired
+  MongoProperties mongoProperties;
 
   @Override
   protected String getDatabaseName() {
-    return AppConfig.DATABASE_NAME;
+    return mongoProperties.getDbName();
   }
 
   @Override
   public MongoClient mongoClient() {
-    return new MongoClient();
+    MongoClientSettings settings = MongoClientSettings.builder()
+        .applyToClusterSettings(builder -> builder
+            .hosts(Arrays.asList(
+              new ServerAddress(mongoProperties.getAddress(),Integer.valueOf(mongoProperties.getPort())))))
+        .build();
+
+    return MongoClients.create(settings);
   }
 
   @Override
   protected String getMappingBasePackage() {
-    return AppConfig.BASE_PACKAGE + ".model";
+    return PuslProperties.BASE_PACKAGE + ".model";
+  }
+  
+  @Override
+  public boolean autoIndexCreation() {
+    return false;
   }
 }

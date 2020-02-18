@@ -16,7 +16,7 @@ import com.vaadin.flow.router.Route;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.service.LectureService;
@@ -30,7 +30,7 @@ import de.bp2019.pusl.ui.views.MainAppView;
  * 
  * @author Leon Chemnitz
  */
-@PageTitle(AppConfig.NAME + " | Veranstaltungen verwalten")
+@PageTitle(PuslProperties.NAME + " | Veranstaltungen verwalten")
 @Route(value = ManageLecturesView.ROUTE, layout = MainAppView.class)
 public class ManageLecturesView extends BaseView {
 

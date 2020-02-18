@@ -14,7 +14,7 @@ import com.vaadin.flow.router.Route;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.views.BaseView;
@@ -25,7 +25,7 @@ import de.bp2019.pusl.ui.views.MainAppView;
  * 
  * @author Leon Chemnitz
  */
-@PageTitle(AppConfig.NAME + " | Benutzer")
+@PageTitle(PuslProperties.NAME + " | Benutzer")
 @Route(value = ManageUsersView.ROUTE, layout = MainAppView.class)
 public class ManageUsersView extends BaseView {
 
@@ -58,7 +58,6 @@ public class ManageUsersView extends BaseView {
         add(grid);
 
         Button newUserButton = new Button("Neuer Nutzer");
-        newUserButton.setId("new-user");
         newUserButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         add(newUserButton);
@@ -126,6 +125,8 @@ public class ManageUsersView extends BaseView {
             dialog.open();
         });
         button.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_ERROR);
+        /** makes testing a lot easier */
+        button.setId("delete-" + user.getId().toString());
         return button;
     }
 }

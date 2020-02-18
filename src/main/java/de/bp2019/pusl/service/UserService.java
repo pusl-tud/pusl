@@ -22,7 +22,6 @@ import de.bp2019.pusl.repository.UserRepository;
  */
 @Service
 public class UserService {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
@@ -44,13 +43,20 @@ public class UserService {
     }
 
     /**
-     * 
      * @return Full name of current user
      * @author Leon Chemnitz
      */
     public String getCurrentUserFullName() {
         return getFullName(getCurrentUser());
     }
+
+    /**
+     * @return Type of current User
+     * @author Leon Chemnitz
+     */
+	public UserType getCurrentUserType() {
+		return getCurrentUser().getType();
+	}
 
     /**
      * Get all Users the User is authenticated to see.
@@ -127,4 +133,5 @@ public class UserService {
     public List<UserType> getUserTypes() {
         return Arrays.asList(UserType.values());
     }
+
 }

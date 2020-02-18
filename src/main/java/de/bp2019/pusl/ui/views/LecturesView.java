@@ -13,13 +13,12 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 
-import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.service.LectureService;
@@ -29,7 +28,7 @@ import de.bp2019.pusl.service.LectureService;
  * 
  * @author Leon Chemnitz
  */
-@PageTitle(AppConfig.NAME + " | Meine Veranstaltungen")
+@PageTitle(PuslProperties.NAME + " | Meine Veranstaltungen")
 @Route(value = LecturesView.ROUTE, layout = MainAppView.class)
 public class LecturesView extends BaseView {
 

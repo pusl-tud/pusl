@@ -26,7 +26,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
-import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.model.User;
@@ -45,7 +45,7 @@ import de.bp2019.pusl.ui.views.MainAppView;
  * 
  * @author Leon Chemnitz
  */
-@PageTitle(AppConfig.NAME + " | Veranstaltung bearbeiten")
+@PageTitle(PuslProperties.NAME + " | Veranstaltung bearbeiten")
 @Route(value = EditLectureView.ROUTE, layout = MainAppView.class)
 public class EditLectureView extends BaseView implements HasUrlParameter<String> {
 

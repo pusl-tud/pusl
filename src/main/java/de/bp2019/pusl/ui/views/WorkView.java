@@ -31,7 +31,7 @@ import com.vaadin.flow.router.Route;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.bp2019.pusl.config.AppConfig;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.Lecture;
@@ -47,7 +47,7 @@ import de.bp2019.pusl.ui.components.VerticalTabs;
  *
  **/
 
-@PageTitle(AppConfig.NAME + " | Noten eintragen")
+@PageTitle(PuslProperties.NAME + " | Noten")
 @Route(value = WorkView.ROUTE, layout = MainAppView.class)
 public class WorkView extends BaseView implements HasUrlParameter<String> {
 

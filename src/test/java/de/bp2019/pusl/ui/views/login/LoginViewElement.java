@@ -1,19 +1,19 @@
 package de.bp2019.pusl.ui.views.login;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class LoginViewElement {
+import de.bp2019.pusl.ui.views.BaseUITest;
+import de.bp2019.pusl.ui.views.BaseUIElement;
 
-    private static final String ADMIN_USERNAME = "user";
-    private static final String ADMIN_PASSWORD = "password";
-
+public class LoginViewElement extends BaseUIElement{
     private WebElement email;
     private WebElement password;
     private WebElement submit;
 
-    public LoginViewElement(WebDriver driver){        
+    public LoginViewElement(BaseUITest uiTest){
+        super(uiTest);
+        
         email = driver.findElement(By.name("username"));
         password = driver.findElement(By.name("password"));
         submit = driver.findElement(By.tagName("vaadin-button"));
@@ -23,10 +23,6 @@ public class LoginViewElement {
         this.email.sendKeys(email);
         this.password.sendKeys(password);
         submit.click();
-    }
-
-    public void loginAdminCredentials(){
-        login(ADMIN_USERNAME, ADMIN_PASSWORD);
     }
 
 }
