@@ -44,11 +44,5 @@ pipeline {
                 sh 'mvn clean package -Pproduction'
             }
         }
-
-        stage ('Deploy') {
-            steps {
-                sh 'sudo cp target/*.jar /var/run/zentraldatei/zentraldatei.jar'
-            }
-        }
     }
 }
