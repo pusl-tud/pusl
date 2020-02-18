@@ -10,8 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
+import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.views.BaseUITest;
-import de.bp2019.pusl.ui.views.login.LoginViewIT;
+import de.bp2019.pusl.ui.views.LoginViewIT;
 
 public class ManageUsersViewIT extends BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewIT.class);
@@ -26,9 +27,7 @@ public class ManageUsersViewIT extends BaseUITest {
 
         goToURL(ManageUsersView.ROUTE);
 
-        ManageUsersViewElement manageUsersView = new ManageUsersViewElement(this);
-
-        manageUsersView.clickNewUserButton();
+        findButtonContainingText("Neuer Nutzer").click();
 
         waitForURL(EditUserView.ROUTE + "/new");
     }
@@ -39,15 +38,14 @@ public class ManageUsersViewIT extends BaseUITest {
         login(UserType.SUPERADMIN);
 
         goToURL(ManageUsersView.ROUTE);
+        
+        User user = userRepository.findByEmailAddress(testProperties.getAdminUsername());
+        String name = UserService.getFullName(user);
+        String id = user.getId().toString();
 
-        ManageUsersViewElement manageUsersView = new ManageUsersViewElement(this);
+        findButtonContainingText(name).click();
 
-        manageUsersView.clickAdminUserNameButton();
-
-        User adminUser = userRepository.findByEmailAddress(testProperties.getAdminUsername());
-        String userID = adminUser.getId().toString();
-
-        waitForURL(EditUserView.ROUTE + "/" + userID);
+        waitForURL(EditUserView.ROUTE + "/" + id);
     }
 
     @Test
@@ -57,13 +55,16 @@ public class ManageUsersViewIT extends BaseUITest {
 
         goToURL(ManageUsersView.ROUTE);
 
-        ManageUsersViewElement manageUsersView = new ManageUsersViewElement(this);
+        User user = userRepository.findByEmailAddress(testProperties.getAdminUsername());
+        String id = user.getId().toString();
 
-        User adminUser = userRepository.findByEmailAddress(testProperties.getAdminUsername());
-        String userID = adminUser.getId().toString();
+        /* click delete button */
+        findElementById("delete-" + id).click();
+        /* confirm delete button */
+        findButtonContainingText("Löschen").click();
 
-        manageUsersView.clickDeleteButton(userID);
-        manageUsersView.clickConfirmDeleteButton();
+        waitUntilDialogVisible("gelöscht");
         
+        assertNull(userRepository.findByEmailAddress(testProperties.getAdminUsername()));
     }
 }

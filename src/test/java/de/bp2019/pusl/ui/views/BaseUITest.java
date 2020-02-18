@@ -5,14 +5,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -31,7 +35,6 @@ import de.bp2019.pusl.config.TestProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
-import de.bp2019.pusl.ui.views.login.LoginViewElement;
 
 /**
  * Base Class for UI tests. Starts Webdriver and fills database with one
@@ -60,8 +63,9 @@ public abstract class BaseUITest {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    private String baseUrl;
-
+    protected String baseUrl;
+    protected WebDriverWait wait;
+    
     /**
      * Initializes TestDatabase and starts Webdriver
      * 
@@ -70,6 +74,7 @@ public abstract class BaseUITest {
      */
     @BeforeEach
     public void setUp() throws Exception {
+
         User mockUser = new User();
         mockUser.setEmailAddress(testProperties.getSuperadminUsername());
         mockUser.setPassword(passwordEncoder.encode(testProperties.getSuperadminPassword()));
@@ -116,6 +121,8 @@ public abstract class BaseUITest {
 
         driver.get(baseUrl);
 
+        wait = new WebDriverWait(driver, 30);
+
         waitForPageload();
     }
 
@@ -134,19 +141,17 @@ public abstract class BaseUITest {
     }
 
     protected void waitForPageload() {
-        var wait = new WebDriverWait(driver, 5);
-
         ExpectedCondition<Boolean> expectation = new ExpectedCondition<Boolean>() {
             public Boolean apply(WebDriver driver) {
                 return ((JavascriptExecutor) driver).executeScript("return document.readyState").toString()
                         .equals("complete");
             }
         };
+        
         wait.until(expectation);
     }
 
     protected void waitForURL(String url) throws InterruptedException {
-        var wait = new WebDriverWait(driver, 2);
         wait.until(ExpectedConditions.urlToBe(baseUrl + url));
     }
 
@@ -194,32 +199,94 @@ public abstract class BaseUITest {
      */
     protected void login(UserType userType) throws Exception {
         waitForLoginRedirect();
-        LoginViewElement loginView = new LoginViewElement(this);
 
         LOGGER.info("Logging in as " + userType.toString());
         switch (userType) {
             case SUPERADMIN:
-                loginView.login(testProperties.getSuperadminUsername(), testProperties.getSuperadminPassword());
+                findElementByName("username").sendKeys(testProperties.getSuperadminUsername());
+                findElementByName("password").sendKeys(testProperties.getSuperadminPassword());
                 break;
             case ADMIN:
-                loginView.login(testProperties.getAdminUsername(), testProperties.getAdminPassword());
+                findElementByName("username").sendKeys(testProperties.getAdminUsername());
+                findElementByName("password").sendKeys(testProperties.getAdminPassword());
                 break;
             case WIMI:
-                loginView.login(testProperties.getWimiUsername(), testProperties.getWimiPassword());
+                findElementByName("username").sendKeys(testProperties.getWimiUsername());
+                findElementByName("password").sendKeys(testProperties.getWimiPassword());
                 break;
             case HIWI:
-                loginView.login(testProperties.getHiwiUsername(), testProperties.getHiwiPassword());
+                findElementByName("username").sendKeys(testProperties.getHiwiUsername());
+                findElementByName("password").sendKeys(testProperties.getHiwiPassword());
                 break;
         }
+
+        findButtonContainingText("Log in").click();
 
         waitForURL("");
     }
 
-    public WebDriver getDriver(){
-        return driver;
+    protected WebElement findButtonContainingText(String text) {
+        return driver.findElement(By.xpath("//vaadin-button[contains(text(),'" + text + "')]"));
     }
 
-    public TestProperties getProperties(){
-        return testProperties;
+    protected WebElement findElementById(String id) {
+        return driver.findElement(By.id(id));
     }
+
+    protected WebElement findElementByName(String name) {
+        return driver.findElement(By.name(name));
+    }
+
+    protected void findSelectByIdAndSelectByText(String id, String selectionText) {      
+        driver.findElement(By.xpath("//vaadin-select[@id='" + id + "']")).click();
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//vaadin-select-overlay")));
+        driver.findElement(By.xpath("//vaadin-select-overlay//vaadin-item[text()='" + selectionText + "']")).click();
+
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//vaadin-select-overlay")));
+    }
+
+    /**
+     * 
+     * MultiselectComboBox is the absolute worst for testing...
+     * 
+     * @param id
+     * @param textList
+     * @author Leon Chemnitz
+     */
+    protected void findMSCBByIdAndSelectByTexts(String id, List<String> textList) {
+        driver.findElement(By.xpath("//multiselect-combo-box[@id='" + id + "']")).click();
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//vaadin-combo-box-overlay")));
+        WebElement shadowRoot1 = expandRootElement(driver.findElement(By.xpath("//vaadin-combo-box-overlay")));
+        WebElement shadowRoot2 = expandRootElement(shadowRoot1.findElement(By.id("content")));
+        List<WebElement> listItems = shadowRoot2.findElements(By.tagName("vaadin-combo-box-item"));
+        textList.forEach(selectionText -> {
+            for(WebElement element: listItems){
+                try {
+                    WebElement div = expandRootElement(element).findElement(By.tagName("div"));
+                    div.findElement(By.xpath(".//span[contains(text(),'" + selectionText + "')]")).click();
+                } catch (Exception e) {
+                    continue;
+                }
+            }
+
+        });
+        driver.findElement(By.xpath("//multiselect-combo-box[@id='" + id + "']")).sendKeys(Keys.ENTER);
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//vaadin-combo-box-overlay")));
+    }
+
+    protected WebElement findPasswordFieldById(String id) {
+        return driver.findElement(By.xpath("//vaadin-password-field[@id='" + id + "']"));
+    }
+
+    protected void waitUntilDialogVisible(String dialogText) {
+        wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.xpath("//div[contains(text(),'" + dialogText + "')]")));
+    }
+
+    private WebElement expandRootElement(WebElement element) {
+        return (WebElement) ((JavascriptExecutor) driver).executeScript("return arguments[0].shadowRoot", element);
+    }
+
 }

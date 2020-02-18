@@ -93,18 +93,21 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                 firstName.setLabel("Vorname");
                 firstName.setPlaceholder("Vorname");
                 firstName.setValueChangeMode(ValueChangeMode.EAGER);
+                firstName.setId("first-name");
                 form.add(firstName, 1);
 
                 TextField lastName = new TextField();
                 lastName.setLabel("Nachname");
                 lastName.setPlaceholder("Nachname");
                 lastName.setValueChangeMode(ValueChangeMode.EAGER);
+                lastName.setId("last-name");
                 form.add(lastName, 1);
 
                 TextField emailAddress = new TextField();
                 emailAddress.setLabel("Email Adresse");
                 emailAddress.setPlaceholder("max@mustermann.de");
                 emailAddress.setValueChangeMode(ValueChangeMode.EAGER);
+                emailAddress.setId("email-address");
                 form.add(emailAddress, 1);
 
                 Label emptyText = new Label(" ");
@@ -114,23 +117,27 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                 institutes.setLabel("Institute");
                 institutes.setItems(instituteService.getAllInstitutes());
                 institutes.setItemLabelGenerator(item -> item.getName());
+                institutes.setId("institutes");
                 form.add(institutes, 1);
 
                 Select<UserType> userType = new Select<UserType>();
                 userType.setLabel("Nutzer Typ");
                 userType.setItems(userService.getUserTypes());
+                userType.setId("user-type");
                 form.add(userType, 1);
 
                 PasswordField password = new PasswordField();
                 password.setLabel("Passwort");
                 password.setPlaceholder("Passwort eingeben");
-                password.setValueChangeMode(ValueChangeMode.EAGER);
+                password.setValueChangeMode(ValueChangeMode.EAGER);                
+                password.setId("password");
                 form.add(password, 1);
 
                 PasswordField repeatPassword = new PasswordField();
                 repeatPassword.setLabel("Passwort wiederholen");
                 repeatPassword.setPlaceholder("Passwort wiederholen");
                 repeatPassword.setValueChangeMode(ValueChangeMode.EAGER);
+                repeatPassword.setId("confirm-password");
                 form.add(repeatPassword, 1);
 
                 Button save = new Button("Speichern");

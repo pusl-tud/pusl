@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.enums.UserType;
@@ -16,21 +19,29 @@ import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
 
 /**
- * Service providing relevant Users
+ * Service providing relevant Users. Implements {@link UserDetailsService} to be
+ * used with Spring Security
  * 
  * @author Leon Chemnitz
  */
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     UserRepository userRepository;
 
-    public UserService() {
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+        User user = userRepository.findByEmailAddress(username);
+        if (user == null) {
+            throw new UsernameNotFoundException(username);
+        }
+        return user;
     }
 
     /**
+     * Returns the currently logged in User as a {@link User} Object
      * 
      * @return current User
      * @author Leon Chemnitz
@@ -43,6 +54,9 @@ public class UserService {
     }
 
     /**
+     * Returns the Full name of the currently logged in User. Returns the users
+     * email address if no firstname is set
+     * 
      * @return Full name of current user
      * @author Leon Chemnitz
      */
@@ -54,9 +68,9 @@ public class UserService {
      * @return Type of current User
      * @author Leon Chemnitz
      */
-	public UserType getCurrentUserType() {
-		return getCurrentUser().getType();
-	}
+    public UserType getCurrentUserType() {
+        return getCurrentUser().getType();
+    }
 
     /**
      * Get all Users the User is authenticated to see.
@@ -70,7 +84,8 @@ public class UserService {
     }
 
     /**
-     * Get the full name of a user
+     * Get the full name of a user.  Returns the users
+     * email address if no firstname is set
      * 
      * @param user User
      * @return Full name of the found User as a String. null if no user is found
@@ -134,4 +149,6 @@ public class UserService {
         return Arrays.asList(UserType.values());
     }
 
+    public UserService() {
+    }
 }

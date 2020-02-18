@@ -1,36 +1,43 @@
 package de.bp2019.pusl.model;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import de.bp2019.pusl.enums.UserType;
 
 /**
- * Model of a User
+ * Model of a User. Implements {@link UserDetails} to be used with Spring
+ * Security
  * 
  * @author Leon Chemnitz
  */
 @Document
-public class User {
+public class User implements UserDetails {
+	private static final long serialVersionUID = 1535517480345333837L;
 
 	@Id
 	private ObjectId id;
-	
+
 	private String firstName;
 
 	private String lastName;
-	
+
 	private String emailAddress;
-	
+
 	private String password;
 
 	@DBRef
 	private Set<Institute> institutes;
-	
+
 	private UserType type;
 
 	public User() {
@@ -44,6 +51,36 @@ public class User {
 		this.password = password;
 		this.institutes = institutes;
 		this.type = type;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return Arrays.asList(new SimpleGrantedAuthority(type.toString()));
+	}
+
+	@Override
+	public String getUsername() {
+		return emailAddress;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 
 	public ObjectId getId() {
@@ -78,6 +115,7 @@ public class User {
 		this.emailAddress = eMail;
 	}
 
+	@Override
 	public String getPassword() {
 		return password;
 	}
@@ -100,6 +138,12 @@ public class User {
 
 	public void setType(UserType type) {
 		this.type = type;
+	}
+
+	@Override
+	public String toString() {
+		return "User [emailAddress=" + emailAddress + ", firstName=" + firstName + ", id=" + id + ", institutes="
+				+ institutes + ", lastName=" + lastName + ", password=" + password + ", type=" + type + "]";
 	}
 
 }
