@@ -1,5 +1,6 @@
 package de.bp2019.pusl.ui.views.lecture;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -91,10 +92,11 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 name.setValueChangeMode(ValueChangeMode.EAGER);
                 formLayout.add(name, 1);
 
+                List<Institute> allInstitutes = instituteService.getAll();
                 MultiselectComboBox<Institute> institutes = new MultiselectComboBox<Institute>();
                 institutes.setLabel("Institute");
-                institutes.setItems(instituteService.getAllInstitutes());
-                institutes.setItemLabelGenerator(item -> item.getName());
+                institutes.setItems(allInstitutes);
+                institutes.setItemLabelGenerator(Institute::getName);
                 formLayout.add(institutes, 1);
 
                 VerticalTabs verticalTabs = new VerticalTabs();
@@ -107,11 +109,12 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 PerformanceSchemeComposer performanceSchemes = new PerformanceSchemeComposer();
                 verticalTabs.addTab("Leistungen", performanceSchemes);
 
+                List<User> allUser = userService.getAll();
                 MultiselectComboBox<User> hasAccess = new MultiselectComboBox<User>();
                 hasAccess.setWidth("100%");
                 hasAccess.setHeight("10em");
                 hasAccess.setLabel("Zugriff");
-                hasAccess.setItems(userService.getAll());
+                hasAccess.setItems(allUser);
                 hasAccess.setItemLabelGenerator(item -> UserService.getFullName(item));
                 verticalTabs.addTab("Zugriff", hasAccess);
 
@@ -130,12 +133,26 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                                 new StringLengthValidator("Bitte Name der Veranstaltung angeben", 1, null))
                                 .bind(Lecture::getName, Lecture::setName);
 
-                binder.forField(institutes)
-                                .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
-                                                "Bitte mind. ein Institut angeben")
-                                .bind(Lecture::getInstitutes, Lecture::setInstitutes);
+                binder.forField(institutes).withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
+                                "Bitte mind. ein Institut angeben").bind(lecture -> {
+                                        if (lecture.getInstitutes() != null) {
+                                                return lecture.getInstitutes().stream()
+                                                                .map(institute -> allInstitutes.stream()
+                                                                                .filter(i -> institute.equals(i))
+                                                                                .findFirst().get())
+                                                                .collect(Collectors.toSet());
+                                        } else
+                                                return null;
+                                }, Lecture::setInstitutes);
 
-                binder.bind(hasAccess, Lecture::getHasAccess, Lecture::setHasAccess);
+                binder.bind(hasAccess, lecture -> {
+                        if (lecture.getHasAccess() != null) {
+                                return lecture.getHasAccess().stream().map(
+                                                user -> allUser.stream().filter(u -> user.equals(u)).findFirst().get())
+                                                .collect(Collectors.toSet());
+                        } else
+                                return null;
+                }, Lecture::setHasAccess);
 
                 binder.bind(exercises, Lecture::getExercises, Lecture::setExercises);
 

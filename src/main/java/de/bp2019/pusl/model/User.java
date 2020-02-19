@@ -43,6 +43,18 @@ public class User implements UserDetails {
 	public User() {
 	}
 
+	@Override
+    public boolean equals(Object o) {   
+        if (o == this) { 
+            return true; 
+        } 
+        if (!(o instanceof User)) { 
+            return false; 
+        }           
+        User u = (User) o;           
+        return u.getEmailAddress().equals(this.getEmailAddress());
+    } 
+
 	public User(String firstName, String lastName, String emailAddress, String password, Set<Institute> institutes,
 			UserType type) {
 		this.firstName = firstName;

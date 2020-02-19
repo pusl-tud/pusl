@@ -1,7 +1,7 @@
 package de.bp2019.pusl.model;
 
 /**
- * Under Development
+ * Model of a PerformanceScheme used in {@link Lecture}
  * 
  * @author Leon Chemnitz
  */

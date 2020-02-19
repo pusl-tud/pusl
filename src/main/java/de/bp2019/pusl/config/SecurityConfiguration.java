@@ -15,11 +15,7 @@ import de.bp2019.pusl.util.CustomRequestCache;
 import de.bp2019.pusl.util.SecurityUtils;
 
 /**
- * Class containing the Spring and vaadin security configuration. most of it is
- * taken straight from the vaadin website.
- * 
- * Once rolebased authentication is implemented a lot will be changed here, so
- * nothing is final...
+ * Class containing the Spring and vaadin security configuration.
  * 
  * @author Leon Chemnitz
  */
@@ -77,6 +73,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	/**
 	 * Allows access to static resources, bypassing Spring security.
+	 * 
+	 * @author Leon Chemnitz
 	 */
 	@Override
 	public void configure(WebSecurity web) {

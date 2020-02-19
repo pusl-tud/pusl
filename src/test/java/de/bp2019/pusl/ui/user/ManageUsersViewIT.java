@@ -1,4 +1,4 @@
-package de.bp2019.pusl.ui.views.user;
+package de.bp2019.pusl.ui.user;
 
 import static org.junit.Assert.assertNull;
 
@@ -11,9 +11,16 @@ import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.service.UserService;
-import de.bp2019.pusl.ui.views.BaseUITest;
-import de.bp2019.pusl.ui.views.LoginViewIT;
+import de.bp2019.pusl.ui.BaseUITest;
+import de.bp2019.pusl.ui.LoginViewIT;
+import de.bp2019.pusl.ui.views.user.EditUserView;
+import de.bp2019.pusl.ui.views.user.ManageUsersView;
 
+/**
+ * UI test for {@link ManageUsersView}
+ * 
+ * @author Leon Chemnitz
+ */
 public class ManageUsersViewIT extends BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewIT.class);
 

@@ -33,7 +33,7 @@ public class InstituteService {
      * @return list of all institutes
      * @author Leon Chemnitz
      */
-    public List<Institute> getAllInstitutes() {
+    public List<Institute> getAll() {
         // TODO: implement authentication
         return instituteRepository.findAll();
     }
@@ -46,7 +46,7 @@ public class InstituteService {
      * @return found Institute with matching Id, null if none is found
      * @author Leon Chemnitz
      */
-    public Institute getInstituteById(String id) {
+    public Institute getById(String id) {
         // TODO: implement authentication
         Optional<Institute> foundInstitute = instituteRepository.findById(id);
 

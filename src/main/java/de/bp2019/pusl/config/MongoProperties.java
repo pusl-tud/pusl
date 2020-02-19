@@ -2,8 +2,13 @@ package de.bp2019.pusl.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * Handle for all the MongoDB configuration in application.properties
+ * 
+ * @auhtor Leon Chemnitz
+ */
 @ConfigurationProperties("pusl.mongo")
-public class MongoProperties {    
+public class MongoProperties {
     private String address;
     private String port;
     private String dbName;

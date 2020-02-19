@@ -1,4 +1,4 @@
-package de.bp2019.pusl.ui.views;
+package de.bp2019.pusl.ui;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -35,6 +35,7 @@ import de.bp2019.pusl.config.TestProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
+import de.bp2019.pusl.ui.views.LoginView;
 
 /**
  * Base Class for UI tests. Starts Webdriver and fills database with one
@@ -65,7 +66,7 @@ public abstract class BaseUITest {
 
     protected String baseUrl;
     protected WebDriverWait wait;
-    
+
     /**
      * Initializes TestDatabase and starts Webdriver
      * 
@@ -121,7 +122,7 @@ public abstract class BaseUITest {
 
         driver.get(baseUrl);
 
-        wait = new WebDriverWait(driver, 30);
+        wait = new WebDriverWait(driver, 10);
 
         waitForPageload();
     }
@@ -140,6 +141,12 @@ public abstract class BaseUITest {
         }
     }
 
+    /**
+     * Explicit wait, but only works the first time the application is started,
+     * since vaadin creates a SPA
+     * 
+     * @author Leon Chemnitz
+     */
     protected void waitForPageload() {
         ExpectedCondition<Boolean> expectation = new ExpectedCondition<Boolean>() {
             public Boolean apply(WebDriver driver) {
@@ -147,14 +154,34 @@ public abstract class BaseUITest {
                         .equals("complete");
             }
         };
-        
+
         wait.until(expectation);
     }
 
+    /**
+     * Use this as confirmation that a redirect took place
+     * 
+     * @param url
+     * @throws InterruptedException
+     * @author Leon Chemnitz
+     */
     protected void waitForURL(String url) throws InterruptedException {
         wait.until(ExpectedConditions.urlToBe(baseUrl + url));
     }
 
+    /**
+     * Use this as a confirmation that a redirect didn't took play
+     * 
+     * @param url
+     * @author Leon Chemnitz
+     */
+    protected void timeoutWrongURL(String url) {
+        assertThrows(TimeoutException.class, () -> waitForURL(url));
+    }
+
+    /**
+     * @author Leon Chemnitz
+     */
     protected void goToURL(String url) throws InterruptedException {
         driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
         driver.navigate().to(baseUrl + url);
@@ -162,32 +189,15 @@ public abstract class BaseUITest {
         waitForPageload();
     }
 
-    private String findFile() throws IOException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        URL url;
-        if (SystemUtils.IS_OS_WINDOWS) {
-            LOGGER.info("Platform Windows detected");
-            url = classLoader.getResource(testProperties.getChromedriverWin());
-        } else if (SystemUtils.IS_OS_LINUX) {
-            LOGGER.info("Platform Linux detected");
-            url = classLoader.getResource(testProperties.getChromedriverLinux());
-        } else if (SystemUtils.IS_OS_MAC) {
-            LOGGER.info("Platform Mac detected");
-            url = classLoader.getResource(testProperties.getChromedriverMac());
-        } else {
-            throw new IOException("No supported plattform detected");
-        }
-
-        return url.getFile();
-    }
-
+    /**
+     * Used during login
+     * 
+     * @throws InterruptedException
+     * @author Leon Chemnitz
+     */
     protected void waitForLoginRedirect() throws InterruptedException {
         driver.navigate().to(baseUrl);
         waitForURL(LoginView.ROUTE);
-    }
-
-    protected void timeoutWrongURL(String url) {
-        assertThrows(TimeoutException.class, () -> waitForURL(url));
     }
 
     /**
@@ -225,19 +235,40 @@ public abstract class BaseUITest {
         waitForURL("");
     }
 
+    /**
+     * Get {@link WebElement} of a button, based on the text displayed on the button
+     * 
+     * @param text
+     * @return
+     * @author Leon Chemnitz
+     */
     protected WebElement findButtonContainingText(String text) {
         return driver.findElement(By.xpath("//vaadin-button[contains(text(),'" + text + "')]"));
     }
 
+    /**
+     * Get {@link WebElement} based on its CSS id
+     * 
+     * @param id
+     * @return
+     * @author Leon Chemnitz
+     */
     protected WebElement findElementById(String id) {
         return driver.findElement(By.id(id));
     }
 
+    /**
+     * Get {@link WebElement} based on its CSS name
+     * 
+     * @param name
+     * @return
+     * @author Leon Chemnitz
+     */
     protected WebElement findElementByName(String name) {
         return driver.findElement(By.name(name));
     }
 
-    protected void findSelectByIdAndSelectByText(String id, String selectionText) {      
+    protected void findSelectByIdAndSelectByText(String id, String selectionText) {
         driver.findElement(By.xpath("//vaadin-select[@id='" + id + "']")).click();
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//vaadin-select-overlay")));
@@ -247,6 +278,8 @@ public abstract class BaseUITest {
     }
 
     /**
+     * Find a Multiselect-combo-box by its CSS ID and select its fields based on a
+     * List of texts
      * 
      * MultiselectComboBox is the absolute worst for testing...
      * 
@@ -258,13 +291,13 @@ public abstract class BaseUITest {
         driver.findElement(By.xpath("//multiselect-combo-box[@id='" + id + "']")).click();
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//vaadin-combo-box-overlay")));
-        WebElement shadowRoot1 = expandRootElement(driver.findElement(By.xpath("//vaadin-combo-box-overlay")));
-        WebElement shadowRoot2 = expandRootElement(shadowRoot1.findElement(By.id("content")));
+        WebElement shadowRoot1 = expandShadowDOM(driver.findElement(By.xpath("//vaadin-combo-box-overlay")));
+        WebElement shadowRoot2 = expandShadowDOM(shadowRoot1.findElement(By.id("content")));
         List<WebElement> listItems = shadowRoot2.findElements(By.tagName("vaadin-combo-box-item"));
         textList.forEach(selectionText -> {
-            for(WebElement element: listItems){
+            for (WebElement element : listItems) {
                 try {
-                    WebElement div = expandRootElement(element).findElement(By.tagName("div"));
+                    WebElement div = expandShadowDOM(element).findElement(By.tagName("div"));
                     div.findElement(By.xpath(".//span[contains(text(),'" + selectionText + "')]")).click();
                 } catch (Exception e) {
                     continue;
@@ -276,17 +309,66 @@ public abstract class BaseUITest {
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//vaadin-combo-box-overlay")));
     }
 
+    /**
+     * Find vaadin Password Field based on its CSS id
+     * 
+     * @param id
+     * @return
+     * @author Leon Chemnitz
+     */
     protected WebElement findPasswordFieldById(String id) {
         return driver.findElement(By.xpath("//vaadin-password-field[@id='" + id + "']"));
     }
 
+    /**
+     * Clear a Vaadin TextField based on its CSS id
+     * 
+     * @param id
+     * @author Leon Chemnitz
+     */
+    protected void clearFieldById(String id) {
+        WebElement shadowRoot = expandShadowDOM(findElementById(id));
+        shadowRoot.findElement(By.tagName("input")).clear();
+    }
+
+    /**
+     * Wait until a Dialog pops up containing dialogText
+     * 
+     * @param dialogText
+     * @author Leon Chemnitz
+     */
     protected void waitUntilDialogVisible(String dialogText) {
         wait.until(ExpectedConditions
                 .visibilityOfElementLocated(By.xpath("//div[contains(text(),'" + dialogText + "')]")));
     }
 
-    private WebElement expandRootElement(WebElement element) {
+    /**
+     * Expand ShadowDom of an Element
+     * 
+     * @param element
+     * @return
+     * @author Leon Chemnitz
+     */
+    protected WebElement expandShadowDOM(WebElement element) {
         return (WebElement) ((JavascriptExecutor) driver).executeScript("return arguments[0].shadowRoot", element);
     }
 
+    private String findFile() throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL url;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            LOGGER.info("Platform Windows detected");
+            url = classLoader.getResource(testProperties.getChromedriverWin());
+        } else if (SystemUtils.IS_OS_LINUX) {
+            LOGGER.info("Platform Linux detected");
+            url = classLoader.getResource(testProperties.getChromedriverLinux());
+        } else if (SystemUtils.IS_OS_MAC) {
+            LOGGER.info("Platform Mac detected");
+            url = classLoader.getResource(testProperties.getChromedriverMac());
+        } else {
+            throw new IOException("No supported plattform detected");
+        }
+
+        return url.getFile();
+    }
 }

@@ -1,4 +1,4 @@
-package de.bp2019.pusl.ui.views;
+package de.bp2019.pusl.ui;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

@@ -17,6 +17,19 @@ public class Institute {
 
 	private String name;
 
+	@Override
+    public boolean equals(Object o) {   
+        if (o == this) { 
+            return true; 
+        } 
+        if (!(o instanceof Institute)) { 
+            return false; 
+        }           
+        Institute i = (Institute) o;           
+        return i.getName().equals(this.getName());
+    } 
+
+
 	public Institute() {
 	}
 

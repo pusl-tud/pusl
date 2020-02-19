@@ -134,7 +134,7 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                         /* clear fields by setting null */
                         binder.readBean(null);
                 } else {
-                        Institute fetchedInstitute = instituteService.getInstituteById(instituteId);
+                        Institute fetchedInstitute = instituteService.getById(instituteId);
                         /* getInstituteById returns null if no matching Institute is found */
                         if (fetchedInstitute == null) {
                                 throw new NotFoundException();

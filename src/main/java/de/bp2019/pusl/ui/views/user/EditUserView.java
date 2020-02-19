@@ -1,5 +1,6 @@
 package de.bp2019.pusl.ui.views.user;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -113,10 +114,11 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                 Label emptyText = new Label(" ");
                 form.add(emptyText, 1);
 
+                List<Institute> allInstitutes = instituteService.getAll();
                 MultiselectComboBox<Institute> institutes = new MultiselectComboBox<Institute>();
                 institutes.setLabel("Institute");
-                institutes.setItems(instituteService.getAllInstitutes());
-                institutes.setItemLabelGenerator(item -> item.getName());
+                institutes.setItems(allInstitutes);
+                institutes.setItemLabelGenerator(Institute::getName);
                 institutes.setId("institutes");
                 form.add(institutes, 1);
 
@@ -129,7 +131,7 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                 PasswordField password = new PasswordField();
                 password.setLabel("Passwort");
                 password.setPlaceholder("Passwort eingeben");
-                password.setValueChangeMode(ValueChangeMode.EAGER);                
+                password.setValueChangeMode(ValueChangeMode.EAGER);
                 password.setId("password");
                 form.add(password, 1);
 
@@ -162,10 +164,17 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                 binder.forField(emailAddress).withValidator(new EmailValidator("Bitte korrekte Email Addresse angeben"))
                                 .bind(User::getEmailAddress, User::setEmailAddress);
 
-                binder.forField(institutes)
-                                .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
-                                                "Bitte mind. ein Institut angeben")
-                                .bind(User::getInstitutes, User::setInstitutes);
+                binder.forField(institutes).withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
+                                "Bitte mind. ein Institut angeben").bind(user -> {
+                                        if (user.getInstitutes() != null) {
+                                                return user.getInstitutes().stream()
+                                                                .map(institute -> allInstitutes.stream()
+                                                                                .filter(i -> institute.equals(i))
+                                                                                .findFirst().get())
+                                                                .collect(Collectors.toSet());
+                                        } else
+                                                return null;
+                                }, User::setInstitutes);
 
                 binder.forField(userType).withValidator(ut -> ut != null, "Bitte Nutzer Typ wählen").bind(User::getType,
                                 User::setType);
@@ -210,6 +219,9 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
 
                                         if (!password.getValue().equals("")) {
                                                 user.setPassword(passwordEncoder.encode(password.getValue()));
+                                        }else{
+                                                String oldPassword = userService.getById(user.getId().toString()).getPassword();
+                                                user.setPassword(oldPassword);
                                         }
 
                                         userService.save(user);

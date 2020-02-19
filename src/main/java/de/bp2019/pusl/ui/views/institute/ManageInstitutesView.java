@@ -43,7 +43,7 @@ public class ManageInstitutesView extends BaseView {
 
         this.instituteService = instituteService;
 
-        instituteDataProvider = new ListDataProvider<>(instituteService.getAllInstitutes());
+        instituteDataProvider = new ListDataProvider<>(instituteService.getAll());
 
         /* -- Create Components -- */
 
