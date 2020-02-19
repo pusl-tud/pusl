@@ -1,4 +1,5 @@
-# zentraldatei
-System for managing student achievements for the institutes of transportation at TU Darmstadt
+# pusl
 
-javadoc: https://leonchemnitz.github.io/zentraldatei/apidocs/
+System for managing student achievements for the institutes of transportation at **TU Darmstadt**
+
+[javadoc](https://leonchemnitz.github.io/pusl/apidocs/)
