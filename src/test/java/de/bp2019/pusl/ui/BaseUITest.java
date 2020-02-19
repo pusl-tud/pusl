@@ -34,6 +34,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import de.bp2019.pusl.config.TestProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
+import de.bp2019.pusl.repository.ExerciseSchemeRepository;
+import de.bp2019.pusl.repository.GradeRepository;
+import de.bp2019.pusl.repository.InstituteRepository;
+import de.bp2019.pusl.repository.LectureRepository;
 import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.ui.views.LoginView;
 
@@ -60,6 +64,18 @@ public abstract class BaseUITest {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    InstituteRepository instituteRepository;
+
+    @Autowired
+    LectureRepository lectureRepository;
+
+    @Autowired
+    ExerciseSchemeRepository exerciseSchemeRepository;
+
+    @Autowired
+    GradeRepository gradeRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -136,6 +152,10 @@ public abstract class BaseUITest {
     @AfterEach
     public void tearDown() throws Exception {
         userRepository.deleteAll();
+        instituteRepository.deleteAll();
+        exerciseSchemeRepository.deleteAll();
+        lectureRepository.deleteAll();
+        gradeRepository.deleteAll();
         if (driver != null) {
             driver.quit();
         }

@@ -77,7 +77,6 @@ public class EditUserViewIT extends BaseUITest {
         assertTrue(passwordEncoder.matches(user.getPassword(), savedUser.getPassword())); 
         assertEquals(user.getType(), savedUser.getType()); 
         savedUser.getInstitutes().forEach(i -> assertEquals(institute.getName(), i.getName()));
-        instituteRepository.deleteAll();
     }
 
     @Test
@@ -125,7 +124,6 @@ public class EditUserViewIT extends BaseUITest {
         assertEquals(newLastName, savedUser.getLastName());
         LOGGER.info("checking password");
         assertEquals(user.getPassword(), savedUser.getPassword()); 
-        instituteRepository.deleteAll();
     }
  
 
