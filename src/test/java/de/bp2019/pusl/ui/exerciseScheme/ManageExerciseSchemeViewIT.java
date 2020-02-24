@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 /**
  * UI test for {@link de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView}
@@ -48,9 +48,14 @@ public class ManageExerciseSchemeViewIT extends BaseUITest {
 
     private Institute institute;
 
+    private Random random = new Random();
+
     public void addExerciseScheme() {
+
+        institute = new Institute(RandomStringUtils.random(8, true, true));
+        instituteRepository.save(institute);
         Set<Institute> instituteSet = new HashSet<>();
-        instituteSet.add(new Institute(RandomStringUtils.random(8, true, true)));
+        instituteSet.add(instituteRepository.findAll().get(0));
 
         Set<Token> tokenSet = new HashSet<>();
         tokenSet.add(new Token(RandomStringUtils.random(8, true, true), false));
@@ -60,6 +65,8 @@ public class ManageExerciseSchemeViewIT extends BaseUITest {
 
         exerciseScheme = new ExerciseScheme(RandomStringUtils.random(8, true, false), false, false,
                 RandomStringUtils.random(8, true, true), tokenSet, instituteSet, userSet );
+
+        exerciseSchemeRepository.save(exerciseScheme);
 
     }
 
@@ -80,18 +87,18 @@ public class ManageExerciseSchemeViewIT extends BaseUITest {
         LOGGER.info("Testing ExerciseScheme name button");
         login(UserType.SUPERADMIN);
 
+        addExerciseScheme();
+
         goToURL(ManageExerciseSchemesView.ROUTE);
 
-        Random random = new Random();
-
         List<ExerciseScheme> allExerciseSchemes = exerciseSchemeRepository.findAll();
-        ExerciseScheme exerciseScheme = allExerciseSchemes.get(0);
+        ExerciseScheme exerciseScheme = allExerciseSchemes.get(random.nextInt(allExerciseSchemes.size()));
         String name = exerciseScheme.getName();
         String id = exerciseScheme.getId();
 
         findButtonContainingText(name).click();
 
-        waitForURL(EditUserView.ROUTE + "/" + id);
+        waitForURL(EditExerciseSchemeView.ROUTE + "/" + id);
     }
 
     @Test
@@ -99,12 +106,12 @@ public class ManageExerciseSchemeViewIT extends BaseUITest {
         LOGGER.info("Testing Delete ExerciseScheme Button");
         login(UserType.SUPERADMIN);
 
+        addExerciseScheme();
+
         goToURL(ManageExerciseSchemesView.ROUTE);
 
-        Random random = new Random();
-
         List<ExerciseScheme> allExerciseSchemes = exerciseSchemeRepository.findAll();
-        ExerciseScheme exerciseScheme = allExerciseSchemes.get(0);
+        ExerciseScheme exerciseScheme = allExerciseSchemes.get(random.nextInt(allExerciseSchemes.size()));
         String id = exerciseScheme.getId();
 
         /* click delete button */
@@ -114,7 +121,7 @@ public class ManageExerciseSchemeViewIT extends BaseUITest {
 
         waitUntilDialogVisible("gelöscht");
 
-        assertNull(exerciseSchemeRepository.findById(id));
+        assertTrue(exerciseSchemeRepository.findById(id).isEmpty());
     }
 
 }
