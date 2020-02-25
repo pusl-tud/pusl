@@ -48,9 +48,7 @@ public class ManageExerciseSchemeViewIT extends BaseUITest {
 
     private Institute institute;
 
-    private Random random = new Random();
-
-    public void addExerciseScheme() {
+    public String addExerciseScheme() {
 
         institute = new Institute(RandomStringUtils.random(8, true, true));
         instituteRepository.save(institute);
@@ -68,6 +66,7 @@ public class ManageExerciseSchemeViewIT extends BaseUITest {
 
         exerciseSchemeRepository.save(exerciseScheme);
 
+        return exerciseScheme.getName();
     }
 
     @Test
@@ -87,18 +86,21 @@ public class ManageExerciseSchemeViewIT extends BaseUITest {
         LOGGER.info("Testing ExerciseScheme name button");
         login(UserType.SUPERADMIN);
 
-        addExerciseScheme();
+        String exerciseSchemeName = addExerciseScheme();
 
         goToURL(ManageExerciseSchemesView.ROUTE);
 
-        List<ExerciseScheme> allExerciseSchemes = exerciseSchemeRepository.findAll();
-        ExerciseScheme exerciseScheme = allExerciseSchemes.get(random.nextInt(allExerciseSchemes.size()));
-        String name = exerciseScheme.getName();
+        ExerciseScheme exerciseScheme = exerciseSchemeRepository.findByName(exerciseSchemeName);
         String id = exerciseScheme.getId();
 
-        findButtonContainingText(name).click();
+        findButtonContainingText(exerciseSchemeName).click();
 
         waitForURL(EditExerciseSchemeView.ROUTE + "/" + id);
+
+        findElementById("numeric").click();
+
+        findButtonContainingText("Speichern").click();
+        waitForURL(ManageExerciseSchemesView.ROUTE);
     }
 
     @Test
@@ -106,12 +108,11 @@ public class ManageExerciseSchemeViewIT extends BaseUITest {
         LOGGER.info("Testing Delete ExerciseScheme Button");
         login(UserType.SUPERADMIN);
 
-        addExerciseScheme();
+        String exerciseSchemeName = addExerciseScheme();
 
         goToURL(ManageExerciseSchemesView.ROUTE);
 
-        List<ExerciseScheme> allExerciseSchemes = exerciseSchemeRepository.findAll();
-        ExerciseScheme exerciseScheme = allExerciseSchemes.get(random.nextInt(allExerciseSchemes.size()));
+        ExerciseScheme exerciseScheme = exerciseSchemeRepository.findByName(exerciseSchemeName);
         String id = exerciseScheme.getId();
 
         /* click delete button */

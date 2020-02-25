@@ -4,7 +4,6 @@ import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
-import de.bp2019.pusl.repository.ExerciseSchemeRepository;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.ui.BaseUITest;
@@ -31,9 +30,6 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewIT.class);
 
     @Autowired
-    ExerciseSchemeRepository exerciseSchemeRepository;
-
-    @Autowired
     UserRepository userRepository;
 
     @Autowired
@@ -42,6 +38,7 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
     private Institute institute;
 
     private Random random;
+
     @Test
     public void testNoInstitutes() throws Exception {
         LOGGER.info("Testing create new ExerciseScheme");
@@ -63,16 +60,37 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
         findElementById("flex-Handin").click();
         assertFalse(findElementById("token").isDisplayed());
 
-        findButtonContainingText("Speichern");
+        findButtonContainingText("Speichern").click();
         timeoutWrongURL(ManageExerciseSchemesView.ROUTE);
 
 
     }
-/*
-    ExerciseScheme savedExerciseScheme = exerciseSchemeRepository.findByName(exerciseScheme.getName());
-    assertTrue(savedExerciseScheme.getIsNumeric());
-    assertTrue(savedExerciseScheme.isFlexHandin());
-    assertEquals(exerciseScheme.getDefaultValue(), savedExerciseScheme.getDefaultValue());
 
-*/
+    @Test
+    public void testCreateNewExerciseScheme() throws Exception {
+        LOGGER.info("Testing create new ExerciseScheme");
+
+        institute = new Institute(RandomStringUtils.random(8, true, true));
+        instituteRepository.save(institute);
+
+        login(UserType.SUPERADMIN);
+        goToURL(EditExerciseSchemeView.ROUTE + "/new");
+
+        ExerciseScheme exerciseScheme = new ExerciseScheme();
+        exerciseScheme.setName(RandomStringUtils.random(8, true, true));
+        exerciseScheme.setDefaultValue(RandomStringUtils.random(8, true, true));
+        LOGGER.info("creating exerciseScheme: " + exerciseScheme.toString());
+
+        findElementById("name").sendKeys(exerciseScheme.getName());
+        findMSCBByIdAndSelectByTexts("institutes", Arrays.asList(institute.getName()));
+        findElementById("default-Value").sendKeys(exerciseScheme.getDefaultValue());
+        findElementById("flex-Handin").click();
+        assertTrue(findElementById("token").isDisplayed());
+
+        findButtonContainingText("Speichern").click();
+        waitForURL(ManageExerciseSchemesView.ROUTE);
+
+
+    }
+
 }
