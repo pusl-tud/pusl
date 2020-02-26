@@ -1,30 +1,26 @@
 package de.bp2019.pusl.ui.exerciseScheme;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.Random;
+
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Institute;
-import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.ui.BaseUITest;
 import de.bp2019.pusl.ui.LoginViewIT;
 import de.bp2019.pusl.ui.views.exercisescheme.EditExerciseSchemeView;
 import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
-import de.bp2019.pusl.ui.views.user.EditUserView;
-import de.bp2019.pusl.ui.views.user.ManageUsersView;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-
-import static org.junit.Assert.*;
 
 public class EditExerciseSchemeViewIT extends BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewIT.class);
@@ -87,7 +83,7 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
         findElementById("flex-Handin").click();
         assertTrue(findElementById("token").isDisplayed());
 
-        findButtonContainingText("Speichern").click();
+        findElementById("save").click();
         waitForURL(ManageExerciseSchemesView.ROUTE);
 
 
