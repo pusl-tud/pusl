@@ -149,6 +149,8 @@ public class ManageExerciseSchemesView extends BaseView {
 
         });
 
+        button.setId("delete-" + exerciseScheme.getId());
+
         button.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_ERROR);
         return button;
     }

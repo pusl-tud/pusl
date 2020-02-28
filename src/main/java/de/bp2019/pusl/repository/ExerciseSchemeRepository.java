@@ -10,4 +10,5 @@ import de.bp2019.pusl.model.ExerciseScheme;
  * @author Leon Chemnitz
  */
 public interface ExerciseSchemeRepository extends MongoRepository<ExerciseScheme, String> {
+    ExerciseScheme findByName(String name);
 }

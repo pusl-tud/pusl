@@ -124,11 +124,12 @@ public abstract class BaseUITest {
                 .build();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--no-sandbox");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--start-maximized");
         if (testProperties.isHeadlessUiTests()) {
             options.addArguments("--headless");
         }
         options.setExperimentalOption("useAutomationExtension", false);
-        options.addArguments("start-maximized");
         options.addArguments("disable-infobars");
         options.addArguments("--disable-extensions");
         options.addArguments("--disable-gpu");

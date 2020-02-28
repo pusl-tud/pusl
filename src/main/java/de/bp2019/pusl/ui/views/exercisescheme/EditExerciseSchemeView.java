@@ -79,6 +79,7 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
 
         /* Create the fields */
         TextField name = new TextField("Name", "Name der Übung");
+        name.setId("name");
         name.setValueChangeMode(ValueChangeMode.EAGER);
 
         List<Institute> allInstitutes = instituteService.getAll();
@@ -86,8 +87,10 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         institutes.setLabel("Institute");
         institutes.setItems(allInstitutes);
         institutes.setItemLabelGenerator(Institute::getName);
+        institutes.setId("institutes");
 
         TokenEditor tokens = new TokenEditor(exerciseSchemeService);
+        tokens.setId("token");
 
         Checkbox isNumeric = new Checkbox("Mit Note");
         isNumeric.addValueChangeListener(evt -> {
@@ -97,11 +100,14 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
                 tokens.setVisible(true);
             }
         });
+        isNumeric.setId("numeric");
 
         Checkbox flexHandin = new Checkbox("Einzel-Ausgabe");
+        flexHandin.setId("flex-Handin");
 
         TextField defaultValue = new TextField();
         defaultValue.setLabel("Standart Wert");
+        defaultValue.setId("default-Value");
 
         form.add(name, 1);
         form.add(institutes, 1);
@@ -111,6 +117,7 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         form.add(tokens, 2);
 
         Button save = new Button("Speichern");
+        save.setId("save");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         /* Button Bar */
