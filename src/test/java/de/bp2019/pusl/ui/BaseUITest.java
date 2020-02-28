@@ -211,6 +211,16 @@ public abstract class BaseUITest {
     }
 
     /**
+     * @author Leon Chemnitz
+     */
+    protected void goToURLandWaitForRedirect(String url, String RedirectUrl) throws InterruptedException {
+        driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+        driver.navigate().to(baseUrl + url);
+        waitForURL(RedirectUrl);
+        waitForPageload();
+    }
+
+    /**
      * Used during login
      * 
      * @throws InterruptedException
@@ -254,6 +264,15 @@ public abstract class BaseUITest {
         findButtonContainingText("Log in").click();
 
         waitForURL("");
+    }
+
+    /**
+     * @author Leon Chemnitz
+     * @throws InterruptedException
+     */
+    protected void logout() throws InterruptedException {
+        findButtonContainingText("logout").click();
+        waitForURL(LoginView.ROUTE);
     }
 
     /**

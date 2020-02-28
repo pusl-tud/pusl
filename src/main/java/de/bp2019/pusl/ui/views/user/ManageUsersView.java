@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.service.UserService;
+import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.MainAppView;
 
@@ -27,7 +28,7 @@ import de.bp2019.pusl.ui.views.MainAppView;
  */
 @PageTitle(PuslProperties.NAME + " | Benutzer")
 @Route(value = ManageUsersView.ROUTE, layout = MainAppView.class)
-public class ManageUsersView extends BaseView {
+public class ManageUsersView extends BaseView implements AccessibleByAdmin{
 
     private static final long serialVersionUID = -5763725756205681478L;
 

@@ -13,6 +13,7 @@ import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.BaseUITest;
 import de.bp2019.pusl.ui.LoginViewIT;
+import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.user.EditUserView;
 import de.bp2019.pusl.ui.views.user.ManageUsersView;
 
@@ -73,5 +74,28 @@ public class ManageUsersViewIT extends BaseUITest {
         waitUntilDialogVisible("gelöscht");
         
         assertNull(userRepository.findByEmailAddress(testProperties.getAdminUsername()));
+    }
+
+    @Test
+    public void testAccess() throws Exception{
+        LOGGER.info("Testing access");
+
+        LOGGER.info("Testing access as SUPERADMIN");
+        login(UserType.SUPERADMIN);        
+        goToURL(ManageUsersView.ROUTE);
+        logout();
+  
+        LOGGER.info("Testing access as ADMIN");
+        login(UserType.ADMIN);        
+        goToURL(ManageUsersView.ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as WIWI");
+        login(UserType.WIMI);        
+        goToURLandWaitForRedirect(ManageUsersView.ROUTE, LecturesView.ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as HIWI");
+        login(UserType.HIWI);        
     }
 }

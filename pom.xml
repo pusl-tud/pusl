@@ -155,8 +155,7 @@
         <version>0.8.5</version>
         <executions>
           <execution>
-            <id>pre-integration-test</id>
-            <phase>pre-integration-test</phase>
+            <id>pre-unit-test</id>
             <goals>
               <goal>prepare-agent</goal>
             </goals>

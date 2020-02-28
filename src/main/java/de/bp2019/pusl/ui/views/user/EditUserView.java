@@ -41,17 +41,18 @@ import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.service.UserService;
+import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.MainAppView;
 
 /**
- * View containing a form to edit a {@link User}
+ * View containing a form to edit a {@link User}. Only Accessible by admins and superadmins
  * 
  * @author Leon Chemnitz
  */
 @PageTitle(PuslProperties.NAME + " | Nutzer bearbeiten")
 @Route(value = EditUserView.ROUTE, layout = MainAppView.class)
-public class EditUserView extends BaseView implements HasUrlParameter<String> {
+public class EditUserView extends BaseView implements HasUrlParameter<String>, AccessibleByAdmin {
 
         private static final long serialVersionUID = 1L;
 

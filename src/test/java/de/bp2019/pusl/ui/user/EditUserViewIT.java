@@ -21,6 +21,7 @@ import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.ui.BaseUITest;
 import de.bp2019.pusl.ui.LoginViewIT;
+import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.user.EditUserView;
 import de.bp2019.pusl.ui.views.user.ManageUsersView;
 
@@ -161,4 +162,29 @@ public class EditUserViewIT extends BaseUITest {
         findButtonContainingText("Speichern").click();
         timeoutWrongURL(ManageUsersView.ROUTE);
     }
+
+    @Test
+    public void testAccess() throws Exception{
+        LOGGER.info("Testing access");
+
+        LOGGER.info("Testing access as SUPERADMIN");
+        login(UserType.SUPERADMIN);        
+        goToURL(EditUserView.ROUTE + "/new");
+        logout();
+  
+        LOGGER.info("Testing access as ADMIN");
+        login(UserType.ADMIN);        
+        goToURL(EditUserView.ROUTE + "/new");
+        logout();
+
+        LOGGER.info("Testing access as WIWI");
+        login(UserType.WIMI);        
+        goToURLandWaitForRedirect(EditUserView.ROUTE + "/new", LecturesView.ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as HIWI");
+        login(UserType.HIWI);        
+        goToURLandWaitForRedirect(EditUserView.ROUTE + "/new", LecturesView.ROUTE);
+    }
+
 }

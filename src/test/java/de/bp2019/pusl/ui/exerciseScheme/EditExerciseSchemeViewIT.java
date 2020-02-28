@@ -4,7 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.Random;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
@@ -31,15 +30,11 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
     @Autowired
     InstituteRepository instituteRepository;
 
-    private Institute institute;
-
-    private Random random;
-
     @Test
     public void testNoInstitutes() throws Exception {
         LOGGER.info("Testing create new ExerciseScheme");
 
-        institute = new Institute(RandomStringUtils.random(8, true, true));
+        Institute institute = new Institute(RandomStringUtils.random(8, true, true));
         instituteRepository.save(institute);
 
         login(UserType.SUPERADMIN);
@@ -66,7 +61,7 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
     public void testCreateNewExerciseScheme() throws Exception {
         LOGGER.info("Testing create new ExerciseScheme");
 
-        institute = new Institute(RandomStringUtils.random(8, true, true));
+        Institute institute = new Institute(RandomStringUtils.random(8, true, true));
         instituteRepository.save(institute);
 
         login(UserType.SUPERADMIN);
