@@ -1,4 +1,4 @@
-package de.bp2019.pusl.ui;
+package de.bp2019.pusl.config;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -31,7 +31,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import de.bp2019.pusl.config.TestProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.ExerciseSchemeRepository;
@@ -39,6 +38,7 @@ import de.bp2019.pusl.repository.GradeRepository;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.LectureRepository;
 import de.bp2019.pusl.repository.UserRepository;
+import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.LoginView;
 
 /**
@@ -271,6 +271,7 @@ public abstract class BaseUITest {
      * @throws InterruptedException
      */
     protected void logout() throws InterruptedException {
+        goToURL(LecturesView.ROUTE);
         findButtonContainingText("logout").click();
         waitForURL(LoginView.ROUTE);
     }

@@ -26,7 +26,7 @@ public class Institute {
             return false; 
         }           
         Institute i = (Institute) o;           
-        return i.getName().equals(this.getName());
+        return i.getId().equals(this.getId());
     } 
 
 

@@ -53,7 +53,7 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-configuration-processor</artifactId>
       <optional>true</optional>
-  </dependency>
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
@@ -116,6 +116,9 @@
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>3.0.0-M4</version>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -160,7 +163,7 @@
               <goal>prepare-agent</goal>
             </goals>
             <configuration>
-              <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
+              <destFile>${project.build.directory}/coverage-reports/jacoco.exec</destFile>
               <propertyName>failsafeArgLine</propertyName>
             </configuration>
           </execution>
@@ -171,8 +174,8 @@
               <goal>report</goal>
             </goals>
             <configuration>
-              <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
-              <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+              <dataFile>${project.build.directory}/coverage-reports/jacoco.exec</dataFile>
+              <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
             </configuration>
           </execution>
         </executions>

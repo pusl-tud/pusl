@@ -11,7 +11,7 @@ import de.bp2019.pusl.ui.views.WorkView;
 import de.bp2019.pusl.ui.views.user.EditUserView;
 
 @SpringBootTest
-public class ClassUtilsTest {
+public class ClassUtilsIT {
 
     @Test
     public void testImplementsInterface() {

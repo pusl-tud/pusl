@@ -35,6 +35,7 @@ import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.service.ExerciseSchemeService;
 import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.ui.components.TokenEditor;
+import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.MainAppView;
 
@@ -46,7 +47,7 @@ import de.bp2019.pusl.ui.views.MainAppView;
 
 @PageTitle(PuslProperties.NAME + " | Übungsschema bearbeiten")
 @Route(value = EditExerciseSchemeView.ROUTE, layout = MainAppView.class)
-public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<String> {
+public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<String>, AccessibleByAdmin {
 
     private static final long serialVersionUID = -1771968129664884637L;
 

@@ -19,7 +19,6 @@ import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.NotFoundException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -29,8 +28,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.service.InstituteService;
+import de.bp2019.pusl.ui.dialogs.ErrorDialog;
+import de.bp2019.pusl.ui.interfaces.AccessibleBySuperadmin;
 import de.bp2019.pusl.ui.views.BaseView;
+import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.util.exceptions.DataNotFoundException;
+import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
  * View containing a form to edit a {@link Institute}
@@ -39,7 +43,7 @@ import de.bp2019.pusl.ui.views.MainAppView;
  */
 @PageTitle(PuslProperties.NAME + " | Institut bearbeiten")
 @Route(value = EditInstituteView.ROUTE, layout = MainAppView.class)
-public class EditInstituteView extends BaseView implements HasUrlParameter<String> {
+public class EditInstituteView extends BaseView implements HasUrlParameter<String>, AccessibleBySuperadmin {
 
         private static final long serialVersionUID = 1L;
 
@@ -57,7 +61,7 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
         /**
          * null if a new Institute is being created
          */
-        private ObjectId objectId;
+        private ObjectId instituteId;
 
         @Autowired
         public EditInstituteView(InstituteService instituteService) {
@@ -89,19 +93,30 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                 actions.setHorizontalComponentAlignment(Alignment.END, save);
                 form.add(actions, 2);
 
+                add(form);
+
                 /* ########### Data Binding and validation ########### */
 
                 binder.forField(name)
                                 .withValidator(new StringLengthValidator("Bitte Name des Instituts angeben", 1, null))
+                                .withValidator(new StringLengthValidator(
+                                                "Institutsnamen dürfen nicht länger als 50 Zeichen sein", null, 50))
                                 .bind(Institute::getName, Institute::setName);
 
                 /* ########### Click Listeners for Buttons ########### */
 
                 save.addClickListener(event -> {
+
+                        if(!instituteService.checkNameAvailable(name.getValue(), instituteId)){
+                                ErrorDialog.open("Name bereits vergeben");
+                                return;
+                        }
+
                         Institute institute = new Institute();
+
                         if (binder.writeBeanIfValid(institute)) {
-                                if (objectId != null) {
-                                        institute.setId(objectId);
+                                if (instituteId != null) {
+                                        institute.setId(instituteId);
                                 }
                                 try {
                                         instituteService.save(institute);
@@ -109,8 +124,8 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                                         dialog.add(new Text("Institut erfolgreich gespeichert"));
                                         UI.getCurrent().navigate(ManageInstitutesView.ROUTE);
                                         dialog.open();
-                                } finally {
-                                        // TODO: implement ErrorHandeling
+                                } catch (UnauthorizedException e) {
+                                        ErrorDialog.open(e.getMessage());
                                 }
                         } else {
                                 BinderValidationStatus<Institute> validate = binder.validate();
@@ -118,29 +133,32 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                                                 .filter(BindingValidationStatus::isError)
                                                 .map(BindingValidationStatus::getMessage).map(Optional::get).distinct()
                                                 .collect(Collectors.joining(", "));
-                                LOGGER.debug("There are errors: " + errorText);
+                                LOGGER.info("Institute could not be saved because of validation errors. Errors were: " + errorText);
                         }
                 });
 
-                /* ########### Add Layout to Component ########### */
-
-                add(form);
         }
 
         @Override
-        public void setParameter(BeforeEvent event, String instituteId) {
-                if (instituteId.equals("new")) {
-                        objectId = null;
+        public void setParameter(BeforeEvent event, String idParameter) {
+                if (idParameter.equals("new")) {
+                        instituteId = null;
                         /* clear fields by setting null */
                         binder.readBean(null);
                 } else {
-                        Institute fetchedInstitute = instituteService.getById(instituteId);
-                        /* getInstituteById returns null if no matching Institute is found */
-                        if (fetchedInstitute == null) {
-                                throw new NotFoundException();
-                        } else {
-                                objectId = fetchedInstitute.getId();
+                        try {
+                                Institute fetchedInstitute;
+                                fetchedInstitute = instituteService.getById(idParameter);                                
+                                instituteId = fetchedInstitute.getId();
                                 binder.readBean(fetchedInstitute);
+                        } catch (UnauthorizedException e) {
+                                event.rerouteTo(LecturesView.ROUTE);
+                                UI.getCurrent().navigate(LecturesView.ROUTE);      
+                                ErrorDialog.open("Nicht authorisiert um Institut zu bearbeiten!");
+                        } catch (DataNotFoundException e) {                   
+                                event.rerouteTo(LecturesView.ROUTE);       
+                                UI.getCurrent().navigate(LecturesView.ROUTE); 
+                                ErrorDialog.open("Institut nicht in Datenbank gefunden!");    
                         }
                 }
         }

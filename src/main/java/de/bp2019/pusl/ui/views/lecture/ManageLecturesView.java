@@ -20,6 +20,7 @@ import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.service.LectureService;
+import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.MainAppView;
 
@@ -32,7 +33,7 @@ import de.bp2019.pusl.ui.views.MainAppView;
  */
 @PageTitle(PuslProperties.NAME + " | Veranstaltungen verwalten")
 @Route(value = ManageLecturesView.ROUTE, layout = MainAppView.class)
-public class ManageLecturesView extends BaseView {
+public class ManageLecturesView extends BaseView implements AccessibleByAdmin{
 
     private static final long serialVersionUID = 1L;
 

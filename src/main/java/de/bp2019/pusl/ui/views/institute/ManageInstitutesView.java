@@ -17,8 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.service.InstituteService;
+import de.bp2019.pusl.ui.dialogs.ErrorDialog;
+import de.bp2019.pusl.ui.interfaces.AccessibleBySuperadmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
  * View that displays a list of all {@link Institute}s
@@ -27,7 +30,7 @@ import de.bp2019.pusl.ui.views.MainAppView;
  */
 @PageTitle(PuslProperties.NAME + " | Institute")
 @Route(value = ManageInstitutesView.ROUTE, layout = MainAppView.class)
-public class ManageInstitutesView extends BaseView {
+public class ManageInstitutesView extends BaseView implements AccessibleBySuperadmin {
 
     private static final long serialVersionUID = -5763725756205681478L;
 
@@ -90,7 +93,7 @@ public class ManageInstitutesView extends BaseView {
      * @author Leon Chemnitz
      * @return delete button
      */
-    protected Button createDeleteButton(Institute institute) {
+    private Button createDeleteButton(Institute institute) {
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {
             Dialog dialog = new Dialog();
             dialog.add(new Text("Wirklich Löschen?"));
@@ -98,8 +101,10 @@ public class ManageInstitutesView extends BaseView {
             dialog.setCloseOnOutsideClick(false);
 
             Button confirmButton = new Button("Löschen", event -> {
+
                 try {
                     instituteService.deleteInstitute(institute);
+
                     instituteDataProvider.getItems().remove(institute);
                     instituteDataProvider.refreshAll();
 
@@ -107,12 +112,10 @@ public class ManageInstitutesView extends BaseView {
                     Dialog answerDialog = new Dialog();
                     answerDialog.add(new Text("Institut '" + institute.getName() + "' gelöscht"));
                     answerDialog.open();
-                } catch (Exception e) {
-                    Dialog answerDialog = new Dialog();
-                    answerDialog.add(new Text("Fehler beim Löschen des Institutes!"));
-                    answerDialog.open();
-                    LOGGER.error("Could not delete Institute! Institute ID was: " + institute.getId());
-                }
+
+                } catch (UnauthorizedException e) {
+                    ErrorDialog.open(e.getMessage());
+                }                
             });
 
             Button cancelButton = new Button("Abbruch", event -> {

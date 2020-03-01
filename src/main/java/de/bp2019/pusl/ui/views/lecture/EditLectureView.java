@@ -38,6 +38,7 @@ import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.components.ExerciseComposer;
 import de.bp2019.pusl.ui.components.PerformanceSchemeComposer;
 import de.bp2019.pusl.ui.components.VerticalTabs;
+import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.MainAppView;
 
@@ -48,7 +49,7 @@ import de.bp2019.pusl.ui.views.MainAppView;
  */
 @PageTitle(PuslProperties.NAME + " | Veranstaltung bearbeiten")
 @Route(value = EditLectureView.ROUTE, layout = MainAppView.class)
-public class EditLectureView extends BaseView implements HasUrlParameter<String> {
+public class EditLectureView extends BaseView implements HasUrlParameter<String>, AccessibleByAdmin {
 
         private static final long serialVersionUID = -7352842685521794385L;
 

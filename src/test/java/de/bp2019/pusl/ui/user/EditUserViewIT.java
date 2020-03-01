@@ -14,17 +14,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import de.bp2019.pusl.config.BaseUITest;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.UserRepository;
-import de.bp2019.pusl.ui.BaseUITest;
 import de.bp2019.pusl.ui.LoginViewIT;
 import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.user.EditUserView;
 import de.bp2019.pusl.ui.views.user.ManageUsersView;
 
+/**
+ * UI test for {@link EditUserView}
+ * 
+ * @author Leon Chemnitz
+ */
 public class EditUserViewIT extends BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewIT.class);
 
@@ -39,6 +44,10 @@ public class EditUserViewIT extends BaseUITest {
 
     private Institute institute;
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
     @Test
     public void testCreateNewUserSuccess() throws Exception {
         LOGGER.info("Testing create new User success");
@@ -67,7 +76,6 @@ public class EditUserViewIT extends BaseUITest {
         findPasswordFieldById("password").sendKeys(user.getPassword());
         findPasswordFieldById("confirm-password").sendKeys(user.getPassword());
 
-
         findButtonContainingText("Speichern").click();
         waitForURL(ManageUsersView.ROUTE);
 
@@ -75,11 +83,15 @@ public class EditUserViewIT extends BaseUITest {
         assertNotNull(savedUser);
         assertEquals(user.getFirstName(), savedUser.getFirstName());
         assertEquals(user.getLastName(), savedUser.getLastName());
-        assertTrue(passwordEncoder.matches(user.getPassword(), savedUser.getPassword())); 
-        assertEquals(user.getType(), savedUser.getType()); 
+        assertTrue(passwordEncoder.matches(user.getPassword(), savedUser.getPassword()));
+        assertEquals(user.getType(), savedUser.getType());
         savedUser.getInstitutes().forEach(i -> assertEquals(institute.getName(), i.getName()));
     }
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
     @Test
     public void testEditUserButNotPassword() throws Exception {
         LOGGER.info("Testing create new User success");
@@ -103,7 +115,7 @@ public class EditUserViewIT extends BaseUITest {
         user = userRepository.findByEmailAddress(user.getEmailAddress());
 
         goToURL(EditUserView.ROUTE + "/" + user.getId());
-       
+
         LOGGER.info("editing user: " + user.toString());
 
         String newFirstName = RandomStringUtils.random(8, true, true);
@@ -124,10 +136,13 @@ public class EditUserViewIT extends BaseUITest {
         LOGGER.info("checking lastName");
         assertEquals(newLastName, savedUser.getLastName());
         LOGGER.info("checking password");
-        assertEquals(user.getPassword(), savedUser.getPassword()); 
+        assertEquals(user.getPassword(), savedUser.getPassword());
     }
- 
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
     @Test
     public void testPasswordToShort() throws Exception {
         LOGGER.info("Testing create new User success");
@@ -151,7 +166,7 @@ public class EditUserViewIT extends BaseUITest {
         user = userRepository.findByEmailAddress(user.getEmailAddress());
 
         goToURL(EditUserView.ROUTE + "/" + user.getId());
-       
+
         LOGGER.info("editing user: " + user.toString());
 
         String newPassword = RandomStringUtils.random(4, true, true);
@@ -163,27 +178,31 @@ public class EditUserViewIT extends BaseUITest {
         timeoutWrongURL(ManageUsersView.ROUTE);
     }
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
     @Test
-    public void testAccess() throws Exception{
+    public void testAccess() throws Exception {
         LOGGER.info("Testing access");
 
         LOGGER.info("Testing access as SUPERADMIN");
-        login(UserType.SUPERADMIN);        
+        login(UserType.SUPERADMIN);
         goToURL(EditUserView.ROUTE + "/new");
         logout();
-  
+
         LOGGER.info("Testing access as ADMIN");
-        login(UserType.ADMIN);        
+        login(UserType.ADMIN);
         goToURL(EditUserView.ROUTE + "/new");
         logout();
 
         LOGGER.info("Testing access as WIWI");
-        login(UserType.WIMI);        
+        login(UserType.WIMI);
         goToURLandWaitForRedirect(EditUserView.ROUTE + "/new", LecturesView.ROUTE);
         logout();
 
         LOGGER.info("Testing access as HIWI");
-        login(UserType.HIWI);        
+        login(UserType.HIWI);
         goToURLandWaitForRedirect(EditUserView.ROUTE + "/new", LecturesView.ROUTE);
     }
 
