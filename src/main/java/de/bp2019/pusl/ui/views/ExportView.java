@@ -1,9 +1,9 @@
 package de.bp2019.pusl.ui.views;
 
-
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.upload.Upload;
@@ -19,6 +19,7 @@ import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.model.PerformanceScheme;
 import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * View that displays all Grades and contains a form to add New Grades
+ * View to calculate and list the Final Grades and export them as a Excelsheet;
  *
  * @author Luca Dinies
  **/
@@ -47,34 +48,29 @@ public class ExportView extends BaseView {
 
     private ListDataProvider<FinalGrade> exportDataProvider;
 
-    private GradeService gradeService;
-    private LectureService lectureService;
     private Grade filter;
 
-
-    File file;
     XSSFWorkbook excelDownload = new XSSFWorkbook();
     XSSFSheet worksheet = excelDownload.createSheet();
     int rowNr = 0;
     int colNr = 0;
     XSSFRow row;
     XSSFCell cell;
-    OutputStream fileOut;
+    Font headerFont;
+    Font font;
 
     Stream<FinalGrade> dataStream;
     List<String> keyList;
 
 
     @Autowired
-    public ExportView(GradeService gradeService, LectureService lectureService) throws IOException {
+    public ExportView(GradeService gradeService, LectureService lectureService) {
         super("Noten exportieren");
         LOGGER.debug("Started creation of ExportView");
 
-        this.gradeService = gradeService;
-        this.lectureService = lectureService;
-
         filter = new Grade();
 
+        /* ######## Select Components ######## */
         FormLayout selectLayout = new FormLayout();
 
         Select<Lecture> lectureSelect = new Select<>();
@@ -90,70 +86,101 @@ public class ExportView extends BaseView {
         performanceSchemeSelect.setEnabled(false);
         selectLayout.add(performanceSchemeSelect);
 
-        lectureSelect.addValueChangeListener(event -> {
-            if (event.getValue() != null) {
-                if (event.getValue().getPerformanceSchemes().isEmpty()) {
-                    PerformanceScheme emptyPerformanceScheme = new PerformanceScheme("Keine Berechnungsregel angelegt", null);
-                    performanceSchemeSelect.setValue(emptyPerformanceScheme);
+        add(selectLayout);
 
-                } else {
-                    List<PerformanceScheme> performanceSchemes = event.getValue().getPerformanceSchemes();
-                    performanceSchemeSelect.setItems(performanceSchemes);
-                    performanceSchemeSelect.setValue(performanceSchemes.get(0));
-                    performanceSchemeSelect.setEnabled(true);
-                    filter.setLecture(event.getValue());
-                }
-            }
-        });
+        /* ######## Upload Component and Calculate Button ######## */
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
 
         MemoryBuffer buffer = new MemoryBuffer();
         Upload upload = new Upload(buffer);
         Button uploadButton = new Button("Matrikelnummern hochladen");
+        upload.setDropLabel(new Span("Excelliste hier abelegen"));
         upload.setUploadButton(uploadButton);
+        upload.setAcceptedFileTypes(".xlsx");
+        buttonLayout.add(upload);
+
+        Button calculateButton = new Button("Berechnen");
+        buttonLayout.setVerticalComponentAlignment((Alignment.CENTER), calculateButton);
+        buttonLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        buttonLayout.add(calculateButton);
+
+        add(buttonLayout);
+
+        /* ######## Grid for the calculated FinalGrades ######## */
+
+        List<FinalGrade> finalGradeList = new ArrayList<>();
+        Grid<FinalGrade> exportGrid = new Grid<>();
+
+        exportDataProvider = new ListDataProvider<>(finalGradeList);
+        exportGrid.setDataProvider(exportDataProvider);
+
+        exportGrid.addColumn(item -> item.getMatrikelNumber()).setHeader("Matrikel-Nummer").setAutoWidth(true).setKey("Matrikelnummern");
+        exportGrid.addColumn(item -> item.getFinalGrade()).setHeader("Note").setAutoWidth(true).setKey("Noten");
+
+        add(exportGrid);
+
+
+        /* ######## Excel import  ######## */
+
         List<String> matrikelList = new ArrayList<String>();
 
         upload.addSucceededListener(event -> {
             try {
+                matrikelList.clear();
                 XSSFWorkbook workbook = new XSSFWorkbook(buffer.getInputStream());
                 XSSFSheet worksheet = workbook.getSheetAt(0);
 
                 for (int i = 0; i < worksheet.getPhysicalNumberOfRows(); i++) {
                     XSSFRow row = worksheet.getRow(i);
-                    matrikelList.add(i, row.getCell(0).getStringCellValue());
+                    matrikelList.add(i, row.getCell(0).getRawValue());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
 
-        Button calculateButton = new Button("Berechnen");
+        /* ######## Click Listeners  ######## */
 
-        buttonLayout.add(upload);
-        buttonLayout.add(calculateButton);
-
-        add(selectLayout);
-        add(buttonLayout);
-
-        List<FinalGrade> finalGradeList = new ArrayList<>();
-        Grid<FinalGrade> exportGrid = new Grid<>();
-
-        exportDataProvider = new ListDataProvider<FinalGrade>(finalGradeList);
-        exportGrid.setDataProvider(exportDataProvider);
-
-        exportGrid.addColumn(item -> item.getMatrikelNumber()).setHeader("Matrikel-Nummer").setAutoWidth(true).setKey("matrikel");
-        exportGrid.addColumn(item -> item.getFinalGrade()).setHeader("Note").setAutoWidth(true).setKey("grade");
-
-        add(exportGrid);
+        lectureSelect.addValueChangeListener(event -> {
+            if (event.getValue() != null) {
+                if (event.getValue().getPerformanceSchemes() != null) {
+                    List<PerformanceScheme> performanceSchemes = event.getValue().getPerformanceSchemes();
+                    performanceSchemeSelect.setItems(performanceSchemes);
+                    performanceSchemeSelect.setValue(performanceSchemes.get(0));
+                    performanceSchemeSelect.setEnabled(true);
+                }
+            }
+        });
 
         calculateButton.addClickListener(event -> {
             exportDataProvider.getItems().clear();
+            filter.setLecture(lectureSelect.getValue());
 
-            finalGradeList.add(new FinalGrade("123456789", lectureSelect.getValue(), performanceSchemeSelect.getValue(), "1,3"));
-            finalGradeList.add(new FinalGrade("542236654", lectureSelect.getValue(), performanceSchemeSelect.getValue(), "1,6"));
-            finalGradeList.add(new FinalGrade("896523522", lectureSelect.getValue(), performanceSchemeSelect.getValue(), "3,7"));
-            finalGradeList.add(new FinalGrade("523654855", lectureSelect.getValue(), performanceSchemeSelect.getValue(), "3,3"));
+            matrikelList.forEach(item -> {
+                FinalGrade tmp = new FinalGrade();
+                tmp.setLecture(lectureSelect.getValue());
+                tmp.setPerformanceScheme(performanceSchemeSelect.getValue());
+                filter.setMatrNumber(item);
+                List<Grade> gradeList;
+                gradeList = gradeService.getAll(filter);
+
+                if (gradeList.size() == 0) {
+                    tmp.setMatrikelNumber(item);
+                    tmp.setFinalGrade("Keine Noten vorhanden");
+                } else {
+                    tmp.setMatrikelNumber(item);
+                    Float grade = 0f;
+
+                    for (int i = 0; i < gradeList.size(); i++) {
+                        grade = Float.parseFloat(gradeList.get(i).getGrade().replace(",", ".")) + grade;
+                    }
+
+                    grade = grade / gradeList.size();
+                    tmp.setFinalGrade(grade.toString().replace(".", ","));
+                }
+                finalGradeList.add(tmp);
+            });
 
             exportDataProvider.refreshAll();
 
@@ -168,8 +195,9 @@ public class ExportView extends BaseView {
                 keyList.add(item.getKey());
             });
 
-
         });
+
+        /* ######## Excel Download Button  ######## */
 
         DynamicFileDownloader downloadButton = new DynamicFileDownloader("Download Excel", "endnoten.xlsx",
                 outputStream -> {
@@ -181,21 +209,18 @@ public class ExportView extends BaseView {
                 });
 
         add(downloadButton);
+
     }
+
+    /* ######## Excel file creator  ######## */
 
     public byte[] ExcelExporter(Stream<FinalGrade> dataStream, List<String> keyList) throws IOException {
         resetContent();
-        initTempFile();
         buildHeader(keyList);
         dataStream.forEach(item -> {
             buildRow(item);
         });
-        fileOut = new FileOutputStream("endnote.xlsx");
-        try {
-            excelDownload.write(fileOut);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             excelDownload.write(bos);
@@ -204,12 +229,6 @@ public class ExportView extends BaseView {
         }
         byte[] bytes = bos.toByteArray();
         return bytes;
-    }
-
-    public void initTempFile() throws IOException {
-        if (file == null || file.delete()) {
-            file = File.createTempFile("tmp", ".xlsx");
-        }
     }
 
     public void onNewRow() {
@@ -247,5 +266,11 @@ public class ExportView extends BaseView {
         rowNr = 0;
         row = null;
         cell = null;
+        headerFont = excelDownload.createFont();
+        headerFont.setFontName("Arial");
+        headerFont.setBold(true);
+        font = excelDownload.createFont();
+        font.setFontName("Arial");
     }
+
 }
