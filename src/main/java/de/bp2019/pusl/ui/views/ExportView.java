@@ -115,8 +115,8 @@ public class ExportView extends BaseView {
         exportDataProvider = new ListDataProvider<>(finalGradeList);
         exportGrid.setDataProvider(exportDataProvider);
 
-        exportGrid.addColumn(item -> item.getMatrikelNumber()).setHeader("Matrikel-Nummer").setAutoWidth(true).setKey("Matrikelnummern");
-        exportGrid.addColumn(item -> item.getFinalGrade()).setHeader("Note").setAutoWidth(true).setKey("Noten");
+        exportGrid.addColumn(item -> item.getMatrikelNumber()).setHeader("Matrikel-Nummer").setAutoWidth(true).setKey("matrNum");
+        exportGrid.addColumn(item -> item.getFinalGrade()).setHeader("Note").setAutoWidth(true).setKey("grades");
 
         add(exportGrid);
 
@@ -246,7 +246,14 @@ public class ExportView extends BaseView {
         onNewRow();
         onNewCell();
         keylist.forEach(item -> {
-            cell.setCellValue(item);
+            switch (item) {
+                case ("matrNum"):
+                    cell.setCellValue("Matrikel-Nummer");
+                    break;
+                case ("grades"):
+                    cell.setCellValue("Note");
+                    break;
+            }
             onNewCell();
         });
     }
