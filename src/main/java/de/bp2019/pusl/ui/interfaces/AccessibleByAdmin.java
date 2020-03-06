@@ -1,3 +1,9 @@
 package de.bp2019.pusl.ui.interfaces;
 
-public interface AccessibleByAdmin {}
+/**
+ * Views implementing this interface are only accessible by admins.
+ * 
+ * @author Leon Chemnitz
+ */
+public interface AccessibleByAdmin {
+}

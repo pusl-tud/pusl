@@ -8,7 +8,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -38,22 +37,18 @@ public class ManageInstitutesView extends BaseView implements AccessibleBySupera
 
     private InstituteService instituteService;
 
-    private ListDataProvider<Institute> instituteDataProvider;
-
     @Autowired
     public ManageInstitutesView(InstituteService instituteService) {
         super("Institute");
 
         this.instituteService = instituteService;
 
-        instituteDataProvider = new ListDataProvider<>(instituteService.getAll());
-
         /* -- Create Components -- */
 
         Grid<Institute> grid = new Grid<>();
 
         grid.setWidth("100%");
-        grid.setDataProvider(instituteDataProvider);
+        grid.setDataProvider(instituteService);
 
         grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true);
         grid.addComponentColumn(item -> createDeleteButton(item)).setFlexGrow(0).setWidth("4em");
@@ -103,10 +98,8 @@ public class ManageInstitutesView extends BaseView implements AccessibleBySupera
             Button confirmButton = new Button("Löschen", event -> {
 
                 try {
-                    instituteService.deleteInstitute(institute);
-
-                    instituteDataProvider.getItems().remove(institute);
-                    instituteDataProvider.refreshAll();
+                    instituteService.delete(institute);
+                    instituteService.refreshAll();
 
                     dialog.close();
                     Dialog answerDialog = new Dialog();
@@ -114,7 +107,7 @@ public class ManageInstitutesView extends BaseView implements AccessibleBySupera
                     answerDialog.open();
 
                 } catch (UnauthorizedException e) {
-                    ErrorDialog.open(e.getMessage());
+                    ErrorDialog.open("Nicht authorisiert um Institut zu löschen!");
                 }                
             });
 

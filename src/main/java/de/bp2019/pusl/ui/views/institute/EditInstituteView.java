@@ -3,11 +3,9 @@ package de.bp2019.pusl.ui.views.institute;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -29,6 +27,7 @@ import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
+import de.bp2019.pusl.ui.dialogs.SuccessDialog;
 import de.bp2019.pusl.ui.interfaces.AccessibleBySuperadmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.LecturesView;
@@ -49,19 +48,13 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
 
         public static final String ROUTE = "admin/institute";
 
-        /*
-         * no @Autowire because service is injected by constructor. Vaadin likes it
-         * better this way...
-         */
         private InstituteService instituteService;
 
         /** Binder to bind the form Data to an Object */
         private Binder<Institute> binder;
 
-        /**
-         * null if a new Institute is being created
-         */
-        private ObjectId instituteId;
+        /** empty if new institute is being created */
+        private Optional<ObjectId> instituteId = Optional.empty();
 
         @Autowired
         public EditInstituteView(InstituteService instituteService) {
@@ -103,7 +96,7 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                                                 "Institutsnamen dürfen nicht länger als 50 Zeichen sein", null, 50))
                                 .bind(Institute::getName, Institute::setName);
 
-                /* ########### Click Listeners for Buttons ########### */
+                /* ########### Listeners ########### */
 
                 save.addClickListener(event -> {
 
@@ -115,17 +108,15 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                         Institute institute = new Institute();
 
                         if (binder.writeBeanIfValid(institute)) {
-                                if (instituteId != null) {
-                                        institute.setId(instituteId);
+                                if (instituteId.isPresent()) {
+                                        institute.setId(instituteId.get());
                                 }
                                 try {
                                         instituteService.save(institute);
-                                        Dialog dialog = new Dialog();
-                                        dialog.add(new Text("Institut erfolgreich gespeichert"));
                                         UI.getCurrent().navigate(ManageInstitutesView.ROUTE);
-                                        dialog.open();
+                                        SuccessDialog.open("Institut erfolgreich gespeichert");
                                 } catch (UnauthorizedException e) {
-                                        ErrorDialog.open(e.getMessage());
+                                        ErrorDialog.open("nicht authorisiert um Institut zu speichern!");
                                 }
                         } else {
                                 BinderValidationStatus<Institute> validate = binder.validate();
@@ -142,14 +133,14 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
         @Override
         public void setParameter(BeforeEvent event, String idParameter) {
                 if (idParameter.equals("new")) {
-                        instituteId = null;
+                        instituteId = Optional.empty();
                         /* clear fields by setting null */
                         binder.readBean(null);
                 } else {
                         try {
                                 Institute fetchedInstitute;
                                 fetchedInstitute = instituteService.getById(idParameter);                                
-                                instituteId = fetchedInstitute.getId();
+                                instituteId = Optional.of(fetchedInstitute.getId());
                                 binder.readBean(fetchedInstitute);
                         } catch (UnauthorizedException e) {
                                 event.rerouteTo(LecturesView.ROUTE);

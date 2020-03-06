@@ -52,8 +52,8 @@ public class MainAppView extends AppLayout {
         HorizontalLayout userInfo = new HorizontalLayout();
         userInfo.setDefaultVerticalComponentAlignment(Alignment.END);
 
-        userInfo.add(generateUserTypeLabel(userService.getCurrentUserType()));
-        userInfo.add(generateUserNameButton(userService.getCurrentUserFullName()));
+        userInfo.add(generateUserTypeLabel(userService.currentUserType()));
+        userInfo.add(generateUserNameButton(userService.currentUserFullName()));
         userInfo.add(generateLogoutButton());
 
         navbarRight.getStyle().set("margin", "0");
@@ -76,7 +76,7 @@ public class MainAppView extends AppLayout {
         content.add(generateMenuButton("Startseite", new Icon(VaadinIcon.HOME), LecturesView.ROUTE));
         content.add(generateMenuButton("Mein Account", new Icon(VaadinIcon.USER), AccountView.ROUTE));
 
-        if (userService.getCurrentUserType().ordinal() <= UserType.ADMIN.ordinal()) {
+        if (userService.currentUserType().ordinal() <= UserType.ADMIN.ordinal()) {
             content.add(generateSeperator());
             content.add(generateSectionLabel("Admin"));
             content.add(generateMenuButton("Nutzer", new Icon(VaadinIcon.USERS), ManageUsersView.ROUTE));
@@ -85,7 +85,7 @@ public class MainAppView extends AppLayout {
             content.add(generateMenuButton("Übungsschemas", new Icon(VaadinIcon.NOTEBOOK),
                     ManageExerciseSchemesView.ROUTE));
 
-            if (userService.getCurrentUserType() == UserType.SUPERADMIN) {
+            if (userService.currentUserType() == UserType.SUPERADMIN) {
                 content.add(generateSeperator());
                 content.add(generateSectionLabel("Global"));
                 content.add(

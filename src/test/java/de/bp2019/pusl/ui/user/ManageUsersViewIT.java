@@ -1,6 +1,6 @@
 package de.bp2019.pusl.ui.user;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class ManageUsersViewIT extends BaseUITest {
 
         goToURL(ManageUsersView.ROUTE);
 
-        User user = userRepository.findByEmailAddress(testProperties.getAdminUsername());
+        User user = userRepository.findByEmailAddress(testProperties.getAdminUsername()).get();
         String name = UserService.getFullName(user);
         String id = user.getId().toString();
 
@@ -75,7 +75,7 @@ public class ManageUsersViewIT extends BaseUITest {
 
         goToURL(ManageUsersView.ROUTE);
 
-        User user = userRepository.findByEmailAddress(testProperties.getAdminUsername());
+        User user = userRepository.findByEmailAddress(testProperties.getAdminUsername()).get();
         String id = user.getId().toString();
 
         /* click delete button */
@@ -85,7 +85,7 @@ public class ManageUsersViewIT extends BaseUITest {
 
         waitUntilDialogVisible("gelöscht");
 
-        assertNull(userRepository.findByEmailAddress(testProperties.getAdminUsername()));
+        assertTrue(userRepository.findByEmailAddress(testProperties.getAdminUsername()).isEmpty());
     }
 
     /**

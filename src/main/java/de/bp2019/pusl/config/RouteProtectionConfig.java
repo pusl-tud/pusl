@@ -15,7 +15,7 @@ import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.interfaces.AccessibleBySuperadmin;
 import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.LoginView;
-import de.bp2019.pusl.util.ClassUtils;
+import de.bp2019.pusl.util.Utils;
 import de.bp2019.pusl.util.SecurityUtils;
 
 /**
@@ -55,15 +55,15 @@ public class RouteProtectionConfig implements VaadinServiceInitListener {
             /* User is logged in tries to access Login page -> reroute to dashboard */
             UI.getCurrent().navigate(LecturesView.class);
 
-        } else if (ClassUtils.implementsInterface(event.getNavigationTarget(), AccessibleByAdmin.class)
-                && userService.getCurrentUserType().ordinal() > UserType.ADMIN.ordinal()) {
+        } else if (Utils.implementsInterface(event.getNavigationTarget(), AccessibleByAdmin.class)
+                && userService.currentUserType().ordinal() > UserType.ADMIN.ordinal()) {
             /* User is not an admin and tries to access admin pages -> reroute to dashboard */
             event.rerouteTo(LecturesView.class);
             UI.getCurrent().navigate(LecturesView.class);
             ErrorDialog.open("Admin-Berechtigungen sind nötig um auf URL zuzugreifen!");
 
-        } else if (ClassUtils.implementsInterface(event.getNavigationTarget(), AccessibleBySuperadmin.class)
-                && userService.getCurrentUserType() != UserType.SUPERADMIN) {
+        } else if (Utils.implementsInterface(event.getNavigationTarget(), AccessibleBySuperadmin.class)
+                && userService.currentUserType() != UserType.SUPERADMIN) {
             /* User is not an superadmin and tries to access superadmin pages -> reroute to dashboard */
             event.rerouteTo(LecturesView.class);
             UI.getCurrent().navigate(LecturesView.class);

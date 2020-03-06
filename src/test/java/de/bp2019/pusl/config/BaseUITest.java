@@ -50,7 +50,7 @@ import de.bp2019.pusl.ui.views.LoginView;
  * 
  * @author Leon Chemnitz
  */
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public abstract class BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseUITest.class);
 

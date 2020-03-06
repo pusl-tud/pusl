@@ -11,11 +11,11 @@ import de.bp2019.pusl.ui.views.WorkView;
 import de.bp2019.pusl.ui.views.user.EditUserView;
 
 @SpringBootTest
-public class ClassUtilsIT {
+public class UtilsIT {
 
     @Test
     public void testImplementsInterface() {
-        assertTrue(ClassUtils.implementsInterface(EditUserView.class, AccessibleByAdmin.class));
-        assertFalse(ClassUtils.implementsInterface(WorkView.class, AccessibleByAdmin.class));
+        assertTrue(Utils.implementsInterface(EditUserView.class, AccessibleByAdmin.class));
+        assertFalse(Utils.implementsInterface(WorkView.class, AccessibleByAdmin.class));
     }
 }

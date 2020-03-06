@@ -1,6 +1,5 @@
 package de.bp2019.pusl.ui.views.exercisescheme;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -83,10 +82,9 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         name.setId("name");
         name.setValueChangeMode(ValueChangeMode.EAGER);
 
-        List<Institute> allInstitutes = instituteService.getAll();
         MultiselectComboBox<Institute> institutes = new MultiselectComboBox<Institute>();
         institutes.setLabel("Institute");
-        institutes.setItems(allInstitutes);
+        institutes.setDataProvider(instituteService);
         institutes.setItemLabelGenerator(Institute::getName);
         institutes.setId("institutes");
 
@@ -141,14 +139,7 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
 
         binder.forField(institutes)
                 .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(), "Bitte mind. ein Institut angeben")
-                .bind(exerciseScheme -> {
-                    if (exerciseScheme.getInstitutes() != null) {
-                        return exerciseScheme.getInstitutes().stream().map(
-                                institute -> allInstitutes.stream().filter(i -> institute.equals(i)).findFirst().get())
-                                .collect(Collectors.toSet());
-                    } else
-                        return null;
-                }, ExerciseScheme::setInstitutes);
+                .bind(ExerciseScheme::getInstitutes, ExerciseScheme::setInstitutes);
 
         binder.bind(tokens, ExerciseScheme::getTokens, ExerciseScheme::setTokens);
 

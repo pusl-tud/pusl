@@ -6,11 +6,9 @@ package de.bp2019.pusl.ui.views;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -32,6 +30,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.service.UserService;
+import de.bp2019.pusl.ui.dialogs.ErrorDialog;
+import de.bp2019.pusl.ui.dialogs.SuccessDialog;
+import de.bp2019.pusl.ui.views.user.ManageUsersView;
+import de.bp2019.pusl.util.exceptions.DataNotFoundException;
+import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
  * @author Godot_Blend102
@@ -56,7 +59,7 @@ public class AccountView extends BaseView {
 	public AccountView(UserService userService) {
 		super("Account verwalten");
 
-		currentUser = userService.getCurrentUser();
+		currentUser = userService.currentUser();
 
 		LOGGER.debug("current user: " + currentUser.toString());
 
@@ -84,6 +87,13 @@ public class AccountView extends BaseView {
 		form.add(password, 1);
 		form.add(confirmPassword, 1);
 
+		Button saveButton = new Button("Änderungen speichern");
+		saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+		add(form, saveButton);
+		
+		/* ########### Data Binding and validation ########### */
+		
 		binder = new Binder<>();
 		binder.setBean(currentUser);
 
@@ -119,22 +129,36 @@ public class AccountView extends BaseView {
 						user.setPassword(passwordEncoder.encode(pwd));
 					}
 				});
+
+		/* ########### Listeners ########### */
+
 		password.addValueChangeListener(e -> passwordBinder.validate());
 
-		Button saveButton = new Button("Änderungen speichern");
-		saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
 		saveButton.addClickListener(event -> {
+
+			if (!userService.checkEmailAvailable(emailAddress.getValue(), Optional.of(currentUser.getId()))) {
+				ErrorDialog.open("Email Adresse bereits vergeben");
+				return;
+			}
+
 			if (binder.writeBeanIfValid(currentUser)) {
 				try {
-					userService.save(currentUser);
 
-					Dialog dialog = new Dialog();
-					dialog.add(new Text("Account erfolgreich angepasst!"));
-					UI.getCurrent().navigate(LecturesView.ROUTE);
-					dialog.open();
-				} finally {
-					// TODO: implement ErrorHandeling
+					if (!password.getValue().equals("")) {
+						currentUser.setPassword(passwordEncoder.encode(password.getValue()));
+					} else {
+						String oldPassword = userService.getById(currentUser.getId().toString()).getPassword();
+						currentUser.setPassword(oldPassword);
+					}
+
+					userService.save(currentUser);
+					UI.getCurrent().navigate(ManageUsersView.ROUTE);
+					SuccessDialog.open("Nutzer erfolgreich gespeichert");
+				} catch (UnauthorizedException e) {
+					ErrorDialog.open("nicht authorisiert um Nutzer zu speichern!");
+				} catch (DataNotFoundException e1) {
+					UI.getCurrent().navigate(ManageUsersView.ROUTE);
+					ErrorDialog.open("Nutzer wurde nicht in Datenbank gefunden!");
 				}
 			} else {
 				BinderValidationStatus<User> validate = binder.validate();
@@ -144,8 +168,6 @@ public class AccountView extends BaseView {
 				LOGGER.debug("There are errors: " + errorText);
 			}
 		});
-
-		add(form, saveButton);
 
 	}
 

@@ -79,7 +79,7 @@ public class EditUserViewIT extends BaseUITest {
         findButtonContainingText("Speichern").click();
         waitForURL(ManageUsersView.ROUTE);
 
-        User savedUser = userRepository.findByEmailAddress(user.getEmailAddress());
+        User savedUser = userRepository.findByEmailAddress(user.getEmailAddress()).get();
         assertNotNull(savedUser);
         assertEquals(user.getFirstName(), savedUser.getFirstName());
         assertEquals(user.getLastName(), savedUser.getLastName());
@@ -112,7 +112,7 @@ public class EditUserViewIT extends BaseUITest {
 
         userRepository.save(user);
 
-        user = userRepository.findByEmailAddress(user.getEmailAddress());
+        user = userRepository.findByEmailAddress(user.getEmailAddress()).get();
 
         goToURL(EditUserView.ROUTE + "/" + user.getId());
 
@@ -129,7 +129,7 @@ public class EditUserViewIT extends BaseUITest {
         findButtonContainingText("Speichern").click();
         waitForURL(ManageUsersView.ROUTE);
 
-        User savedUser = userRepository.findByEmailAddress(user.getEmailAddress());
+        User savedUser = userRepository.findByEmailAddress(user.getEmailAddress()).get();
         assertNotNull(savedUser);
         LOGGER.info("checking firstName");
         assertTrue(newFirstName.equals(savedUser.getFirstName()));
@@ -163,7 +163,7 @@ public class EditUserViewIT extends BaseUITest {
 
         userRepository.save(user);
 
-        user = userRepository.findByEmailAddress(user.getEmailAddress());
+        user = userRepository.findByEmailAddress(user.getEmailAddress()).get();
 
         goToURL(EditUserView.ROUTE + "/" + user.getId());
 

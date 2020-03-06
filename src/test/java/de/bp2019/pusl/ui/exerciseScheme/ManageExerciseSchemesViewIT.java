@@ -61,7 +61,7 @@ public class ManageExerciseSchemesViewIT extends BaseUITest {
         tokenSet.add(new Token(RandomStringUtils.random(8, true, true), false));
 
         Set<User> userSet = new HashSet<>();
-        userSet.add(userRepository.findByEmailAddress(testProperties.getAdminUsername()));
+        userSet.add(userRepository.findByEmailAddress(testProperties.getAdminUsername()).get());
 
         exerciseScheme = new ExerciseScheme(RandomStringUtils.random(8, true, false), false, false,
                 RandomStringUtils.random(8, true, true), tokenSet, instituteSet, userSet);
