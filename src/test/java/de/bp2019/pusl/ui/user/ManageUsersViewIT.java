@@ -1,18 +1,19 @@
 package de.bp2019.pusl.ui.user;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import de.bp2019.pusl.config.BaseUITest;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.service.UserService;
-import de.bp2019.pusl.ui.BaseUITest;
 import de.bp2019.pusl.ui.LoginViewIT;
+import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.user.EditUserView;
 import de.bp2019.pusl.ui.views.user.ManageUsersView;
 
@@ -27,6 +28,10 @@ public class ManageUsersViewIT extends BaseUITest {
     @Autowired
     UserRepository userRepository;
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
     @Test
     public void testNewUserButton() throws Exception {
         LOGGER.info("Testing new User button");
@@ -39,14 +44,18 @@ public class ManageUsersViewIT extends BaseUITest {
         waitForURL(EditUserView.ROUTE + "/new");
     }
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
     @Test
     public void testNameButton() throws Exception {
         LOGGER.info("Testing User name button");
         login(UserType.SUPERADMIN);
 
         goToURL(ManageUsersView.ROUTE);
-        
-        User user = userRepository.findByEmailAddress(testProperties.getAdminUsername());
+
+        User user = userRepository.findByEmailAddress(testProperties.getAdminUsername()).get();
         String name = UserService.getFullName(user);
         String id = user.getId().toString();
 
@@ -55,6 +64,10 @@ public class ManageUsersViewIT extends BaseUITest {
         waitForURL(EditUserView.ROUTE + "/" + id);
     }
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
     @Test
     public void testDeleteButton() throws Exception {
         LOGGER.info("Testing Delete User Button");
@@ -62,7 +75,7 @@ public class ManageUsersViewIT extends BaseUITest {
 
         goToURL(ManageUsersView.ROUTE);
 
-        User user = userRepository.findByEmailAddress(testProperties.getAdminUsername());
+        User user = userRepository.findByEmailAddress(testProperties.getAdminUsername()).get();
         String id = user.getId().toString();
 
         /* click delete button */
@@ -71,7 +84,34 @@ public class ManageUsersViewIT extends BaseUITest {
         findButtonContainingText("Löschen").click();
 
         waitUntilDialogVisible("gelöscht");
-        
-        assertNull(userRepository.findByEmailAddress(testProperties.getAdminUsername()));
+
+        assertTrue(userRepository.findByEmailAddress(testProperties.getAdminUsername()).isEmpty());
+    }
+
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
+    @Test
+    public void testAccess() throws Exception {
+        LOGGER.info("Testing access");
+
+        LOGGER.info("Testing access as SUPERADMIN");
+        login(UserType.SUPERADMIN);
+        goToURL(ManageUsersView.ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as ADMIN");
+        login(UserType.ADMIN);
+        goToURL(ManageUsersView.ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as WIWI");
+        login(UserType.WIMI);
+        goToURLandWaitForRedirect(ManageUsersView.ROUTE, LecturesView.ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as HIWI");
+        login(UserType.HIWI);
     }
 }

@@ -2,6 +2,10 @@ package de.bp2019.pusl.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import com.vaadin.flow.data.provider.AbstractDataProvider;
+import com.vaadin.flow.data.provider.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,21 +13,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.repository.ExerciseSchemeRepository;
 import de.bp2019.pusl.repository.GradeRepository;
 import de.bp2019.pusl.repository.UserRepository;
+import de.bp2019.pusl.util.LimitOffsetPageRequest;
 
 /**
  * Service providing relevant Grades
  *
- * @author Luca Dinies
+ * @author Luca Dinies, Leon Chemnitz
  */
 
 @Service
-public class GradeService {
+public class GradeService extends AbstractDataProvider<Grade, String>{
     private static final Logger LOGGER = LoggerFactory.getLogger(GradeService.class);
 
     @Autowired
@@ -36,6 +42,22 @@ public class GradeService {
     UserRepository userRepository;
 
     public GradeService() {
+    }
+
+    @Override
+    public boolean isInMemory() {
+        return false;
+    }
+
+    @Override
+    public int size(Query<Grade, String> query) {
+        return (int) gradeRepository.count();
+    }
+
+    @Override
+    public Stream<Grade> fetch(Query<Grade, String> query) {
+        Pageable pageable = new LimitOffsetPageRequest( query.getLimit(), query.getOffset());
+        return gradeRepository.findAll(pageable).stream();
     }
 
     /**

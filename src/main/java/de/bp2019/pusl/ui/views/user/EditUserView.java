@@ -1,14 +1,11 @@
 package de.bp2019.pusl.ui.views.user;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Label;
@@ -26,7 +23,6 @@ import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.NotFoundException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -41,35 +37,36 @@ import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.service.UserService;
+import de.bp2019.pusl.ui.dialogs.ErrorDialog;
+import de.bp2019.pusl.ui.dialogs.SuccessDialog;
+import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
+import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.util.exceptions.DataNotFoundException;
+import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
- * View containing a form to edit a {@link User}
+ * View containing a form to edit a {@link User}. Only Accessible by admins and
+ * superadmins
  * 
  * @author Leon Chemnitz
  */
 @PageTitle(PuslProperties.NAME + " | Nutzer bearbeiten")
 @Route(value = EditUserView.ROUTE, layout = MainAppView.class)
-public class EditUserView extends BaseView implements HasUrlParameter<String> {
+public class EditUserView extends BaseView implements HasUrlParameter<String>, AccessibleByAdmin {
 
         private static final long serialVersionUID = 1L;
 
         public static final String ROUTE = "admin/user";
 
-        /*
-         * no @Autowire because service is injected by constructor. Vaadin likes it
-         * better this way...
-         */
         private UserService userService;
 
         /** Binder to bind the form Data to an Object */
         private Binder<User> binder;
 
-        /**
-         * null if a new User is being created
-         */
-        private ObjectId objectId;
+        /** empty if new institute is being created */
+        private Optional<ObjectId> userId;
 
         @Autowired
         PasswordEncoder passwordEncoder;
@@ -114,10 +111,9 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                 Label emptyText = new Label(" ");
                 form.add(emptyText, 1);
 
-                List<Institute> allInstitutes = instituteService.getAll();
                 MultiselectComboBox<Institute> institutes = new MultiselectComboBox<Institute>();
                 institutes.setLabel("Institute");
-                institutes.setItems(allInstitutes);
+                institutes.setDataProvider(instituteService);
                 institutes.setItemLabelGenerator(Institute::getName);
                 institutes.setId("institutes");
                 form.add(institutes, 1);
@@ -149,6 +145,8 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                 actions.add(save);
                 actions.setHorizontalComponentAlignment(Alignment.END, save);
                 form.add(actions, 2);
+                
+                add(form);
 
                 /* ########### Data Binding and validation ########### */
 
@@ -164,17 +162,10 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                 binder.forField(emailAddress).withValidator(new EmailValidator("Bitte korrekte Email Addresse angeben"))
                                 .bind(User::getEmailAddress, User::setEmailAddress);
 
-                binder.forField(institutes).withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
-                                "Bitte mind. ein Institut angeben").bind(user -> {
-                                        if (user.getInstitutes() != null) {
-                                                return user.getInstitutes().stream()
-                                                                .map(institute -> allInstitutes.stream()
-                                                                                .filter(i -> institute.equals(i))
-                                                                                .findFirst().get())
-                                                                .collect(Collectors.toSet());
-                                        } else
-                                                return null;
-                                }, User::setInstitutes);
+                binder.forField(institutes)
+                                .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
+                                                "Bitte mind. ein Institut angeben")
+                                .bind(User::getInstitutes, User::setInstitutes);
 
                 binder.forField(userType).withValidator(ut -> ut != null, "Bitte Nutzer Typ wählen").bind(User::getType,
                                 User::setType);
@@ -182,7 +173,7 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                 Binding<User, String> passwordBinder = binder.forField(password)
                                 .withValidator((enteredPassword, valueContext) -> {
 
-                                        if (objectId != null && enteredPassword == "") {
+                                        if (userId != null && enteredPassword == "") {
                                                 /*
                                                  * User already exists and has entered no new password, therefore a new
                                                  * password is not needed
@@ -210,28 +201,37 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                 /* ########### Click Listeners for Buttons ########### */
 
                 save.addClickListener(event -> {
+
+                        if (!userService.checkEmailAvailable(emailAddress.getValue(), userId)) {
+                                ErrorDialog.open("Email Adresse bereits vergeben");
+                                return;
+                        }
+
                         User user = new User();
                         if (binder.writeBeanIfValid(user)) {
-                                if (objectId != null) {
-                                        user.setId(objectId);
+                                if (userId.isPresent()) {
+                                        user.setId(userId.get());
                                 }
                                 try {
 
                                         if (!password.getValue().equals("")) {
                                                 user.setPassword(passwordEncoder.encode(password.getValue()));
-                                        }else{
-                                                String oldPassword = userService.getById(user.getId().toString()).getPassword();
+                                        } else {
+                                                String oldPassword = userService.getById(user.getId().toString())
+                                                                .getPassword();
                                                 user.setPassword(oldPassword);
                                         }
 
                                         userService.save(user);
-                                        Dialog dialog = new Dialog();
-                                        dialog.add(new Text("Nutzer erfolgreich gespeichert"));
                                         UI.getCurrent().navigate(ManageUsersView.ROUTE);
-                                        dialog.open();
-                                } finally {
-                                        // TODO: implement ErrorHandeling
+                                        SuccessDialog.open("Nutzer erfolgreich gespeichert");
+                                } catch (UnauthorizedException e) {
+                                        ErrorDialog.open("nicht authorisiert um Nutzer zu speichern!");
+                                } catch (DataNotFoundException e1) {                                        
+                                        UI.getCurrent().navigate(ManageUsersView.ROUTE);
+                                        ErrorDialog.open("Nutzer wurde nicht in Datenbank gefunden!");
                                 }
+
                         } else {
                                 BinderValidationStatus<User> validate = binder.validate();
                                 String errorText = validate.getFieldValidationStatuses().stream()
@@ -242,25 +242,28 @@ public class EditUserView extends BaseView implements HasUrlParameter<String> {
                         }
                 });
 
-                /* ########### Add Layout to Component ########### */
-
-                add(form);
         }
 
         @Override
-        public void setParameter(BeforeEvent event, String userId) {
-                if (userId.equals("new")) {
-                        objectId = null;
+        public void setParameter(BeforeEvent event, String idParameter) {
+                if (idParameter.equals("new")) {
+                        userId = Optional.empty();
                         /* clear fields by setting null */
                         binder.readBean(null);
                 } else {
-                        User fetchedUser = userService.getById(userId);
-                        /* getUserById returns null if no matching User is found */
-                        if (fetchedUser == null) {
-                                throw new NotFoundException();
-                        } else {
-                                objectId = fetchedUser.getId();
+                        try {
+                                User fetchedUser;
+                                fetchedUser = userService.getById(idParameter);                                
+                                userId = Optional.of(fetchedUser.getId());
                                 binder.readBean(fetchedUser);
+                        } catch (UnauthorizedException e) {
+                                event.rerouteTo(LecturesView.ROUTE);
+                                UI.getCurrent().navigate(LecturesView.ROUTE);      
+                                ErrorDialog.open("Nicht authorisiert um Nutzer zu bearbeiten!");
+                        } catch (DataNotFoundException e) {                   
+                                event.rerouteTo(LecturesView.ROUTE);       
+                                UI.getCurrent().navigate(LecturesView.ROUTE); 
+                                ErrorDialog.open("Nitzer nicht in Datenbank gefunden!");    
                         }
                 }
         }

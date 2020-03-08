@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.bp2019.pusl.config.BaseUITest;
+
 public class LoginViewIT extends BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewIT.class);
 

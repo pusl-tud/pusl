@@ -52,15 +52,14 @@ public class MainAppView extends AppLayout {
         HorizontalLayout userInfo = new HorizontalLayout();
         userInfo.setDefaultVerticalComponentAlignment(Alignment.END);
 
-        userInfo.add(generateUserTypeLabel(userService.getCurrentUserType()));
-        userInfo.add(generateUserNameButton(userService.getCurrentUserFullName()));
+        userInfo.add(generateUserTypeLabel(userService.currentUserType()));
+        userInfo.add(generateUserNameButton(userService.currentUserFullName()));
         userInfo.add(generateLogoutButton());
-
 
         navbarRight.getStyle().set("margin", "0");
         navbarRight.getStyle().set("margin-right", "1.5em");
         navbarRight.getStyle().set("padding", "0");
-        navbarRight.setWidthFull();        
+        navbarRight.setWidthFull();
         navbarRight.add(userInfo);
         navbarRight.setHorizontalComponentAlignment(Alignment.END, userInfo);
 
@@ -77,17 +76,26 @@ public class MainAppView extends AppLayout {
         content.add(generateMenuButton("Startseite", new Icon(VaadinIcon.HOME), LecturesView.ROUTE));
         content.add(generateMenuButton("Mein Account", new Icon(VaadinIcon.USER), AccountView.ROUTE));
         content.add(generateMenuButton("Noten Export", new Icon(VaadinIcon.DOWNLOAD), ExportView.ROUTE));
-        content.add(generateSeperator());
-        content.add(generateSectionLabel("Admin"));
-        content.add(generateMenuButton("Nutzer",  new Icon(VaadinIcon.USERS), ManageUsersView.ROUTE));
-        content.add(generateMenuButton("Veranstaltungen", new Icon(VaadinIcon.ACADEMY_CAP), ManageLecturesView.ROUTE));
-        content.add(generateMenuButton("Übungsschemas", new Icon(VaadinIcon.NOTEBOOK) ,ManageExerciseSchemesView.ROUTE));
-        content.add(generateSeperator());
-        content.add(generateSectionLabel("Global"));
-        content.add(generateMenuButton("Institute", new Icon(VaadinIcon.WORKPLACE), ManageInstitutesView.ROUTE));
-        content.add(generateMenuButton("Demo", new Icon(VaadinIcon.BUG), DemoView.ROUTE));
-        sidebar.add(content);
 
+        if (userService.currentUserType().ordinal() <= UserType.ADMIN.ordinal()) {
+            content.add(generateSeperator());
+            content.add(generateSectionLabel("Admin"));
+            content.add(generateMenuButton("Nutzer", new Icon(VaadinIcon.USERS), ManageUsersView.ROUTE));
+            content.add(
+                    generateMenuButton("Veranstaltungen", new Icon(VaadinIcon.ACADEMY_CAP), ManageLecturesView.ROUTE));
+            content.add(generateMenuButton("Übungsschemas", new Icon(VaadinIcon.NOTEBOOK),
+                    ManageExerciseSchemesView.ROUTE));
+
+            if (userService.currentUserType() == UserType.SUPERADMIN) {
+                content.add(generateSeperator());
+                content.add(generateSectionLabel("Global"));
+                content.add(
+                        generateMenuButton("Institute", new Icon(VaadinIcon.WORKPLACE), ManageInstitutesView.ROUTE));
+                content.add(generateMenuButton("Demo", new Icon(VaadinIcon.BUG), DemoView.ROUTE));
+            }
+        }
+
+        sidebar.add(content);
         addToDrawer(sidebar);
     }
 
@@ -139,17 +147,16 @@ public class MainAppView extends AppLayout {
         return button;
     }
 
-
-    private Label generateUserTypeLabel(UserType type){
+    private Label generateUserTypeLabel(UserType type) {
         Label label = new Label(type.toString());
-        label.getStyle().set("font-weight", "200");               
+        label.getStyle().set("font-weight", "200");
         label.getStyle().set("font-size", "0.8em");
         label.getStyle().set("padding-right", "0");
-        label.getStyle().set("padding-bottom", "0.75em"); 
+        label.getStyle().set("padding-bottom", "0.75em");
         return label;
     }
 
-    private Button generateUserNameButton(String name){
+    private Button generateUserNameButton(String name) {
         Button button = new Button(name);
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         button.getStyle().set("color", "dark-grey");

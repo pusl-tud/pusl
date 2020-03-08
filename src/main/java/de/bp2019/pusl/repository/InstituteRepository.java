@@ -1,7 +1,11 @@
 package de.bp2019.pusl.repository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
+import org.bson.types.ObjectId;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import de.bp2019.pusl.model.Institute;
@@ -12,5 +16,6 @@ import de.bp2019.pusl.model.Institute;
  * @author Leon Chemnitz
  */
 public interface InstituteRepository extends MongoRepository<Institute, String> {
-    List<Institute> findByName(String name);
+    Optional<Institute> findByName(String name);
+    Stream<Institute> findByIdIn(List<ObjectId> ids, Pageable pageable);
 }

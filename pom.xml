@@ -99,6 +99,11 @@
       <version>5.6.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.mozilla</groupId>
+      <artifactId>rhino</artifactId>
+      <version>1.7.12</version>
+  </dependency>  
   </dependencies>
   <repositories>
     <repository>
@@ -126,6 +131,9 @@
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>3.0.0-M4</version>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -165,13 +173,12 @@
         <version>0.8.5</version>
         <executions>
           <execution>
-            <id>pre-integration-test</id>
-            <phase>pre-integration-test</phase>
+            <id>pre-unit-test</id>
             <goals>
               <goal>prepare-agent</goal>
             </goals>
             <configuration>
-              <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
+              <destFile>${project.build.directory}/coverage-reports/jacoco.exec</destFile>
               <propertyName>failsafeArgLine</propertyName>
             </configuration>
           </execution>
@@ -182,8 +189,8 @@
               <goal>report</goal>
             </goals>
             <configuration>
-              <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
-              <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+              <dataFile>${project.build.directory}/coverage-reports/jacoco.exec</dataFile>
+              <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
             </configuration>
           </execution>
         </executions>

@@ -50,7 +50,7 @@ public class LoginView extends VerticalLayout {
 						.authenticate(new UsernamePasswordAuthenticationToken(e.getUsername(), e.getPassword()));
 
 				/*
-				 * if authentication was successful we will update the security context and //
+				 * if authentication was successful we will update the security context and 
 				 * redirect to the page requested first
 				 */
 				if (authentication != null) {

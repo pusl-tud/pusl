@@ -1,6 +1,5 @@
 package de.bp2019.pusl.ui.views.lecture;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,11 +34,16 @@ import de.bp2019.pusl.service.ExerciseSchemeService;
 import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.service.UserService;
+import de.bp2019.pusl.service.dataproviders.HiwiDataProvider;
 import de.bp2019.pusl.ui.components.ExerciseComposer;
 import de.bp2019.pusl.ui.components.PerformanceSchemeComposer;
 import de.bp2019.pusl.ui.components.VerticalTabs;
+import de.bp2019.pusl.ui.dialogs.ErrorDialog;
+import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
+import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
  * View containing a form to edit a Lecture
@@ -48,7 +52,7 @@ import de.bp2019.pusl.ui.views.MainAppView;
  */
 @PageTitle(PuslProperties.NAME + " | Veranstaltung bearbeiten")
 @Route(value = EditLectureView.ROUTE, layout = MainAppView.class)
-public class EditLectureView extends BaseView implements HasUrlParameter<String> {
+public class EditLectureView extends BaseView implements HasUrlParameter<String>, AccessibleByAdmin {
 
         private static final long serialVersionUID = -7352842685521794385L;
 
@@ -68,13 +72,21 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
          */
         private ObjectId objectId;
 
+        private HiwiDataProvider hiwiDataProvider;
+
         @Autowired
         public EditLectureView(InstituteService instituteService, UserService userService,
                         LectureService lectureService, ExerciseSchemeService exerciseSchemeService) {
-
                 super("Veranstaltung bearbeiten");
 
                 this.lectureService = lectureService;
+
+                try {
+                        hiwiDataProvider = new HiwiDataProvider(userService);
+                } catch (UnauthorizedException e) {                
+                        UI.getCurrent().navigate(LecturesView.ROUTE); 
+                        ErrorDialog.open("Nicht authorisiert um alle HIWIs abzurufen");
+                }
 
                 FormLayout formLayout = new FormLayout();
                 formLayout.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
@@ -92,10 +104,9 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 name.setValueChangeMode(ValueChangeMode.EAGER);
                 formLayout.add(name, 1);
 
-                List<Institute> allInstitutes = instituteService.getAll();
                 MultiselectComboBox<Institute> institutes = new MultiselectComboBox<Institute>();
                 institutes.setLabel("Institute");
-                institutes.setItems(allInstitutes);
+                institutes.setDataProvider(instituteService);
                 institutes.setItemLabelGenerator(Institute::getName);
                 formLayout.add(institutes, 1);
 
@@ -109,12 +120,11 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 PerformanceSchemeComposer performanceSchemes = new PerformanceSchemeComposer();
                 verticalTabs.addTab("Leistungen", performanceSchemes);
 
-                List<User> allUser = userService.getAll();
                 MultiselectComboBox<User> hasAccess = new MultiselectComboBox<User>();
                 hasAccess.setWidth("100%");
                 hasAccess.setHeight("10em");
                 hasAccess.setLabel("Zugriff");
-                hasAccess.setItems(allUser);
+                hasAccess.setDataProvider(hiwiDataProvider);
                 hasAccess.setItemLabelGenerator(item -> UserService.getFullName(item));
                 verticalTabs.addTab("Zugriff", hasAccess);
 
@@ -134,31 +144,20 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                                 .bind(Lecture::getName, Lecture::setName);
 
                 binder.forField(institutes).withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
-                                "Bitte mind. ein Institut angeben").bind(lecture -> {
-                                        if (lecture.getInstitutes() != null) {
-                                                return lecture.getInstitutes().stream()
-                                                                .map(institute -> allInstitutes.stream()
-                                                                                .filter(i -> institute.equals(i))
-                                                                                .findFirst().get())
-                                                                .collect(Collectors.toSet());
-                                        } else
-                                                return null;
-                                }, Lecture::setInstitutes);
+                                "Bitte mind. ein Institut angeben").bind(Lecture::getInstitutes, Lecture::setInstitutes);
 
-                binder.bind(hasAccess, lecture -> {
-                        if (lecture.getHasAccess() != null) {
-                                return lecture.getHasAccess().stream().map(
-                                                user -> allUser.stream().filter(u -> user.equals(u)).findFirst().get())
-                                                .collect(Collectors.toSet());
-                        } else
-                                return null;
-                }, Lecture::setHasAccess);
+                binder.bind(hasAccess, Lecture::getHasAccess, Lecture::setHasAccess);
 
                 binder.bind(exercises, Lecture::getExercises, Lecture::setExercises);
 
                 binder.bind(performanceSchemes, Lecture::getPerformanceSchemes, Lecture::setPerformanceSchemes);
 
-                /* ########### Click Listeners for Buttons ########### */
+                /* ########### Listeners ########### */
+
+                institutes.addValueChangeListener(event -> {
+                        hiwiDataProvider.setFilter(event.getValue());
+                        hiwiDataProvider.refreshAll();
+                });
 
                 save.addClickListener(event -> {
                         Lecture lecture = new Lecture();

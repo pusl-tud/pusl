@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import de.bp2019.pusl.config.BaseUITest;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Institute;
@@ -19,18 +20,18 @@ import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.ExerciseSchemeRepository;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.UserRepository;
-import de.bp2019.pusl.ui.BaseUITest;
 import de.bp2019.pusl.ui.LoginViewIT;
+import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.exercisescheme.EditExerciseSchemeView;
 import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
 
 /**
- * UI test for {@link de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView}
+ * UI test for
+ * {@link de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView}
  *
  * @author Luca Dinies
  */
-
-public class ManageExerciseSchemeViewIT extends BaseUITest {
+public class ManageExerciseSchemesViewIT extends BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewIT.class);
 
     @Autowired
@@ -46,8 +47,11 @@ public class ManageExerciseSchemeViewIT extends BaseUITest {
 
     private Institute institute;
 
-    public String addExerciseScheme() {
-
+    /**
+     * @author Luca Dinies
+     * @throws Exception
+     */
+    private String addExerciseScheme() {
         institute = new Institute(RandomStringUtils.random(8, true, true));
         instituteRepository.save(institute);
         Set<Institute> instituteSet = new HashSet<>();
@@ -57,16 +61,20 @@ public class ManageExerciseSchemeViewIT extends BaseUITest {
         tokenSet.add(new Token(RandomStringUtils.random(8, true, true), false));
 
         Set<User> userSet = new HashSet<>();
-        userSet.add(userRepository.findByEmailAddress(testProperties.getAdminUsername()));
+        userSet.add(userRepository.findByEmailAddress(testProperties.getAdminUsername()).get());
 
         exerciseScheme = new ExerciseScheme(RandomStringUtils.random(8, true, false), false, false,
-                RandomStringUtils.random(8, true, true), tokenSet, instituteSet, userSet );
+                RandomStringUtils.random(8, true, true), tokenSet, instituteSet, userSet);
 
         exerciseSchemeRepository.save(exerciseScheme);
 
         return exerciseScheme.getName();
     }
 
+    /**
+     * @author Luca Dinies
+     * @throws Exception
+     */
     @Test
     public void testNewExerciseSchemeButton() throws Exception {
         LOGGER.info("Testing new ExerciseScheme button");
@@ -79,6 +87,10 @@ public class ManageExerciseSchemeViewIT extends BaseUITest {
         waitForURL(EditExerciseSchemeView.ROUTE + "/new");
     }
 
+    /**
+     * @author Luca Dinies
+     * @throws Exception
+     */
     @Test
     public void testNameButton() throws Exception {
         LOGGER.info("Testing ExerciseScheme name button");
@@ -101,6 +113,10 @@ public class ManageExerciseSchemeViewIT extends BaseUITest {
         waitForURL(ManageExerciseSchemesView.ROUTE);
     }
 
+    /**
+     * @author Luca Dinies
+     * @throws Exception
+     */
     @Test
     public void testDeleteButton() throws Exception {
         LOGGER.info("Testing Delete ExerciseScheme Button");
@@ -123,4 +139,31 @@ public class ManageExerciseSchemeViewIT extends BaseUITest {
         assertTrue(exerciseSchemeRepository.findById(id).isEmpty());
     }
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
+    @Test
+    public void testAccess() throws Exception {
+        LOGGER.info("Testing access");
+
+        LOGGER.info("Testing access as SUPERADMIN");
+        login(UserType.SUPERADMIN);
+        goToURL(ManageExerciseSchemesView.ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as ADMIN");
+        login(UserType.ADMIN);
+        goToURL(ManageExerciseSchemesView.ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as WIWI");
+        login(UserType.WIMI);
+        goToURLandWaitForRedirect(ManageExerciseSchemesView.ROUTE, LecturesView.ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as HIWI");
+        login(UserType.HIWI);
+        goToURLandWaitForRedirect(ManageExerciseSchemesView.ROUTE, LecturesView.ROUTE);
+    }
 }

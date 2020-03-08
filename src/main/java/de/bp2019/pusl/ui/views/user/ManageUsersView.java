@@ -8,7 +8,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -17,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.service.UserService;
+import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.MainAppView;
 
@@ -27,15 +27,13 @@ import de.bp2019.pusl.ui.views.MainAppView;
  */
 @PageTitle(PuslProperties.NAME + " | Benutzer")
 @Route(value = ManageUsersView.ROUTE, layout = MainAppView.class)
-public class ManageUsersView extends BaseView {
+public class ManageUsersView extends BaseView implements AccessibleByAdmin{
 
     private static final long serialVersionUID = -5763725756205681478L;
 
     public static final String ROUTE = "admin/users";
 
     private UserService userService;
-    
-    private ListDataProvider<User> userDataProvider;
 
     @Autowired
     public ManageUsersView(UserService userService) {
@@ -43,14 +41,12 @@ public class ManageUsersView extends BaseView {
 
         this.userService = userService;
 
-        userDataProvider = new ListDataProvider<>(userService.getAll());
-
         /* -- Create Components -- */
 
         Grid<User> grid = new Grid<>();
 
         grid.setWidth("100%");
-        grid.setDataProvider(userDataProvider);
+        grid.setDataProvider(userService);
 
         grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true);
         grid.addComponentColumn(item -> createDeleteButton(item)).setFlexGrow(0).setWidth("4em");
@@ -102,8 +98,7 @@ public class ManageUsersView extends BaseView {
             Button confirmButton = new Button("Löschen", event -> {
                 try {
                     userService.delete(user);
-                    userDataProvider.getItems().remove(user);
-                    userDataProvider.refreshAll();
+                    userService.refreshAll();
     
                     dialog.close();
                     Dialog answerDialog = new Dialog();
