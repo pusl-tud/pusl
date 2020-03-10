@@ -1,10 +1,8 @@
 package de.bp2019.pusl.ui.views.user;
 
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -16,9 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.service.UserService;
+import de.bp2019.pusl.ui.dialogs.ConfirmDeletionDialog;
+import de.bp2019.pusl.ui.dialogs.ErrorDialog;
+import de.bp2019.pusl.ui.dialogs.SuccessDialog;
 import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
+import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
  * View that displays a list of all {@link User}s
@@ -90,34 +93,16 @@ public class ManageUsersView extends BaseView implements AccessibleByAdmin{
      */
     protected Button createDeleteButton(User user) {
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {
-            Dialog dialog = new Dialog();
-            dialog.add(new Text("Wirklich Löschen?"));
-            dialog.setCloseOnEsc(false);
-            dialog.setCloseOnOutsideClick(false);
-
-            Button confirmButton = new Button("Löschen", event -> {
-                try {
+            ConfirmDeletionDialog.open(user.getEmailAddress(), () -> {
+                try{
                     userService.delete(user);
                     userService.refreshAll();
-    
-                    dialog.close();
-                    Dialog answerDialog = new Dialog();
-                    answerDialog.add(new Text("Nutzer '" + UserService.getFullName(user) + "' gelöscht"));
-                    answerDialog.open();
-                } catch(Exception e){                    
-                    Dialog answerDialog = new Dialog();
-                    answerDialog.add(new Text("Fehler beim Löschen des Nutzers!"));
-                    answerDialog.open();
-                    LOGGER.error("Could not delete User! User ID was: " + user.getId());
+                    SuccessDialog.open(user.getEmailAddress() + " erfolgreich gelöscht");
+                }catch(UnauthorizedException e){
+                    UI.getCurrent().navigate(LecturesView.ROUTE);      
+                    ErrorDialog.open("Nicht authorisiert um Nutzer zu löschen!");
                 }
             });
-
-            Button cancelButton = new Button("Abbruch", event -> {
-                dialog.close();
-            });
-
-            dialog.add(confirmButton, cancelButton);
-            dialog.open();
         });
         button.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_ERROR);
         /** makes testing a lot easier */

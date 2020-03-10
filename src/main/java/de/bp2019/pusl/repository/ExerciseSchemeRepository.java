@@ -1,8 +1,14 @@
 package de.bp2019.pusl.repository;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import de.bp2019.pusl.model.ExerciseScheme;
+import de.bp2019.pusl.model.Institute;
 
 /**
  * Repository for access of {@link ExerciseScheme}s
@@ -10,5 +16,7 @@ import de.bp2019.pusl.model.ExerciseScheme;
  * @author Leon Chemnitz
  */
 public interface ExerciseSchemeRepository extends MongoRepository<ExerciseScheme, String> {
-    ExerciseScheme findByName(String name);
+    Optional<ExerciseScheme> findByName(String name);
+    Stream<ExerciseScheme> findByInstitutesIn(Set<Institute> institutes, Pageable pageable);
+    int countByInstitutesIn(Set<Institute> institutes);
 }

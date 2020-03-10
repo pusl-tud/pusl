@@ -38,7 +38,7 @@ public class NoFlexExerciseDialog {
     private Binder<Grade> binder;
 
     @Autowired
-    public NoFlexExerciseDialog(LectureService moduleService, GradeService gradeService) {
+    public NoFlexExerciseDialog(LectureService lectureService, GradeService gradeService) {
 
         Dialog dialog = new Dialog();
         dialog.setCloseOnOutsideClick(false);
@@ -61,8 +61,7 @@ public class NoFlexExerciseDialog {
 
         Select<Lecture> lectureSelect = new Select<>();
         lectureSelect.setItemLabelGenerator(Lecture::getName);
-        List<Lecture> allModules = moduleService.getAll();
-        lectureSelect.setItems(allModules);
+        lectureSelect.setDataProvider(lectureService);
         lectureSelect.setPlaceholder("Modul");
         lectureSelect.setLabel("Modul");
         form.add(lectureSelect);

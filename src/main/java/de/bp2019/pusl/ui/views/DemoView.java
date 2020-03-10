@@ -20,6 +20,7 @@ import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.Lecture;
+import de.bp2019.pusl.model.PerformanceScheme;
 import de.bp2019.pusl.model.Token;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.ExerciseSchemeRepository;
@@ -63,97 +64,159 @@ public class DemoView extends BaseView implements AccessibleBySuperadmin {
                         lectureRepository.deleteAll();
 
                         LOGGER.info("refilling Database...");
-                        instituteRepository.save(new Institute("Bahntechnik"));
+                        instituteRepository.save(new Institute("Verkehrsplanung"));
+                        instituteRepository.save(new Institute("Bahnsysteme"));
                         instituteRepository.save(new Institute("Straßenwesen"));
-                        instituteRepository.save(new Institute("Computergrafik"));
+                        instituteRepository.save(new Institute("Luftverkehr"));
 
                         List<Institute> institutes = instituteRepository.findAll();
-
-                        Set<Institute> instituteSet1 = new HashSet<>();
-                        instituteSet1.add(institutes.get(0));
-                        instituteSet1.add(institutes.get(2));
-
-                        Set<Institute> instituteSet2 = new HashSet<>();
-                        instituteSet2.add(institutes.get(1));
-
-                        Set<Institute> instituteSet3 = new HashSet<>();
-                        instituteSet3.add(institutes.get(1));
-                        instituteSet3.add(institutes.get(0));
 
                         String password = passwordEncoder.encode("password");
                         String adminPassword = passwordEncoder.encode("admin");
 
                         userRepository.save(new User(null, null, "admin", adminPassword, new HashSet<Institute>(),
                                         UserType.SUPERADMIN));
-                        userRepository.save(new User("Walter", "Frosch", "wf@test.de", password, instituteSet3,
-                                        UserType.WIMI));
-                        userRepository.save(new User("Peter", "Pan", "pp@tu-darmstadt.de", password, instituteSet1,
-                                        UserType.WIMI));
-                        userRepository.save(new User("Angela", "Merkel", "angie.m@deutschland.com", password,
-                                        instituteSet3, UserType.WIMI));
-                        userRepository.save(new User("John", "Lennon", "johnny@aol.de", password, instituteSet1,
-                                        UserType.WIMI));
-                        userRepository.save(new User("Helene", "Fischer", "helene@yahoo.com", password, instituteSet1,
-                                        UserType.WIMI));
-                        userRepository.save(new User("Walter", "Gropius", "wg@walter.de", password, instituteSet2,
-                                        UserType.WIMI));
+
+                        User user;
+                        Set<Institute> instituteSet;
+
+                        for (Institute institute : institutes) {
+                                instituteSet = new HashSet<>();
+                                instituteSet.add(institute);
+
+                                user = new User();
+                                user.setType(UserType.ADMIN);
+                                user.setEmailAddress("admin@" + institute.getName().toLowerCase() + ".de");
+                                user.setFirstName("admin");
+                                user.setLastName(institute.getName());
+                                user.setPassword(password);
+                                user.setInstitutes(instituteSet);
+                                userRepository.save(user);
+
+                                for (int i = 1; i <= 3; i++) {
+                                        user = new User();
+                                        user.setType(UserType.HIWI);
+                                        user.setEmailAddress(
+                                                        "hiwi" + i + "@" + institute.getName().toLowerCase() + ".de");
+                                        user.setFirstName("hiwi" + i);
+                                        user.setLastName(institute.getName());
+                                        user.setPassword(password);
+                                        user.setInstitutes(instituteSet);
+                                        userRepository.save(user);
+
+                                        user = new User();
+                                        user.setType(UserType.WIMI);
+                                        user.setEmailAddress(
+                                                        "wimi" + i + "@" + institute.getName().toLowerCase() + ".de");
+                                        user.setFirstName("wimi" + i);
+                                        user.setLastName(institute.getName());
+                                        user.setPassword(password);
+                                        user.setInstitutes(instituteSet);
+                                        userRepository.save(user);
+                                }
+                        }
 
                         List<User> users = userRepository.findAll();
 
-                        Set<User> userSet1 = new HashSet<>();
-                        userSet1.add(users.get(3));
-                        userSet1.add(users.get(5));
-                        userSet1.add(users.get(0));
-                        userSet1.add(users.get(1));
+                        Set<Token> tokenSet1;
+                        ExerciseScheme exerciseScheme;
+                        Lecture lecture;
 
-                        Set<User> userSet2 = new HashSet<>();
-                        userSet2.add(users.get(2));
-                        userSet2.add(users.get(4));
+                        tokenSet1 = new HashSet<>();
+                        tokenSet1.add(new Token("O", true));
+                        tokenSet1.add(new Token("T", true));
+                        tokenSet1.add(new Token("J", true));
+                        tokenSet1.add(new Token("N", true));
 
-                        Set<User> userSet3 = new HashSet<>();
-                        userSet3.add(users.get(1));
-                        userSet3.add(users.get(5));
-                        userSet3.add(users.get(0));
+                        exerciseScheme = new ExerciseScheme();
+                        exerciseScheme.setName("Hausübung");
+                        exerciseScheme.setDefaultValue("O");
+                        exerciseScheme.setIsNumeric(false);
+                        exerciseScheme.setTokens(tokenSet1);
+                        exerciseScheme.setInstitutes(Set.of(institutes.get(0), institutes.get(1)));
+                        exerciseSchemeRepository.save(exerciseScheme);
 
-                        Set<Token> tokenSet1 = new HashSet<>();
-                        tokenSet1.add(new Token("wiedervorlage", false));
-                        tokenSet1.add(new Token("ausgegeben", true));
-                        tokenSet1.add(new Token("abgegeben", false));
+                        tokenSet1 = new HashSet<>();
+                        tokenSet1.add(new Token("O", true));
+                        tokenSet1.add(new Token("J", true));
 
-                        exerciseSchemeRepository.save(new ExerciseScheme("Testat", false, false, "5", tokenSet1,
-                                        instituteSet3, userSet2));
-                        exerciseSchemeRepository.save(new ExerciseScheme("Übung", true, false, "1", tokenSet1,
-                                        instituteSet1, userSet1));
-                        exerciseSchemeRepository.save(new ExerciseScheme("Klausur", true, true, "test", tokenSet1,
-                                        instituteSet2, userSet3));
+                        exerciseScheme = new ExerciseScheme();
+                        exerciseScheme.setName("Exkursion");
+                        exerciseScheme.setDefaultValue("O");
+                        exerciseScheme.setIsNumeric(false);
+                        exerciseScheme.setTokens(tokenSet1);
+                        exerciseScheme.setInstitutes(Set.of(institutes.get(0)));
+                        exerciseSchemeRepository.save(exerciseScheme);
+
+                        exerciseScheme = new ExerciseScheme();
+                        exerciseScheme.setName("Klausur");
+                        exerciseScheme.setDefaultValue("5.0");
+                        exerciseScheme.setIsNumeric(true);
+                        exerciseScheme.setInstitutes(Set.of(institutes.get(0)));
+                        exerciseSchemeRepository.save(exerciseScheme);
 
                         List<ExerciseScheme> exerciseSchemes = exerciseSchemeRepository.findAll();
 
                         List<Exercise> exerciseList = Arrays.asList(
-                                        new Exercise("Übung 1", exerciseSchemes.get(1), true),
-                                        new Exercise("1. Testat", exerciseSchemes.get(0), true),
-                                        new Exercise("2. Testat", exerciseSchemes.get(0), true),
+                                        new Exercise("Übung 1", exerciseSchemes.get(0), true),
+                                        new Exercise("Übung 2", exerciseSchemes.get(0), true),
+                                        new Exercise("Übung 3", exerciseSchemes.get(0), true),
+                                        new Exercise("Übung 4", exerciseSchemes.get(0), true),
+                                        new Exercise("Übung 5", exerciseSchemes.get(0), true),
+                                        new Exercise("Exkursion", exerciseSchemes.get(1), false),
                                         new Exercise("Klausur", exerciseSchemes.get(2), false));
 
-                        lectureRepository.save(new Lecture("Einführung in den Compilerbau", instituteSet1, userSet1,
-                                        exerciseList, null));
+                        String defaultValue = "function calcuate(results) { \n";
+                        defaultValue += "     \n";
+                        defaultValue += "    return ergebnis;\n";
+                        defaultValue += "}";
 
-                        exerciseList = Arrays.asList(new Exercise("1. Übung", exerciseSchemes.get(1), true),
-                                        new Exercise("2.Übung", exerciseSchemes.get(1), true),
-                                        new Exercise("Zwischenprüfung", exerciseSchemes.get(2), true),
-                                        new Exercise("3.Übung", exerciseSchemes.get(1), false),
-                                        new Exercise("4.Übung", exerciseSchemes.get(1), false),
+                        PerformanceScheme pruefungsLeistung = new PerformanceScheme();
+                        pruefungsLeistung.setName("Prüfungsleistung");
+                        pruefungsLeistung.setCalculationRule(defaultValue);
+
+                        PerformanceScheme studienLeistung = new PerformanceScheme();
+                        studienLeistung.setName("Studienleistung");
+                        studienLeistung.setCalculationRule(defaultValue);
+
+                        lecture = new Lecture();
+                        lecture.setName("Verkehr I");
+                        lecture.setInstitutes(Set.of(institutes.get(0)));
+                        lecture.setExercises(exerciseList);
+                        lecture.setPerformanceSchemes(List.of(pruefungsLeistung, studienLeistung));
+                        lectureRepository.save(lecture);
+
+                        exerciseList = Arrays.asList(
+                                        new Exercise("Übung 1", exerciseSchemes.get(0), true),
+                                        new Exercise("Übung 2", exerciseSchemes.get(0), true),
+                                        new Exercise("Übung 3", exerciseSchemes.get(0), true),
+                                        new Exercise("Übung 4", exerciseSchemes.get(0), true),
+                                        new Exercise("Übung 5", exerciseSchemes.get(0), true),
+                                        new Exercise("Übung 6", exerciseSchemes.get(0), true),
                                         new Exercise("Klausur", exerciseSchemes.get(2), false));
 
-                        lectureRepository
-                                        .save(new Lecture("Mathematik I", instituteSet2, userSet2, exerciseList, null));
+                        lecture = new Lecture();
+                        lecture.setName("Verkehr II");
+                        lecture.setInstitutes(Set.of(institutes.get(0)));
+                        lecture.setExercises(exerciseList);
+                        lecture.setPerformanceSchemes(List.of(pruefungsLeistung, studienLeistung));
+                        lectureRepository.save(lecture);
 
-                        exerciseList = Arrays.asList(new Exercise("Testat 1", exerciseSchemes.get(0), false),
-                                        new Exercise("Testat 2", exerciseSchemes.get(0), true),
-                                        new Exercise("Testat 3", exerciseSchemes.get(0), true),
+
+                        exerciseList = Arrays.asList(
+                                        new Exercise("Übung 1", exerciseSchemes.get(0), true),
+                                        new Exercise("Übung 2", exerciseSchemes.get(0), true),
+                                        new Exercise("Übung 3", exerciseSchemes.get(0), true),
+                                        new Exercise("Übung 4", exerciseSchemes.get(0), true),
+                                        new Exercise("Übung 6", exerciseSchemes.get(0), true),
                                         new Exercise("Klausur", exerciseSchemes.get(2), false));
-                        lectureRepository.save(new Lecture("Visuelle Trendanalyse", instituteSet3, userSet3,
-                                        exerciseList, null));
+
+                        lecture = new Lecture();
+                        lecture.setName("Bahn B");
+                        lecture.setInstitutes(Set.of(institutes.get(1)));
+                        lecture.setExercises(exerciseList);
+                        lecture.setPerformanceSchemes(List.of(pruefungsLeistung, studienLeistung));
+                        lectureRepository.save(lecture);
 
                         List<Lecture> lectures = lectureRepository.findAll();
 

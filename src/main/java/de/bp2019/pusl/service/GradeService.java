@@ -30,6 +30,8 @@ import de.bp2019.pusl.util.LimitOffsetPageRequest;
 
 @Service
 public class GradeService extends AbstractDataProvider<Grade, String>{
+    private static final long serialVersionUID = -8681198334128727062L;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(GradeService.class);
 
     @Autowired
@@ -81,9 +83,9 @@ public class GradeService extends AbstractDataProvider<Grade, String>{
             filter = new Grade();
         }       
         ExampleMatcher matcher = ExampleMatcher.matching()
-        .withMatcher("matrNumber", GenericPropertyMatchers.contains())
+                .withMatcher("matrNumber", GenericPropertyMatchers.contains())
+                .withMatcher("lecture", GenericPropertyMatchers.exact())
                 .withMatcher("grade", GenericPropertyMatchers.contains())
-                .withMatcher("lecture", GenericPropertyMatchers.contains())
                 .withMatcher("exercise", GenericPropertyMatchers.contains());
 
         return gradeRepository.findAll(Example.of(filter, matcher));

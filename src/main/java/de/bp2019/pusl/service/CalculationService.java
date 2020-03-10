@@ -7,24 +7,51 @@ import java.util.Optional;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.Lecture;
+import de.bp2019.pusl.model.Performance;
 import de.bp2019.pusl.model.PerformanceScheme;
-import de.bp2019.pusl.model.StudentPerformance;
 import de.bp2019.pusl.util.exceptions.JSException;
 
+@Service
 public class CalculationService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CalculationService.class);
 
-    public StudentPerformance calculatePerformance(List<Grade> grades, Lecture lecture, String matrNumber) {
+    @Autowired
+    GradeService gradeService;
+
+    public CalculationService(){}
+
+    public List<Performance> calculatePerformances(List<String> matrNumbers, Lecture lecture,
+            PerformanceScheme performanceScheme) {
+        List<Performance> result = new ArrayList<>();
+
+        matrNumbers.forEach(matrNumber -> {
+            result.add(calculatePerformance(matrNumber, lecture, performanceScheme));
+        });
+
+        return result;
+    }
+
+    public Performance calculatePerformance(String matrNumber, Lecture lecture, PerformanceScheme performanceScheme) {
+
+        Grade filter = new Grade();
+        filter.setMatrNumber(matrNumber);
+        filter.setLecture(lecture);
+        List<Grade> grades = gradeService.getAll(filter);
+        LOGGER.info(grades.toString());
 
         List<Object> gradeValues = new ArrayList<>();
 
         for (Exercise exercise : lecture.getExercises()) {
             Optional<Grade> grade = grades.stream()
-                        .filter(g -> g.getExercise().equals(exercise) && g.getMatrNumber().equals(matrNumber))
-                        .findFirst();
+                    .filter(g -> g.getExercise().equals(exercise) && g.getMatrNumber().equals(matrNumber)).findFirst();
 
             if (grade.isPresent()) {
                 if (exercise.getScheme().getIsNumeric()) {
@@ -37,14 +64,9 @@ public class CalculationService {
             }
         }
 
-        StudentPerformance result = new StudentPerformance(matrNumber, lecture);
+        String calculationResult = calculate(performanceScheme.getCalculationRule(), gradeValues.toArray());
 
-        for(PerformanceScheme performanceScheme: lecture.getPerformanceSchemes()){
-            String calculationResult = calculate(performanceScheme.getCalculationRule(), gradeValues.toArray());
-            result.setPerformance(performanceScheme, calculationResult);
-        }
-
-        return result;
+        return new Performance(matrNumber, performanceScheme, calculationResult);
     }
 
     public String calculate(String script, Object[] grades) {

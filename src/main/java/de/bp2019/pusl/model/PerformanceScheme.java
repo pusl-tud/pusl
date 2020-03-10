@@ -29,4 +29,7 @@ public class PerformanceScheme {
         this.name = name;
         this.calculationRule = calculationRule;
     }
+
+    public PerformanceScheme() {
+    }
 }

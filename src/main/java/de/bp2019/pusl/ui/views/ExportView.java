@@ -1,5 +1,10 @@
 package de.bp2019.pusl.ui.views;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -9,29 +14,21 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.bp2019.pusl.config.PuslProperties;
-import de.bp2019.pusl.model.FinalGrade;
-import de.bp2019.pusl.model.Grade;
-import de.bp2019.pusl.model.Lecture;
-import de.bp2019.pusl.model.PerformanceScheme;
-import de.bp2019.pusl.service.GradeService;
-import de.bp2019.pusl.service.LectureService;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.vaadin.firitin.components.DynamicFileDownloader;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.firitin.components.DynamicFileDownloader;
+
+import de.bp2019.pusl.config.PuslProperties;
+import de.bp2019.pusl.model.Lecture;
+import de.bp2019.pusl.model.Performance;
+import de.bp2019.pusl.model.PerformanceScheme;
+import de.bp2019.pusl.service.CalculationService;
+import de.bp2019.pusl.service.LectureService;
+import de.bp2019.pusl.ui.interfaces.AccessibleByWimi;
+import de.bp2019.pusl.util.ExcelExporter;
+import de.bp2019.pusl.util.ExcelUtil;
 
 /**
  * View to calculate and list the Final Grades and export them as a Excelsheet;
@@ -41,46 +38,42 @@ import java.util.stream.Stream;
 
 @PageTitle(PuslProperties.NAME + " | Export")
 @Route(value = ExportView.ROUTE, layout = MainAppView.class)
-public class ExportView extends BaseView {
+public class ExportView extends BaseView implements AccessibleByWimi {
 
     private static final long serialVersionUID = 1L;
     public static final String ROUTE = "export";
 
-    private ListDataProvider<FinalGrade> exportDataProvider;
+    private List<Performance> performanceList;
+    private ListDataProvider<Performance> performanceDataProvider;
 
-    private Grade filter;
+    private CalculationService calculationService;
 
-    XSSFWorkbook excelDownload = new XSSFWorkbook();
-    XSSFSheet worksheet = excelDownload.createSheet();
-    int rowNr = 0;
-    int colNr = 0;
-    XSSFRow row;
-    XSSFCell cell;
-    Font headerFont;
-    Font font;
+    private MemoryBuffer uploadBuffer;
 
-    Stream<FinalGrade> dataStream;
-    List<String> keyList;
-
+    private Select<Lecture> lectureSelect;
+    private Select<PerformanceScheme> performanceSchemeSelect;
 
     @Autowired
-    public ExportView(GradeService gradeService, LectureService lectureService) {
+    public ExportView(LectureService lectureService, CalculationService calculationService) {
         super("Noten exportieren");
-        LOGGER.debug("Started creation of ExportView");
 
-        filter = new Grade();
+        this.calculationService = calculationService;
+
+        performanceList = new ArrayList<>();
+        performanceDataProvider = new ListDataProvider<>(performanceList);
+
+        uploadBuffer = new MemoryBuffer();
 
         /* ######## Select Components ######## */
         FormLayout selectLayout = new FormLayout();
 
-        Select<Lecture> lectureSelect = new Select<>();
-        List<Lecture> allLectures = lectureService.getAll();
+        lectureSelect = new Select<>();
         lectureSelect.setItemLabelGenerator(Lecture::getName);
-        lectureSelect.setItems(allLectures);
-        lectureSelect.setLabel("Modul");
+        lectureSelect.setDataProvider(lectureService);
+        lectureSelect.setLabel("Veranstaltung");
         selectLayout.add(lectureSelect);
 
-        Select<PerformanceScheme> performanceSchemeSelect = new Select<>();
+        performanceSchemeSelect = new Select<>();
         performanceSchemeSelect.setItemLabelGenerator(PerformanceScheme::getName);
         performanceSchemeSelect.setLabel("Berechnungsregel");
         performanceSchemeSelect.setEnabled(false);
@@ -92,11 +85,9 @@ public class ExportView extends BaseView {
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
 
-        MemoryBuffer buffer = new MemoryBuffer();
-        Upload upload = new Upload(buffer);
-        Button uploadButton = new Button("Matrikelnummern hochladen");
+        Upload upload = new Upload(uploadBuffer);
         upload.setDropLabel(new Span("Excelliste hier abelegen"));
-        upload.setUploadButton(uploadButton);
+        upload.setUploadButton(new Button("Matrikelnummern hochladen"));
         upload.setAcceptedFileTypes(".xlsx");
         buttonLayout.add(upload);
 
@@ -107,40 +98,17 @@ public class ExportView extends BaseView {
 
         add(buttonLayout);
 
-        /* ######## Grid for the calculated FinalGrades ######## */
+        /* ######## Grid for the calculated Performances ######## */
 
-        List<FinalGrade> finalGradeList = new ArrayList<>();
-        Grid<FinalGrade> exportGrid = new Grid<>();
+        Grid<Performance> performanceGrid = new Grid<>();
+        performanceGrid.setDataProvider(performanceDataProvider);
 
-        exportDataProvider = new ListDataProvider<>(finalGradeList);
-        exportGrid.setDataProvider(exportDataProvider);
+        performanceGrid.addColumn(Performance::getMatriculationNumber).setHeader("Matrikel-Nummer").setAutoWidth(true);
+        performanceGrid.addColumn(Performance::getGrade).setHeader("Note").setAutoWidth(true);
 
-        exportGrid.addColumn(item -> item.getMatrikelNumber()).setHeader("Matrikel-Nummer").setAutoWidth(true).setKey("matrNum");
-        exportGrid.addColumn(item -> item.getFinalGrade()).setHeader("Note").setAutoWidth(true).setKey("grades");
+        add(performanceGrid);
 
-        add(exportGrid);
-
-
-        /* ######## Excel import  ######## */
-
-        List<String> matrikelList = new ArrayList<String>();
-
-        upload.addSucceededListener(event -> {
-            try {
-                matrikelList.clear();
-                XSSFWorkbook workbook = new XSSFWorkbook(buffer.getInputStream());
-                XSSFSheet worksheet = workbook.getSheetAt(0);
-
-                for (int i = 0; i < worksheet.getPhysicalNumberOfRows(); i++) {
-                    XSSFRow row = worksheet.getRow(i);
-                    matrikelList.add(i, row.getCell(0).getRawValue());
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-
-        /* ######## Click Listeners  ######## */
+        /* ######## Listeners ######## */
 
         lectureSelect.addValueChangeListener(event -> {
             if (event.getValue() != null) {
@@ -153,131 +121,57 @@ public class ExportView extends BaseView {
             }
         });
 
-        calculateButton.addClickListener(event -> {
-            exportDataProvider.getItems().clear();
-            filter.setLecture(lectureSelect.getValue());
-
-            matrikelList.forEach(item -> {
-                FinalGrade tmp = new FinalGrade();
-                tmp.setLecture(lectureSelect.getValue());
-                tmp.setPerformanceScheme(performanceSchemeSelect.getValue());
-                filter.setMatrNumber(item);
-                List<Grade> gradeList;
-                gradeList = gradeService.getAll(filter);
-
-                if (gradeList.size() == 0) {
-                    tmp.setMatrikelNumber(item);
-                    tmp.setFinalGrade("Keine Noten vorhanden");
-                } else {
-                    tmp.setMatrikelNumber(item);
-                    Float grade = 0f;
-
-                    for (int i = 0; i < gradeList.size(); i++) {
-                        grade = Float.parseFloat(gradeList.get(i).getGrade().replace(",", ".")) + grade;
-                    }
-
-                    grade = grade / gradeList.size();
-                    tmp.setFinalGrade(grade.toString().replace(".", ","));
-                }
-                finalGradeList.add(tmp);
-            });
-
-            exportDataProvider.refreshAll();
-
-            List<Grid.Column<FinalGrade>> columns = exportGrid.getColumns().stream().filter(item -> item.getKey() != null && item.isVisible()).collect(Collectors.toList());
-            Query streamQuery = new Query(0, exportGrid.getDataProvider().size(new Query<>()),
-                    exportGrid.getDataCommunicator().getBackEndSorting(), exportGrid.getDataCommunicator().getInMemorySorting(), null);
-            dataStream = exportGrid.getDataProvider().fetch(streamQuery);
-
-            keyList = new ArrayList<>();
-
-            columns.forEach(item -> {
-                keyList.add(item.getKey());
-            });
-
+        upload.addSucceededListener(event -> {
+            refreshGrid();
         });
 
-        /* ######## Excel Download Button  ######## */
+        performanceSchemeSelect.addValueChangeListener(event -> {
+            refreshGrid();
+        });
+
+        /* ######## Excel Download Button ######## */
 
         DynamicFileDownloader downloadButton = new DynamicFileDownloader("Download Excel", "endnoten.xlsx",
                 outputStream -> {
                     try {
-                        outputStream.write(ExcelExporter(dataStream, keyList));
+                        ExcelExporter<Performance> exporter = new ExcelExporter<Performance>();
+                        exporter.setItems(performanceList);
+                        exporter.addColumn(Performance::getMatriculationNumber);
+                        exporter.addColumn(Performance::getGrade);
+                        exporter.write(outputStream);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 });
 
         add(downloadButton);
-
     }
 
-    /* ######## Excel file creator  ######## */
-
-    public byte[] ExcelExporter(Stream<FinalGrade> dataStream, List<String> keyList) throws IOException {
-        resetContent();
-        buildHeader(keyList);
-        dataStream.forEach(item -> {
-            buildRow(item);
-        });
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    private void refreshGrid() {
+        List<String> matrNumbers = new ArrayList<String>();
         try {
-            excelDownload.write(bos);
-        } finally {
-            bos.close();
-        }
-        byte[] bytes = bos.toByteArray();
-        return bytes;
-    }
-
-    public void onNewRow() {
-        row = worksheet.createRow(rowNr);
-        rowNr++;
-        colNr = 0;
-    }
-
-    public void onNewCell() {
-        cell = row.createCell(colNr);
-        colNr++;
-    }
-
-    public void buildHeader(List<String> keylist) {
-        onNewRow();
-        onNewCell();
-        keylist.forEach(item -> {
-            switch (item) {
-                case ("matrNum"):
-                    cell.setCellValue("Matrikel-Nummer");
-                    break;
-                case ("grades"):
-                    cell.setCellValue("Note");
-                    break;
+            if (uploadBuffer.getInputStream().available() > 0) {
+                matrNumbers = ExcelUtil.readColumnToList(uploadBuffer.getInputStream(), 0);
             }
-            onNewCell();
-        });
-    }
 
-    public void buildRow(FinalGrade finalGrade) {
-        onNewRow();
-        onNewCell();
-        cell.setCellValue(finalGrade.getMatrikelNumber());
-        onNewCell();
-        cell.setCellValue(finalGrade.getFinalGrade());
-    }
+            uploadBuffer.getInputStream().close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-    public void resetContent() {
-        excelDownload = new XSSFWorkbook();
-        worksheet = excelDownload.createSheet();
-        colNr = 0;
-        rowNr = 0;
-        row = null;
-        cell = null;
-        headerFont = excelDownload.createFont();
-        headerFont.setFontName("Arial");
-        headerFont.setBold(true);
-        font = excelDownload.createFont();
-        font.setFontName("Arial");
-    }
+        Lecture lecture = lectureSelect.getValue();
+        PerformanceScheme performanceScheme = performanceSchemeSelect.getValue();
 
+        if (lecture != null && performanceScheme != null) {
+            performanceList.clear();
+            performanceList.addAll(calculationService.calculatePerformances(matrNumbers, lecture, performanceScheme));
+        } else {
+            performanceList.clear();
+            performanceList.addAll(
+                    matrNumbers.stream().map(matr -> new Performance(matr, null, "")).collect(Collectors.toList()));
+        }
+        LOGGER.info(performanceList.toString());
+        performanceDataProvider.refreshAll();
+    }
 }

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,12 +101,12 @@ public class ManageExerciseSchemesViewIT extends BaseUITest {
 
         goToURL(ManageExerciseSchemesView.ROUTE);
 
-        ExerciseScheme exerciseScheme = exerciseSchemeRepository.findByName(exerciseSchemeName);
-        String id = exerciseScheme.getId();
+        ExerciseScheme exerciseScheme = exerciseSchemeRepository.findByName(exerciseSchemeName).get();
+        ObjectId id = exerciseScheme.getId();
 
         findButtonContainingText(exerciseSchemeName).click();
 
-        waitForURL(EditExerciseSchemeView.ROUTE + "/" + id);
+        waitForURL(EditExerciseSchemeView.ROUTE + "/" + id.toString());
 
         findElementById("numeric").click();
 
@@ -126,17 +127,17 @@ public class ManageExerciseSchemesViewIT extends BaseUITest {
 
         goToURL(ManageExerciseSchemesView.ROUTE);
 
-        ExerciseScheme exerciseScheme = exerciseSchemeRepository.findByName(exerciseSchemeName);
-        String id = exerciseScheme.getId();
+        ExerciseScheme exerciseScheme = exerciseSchemeRepository.findByName(exerciseSchemeName).get();
+        ObjectId id = exerciseScheme.getId();
 
         /* click delete button */
-        findElementById("delete-" + id).click();
+        findElementById("delete-" + id.toString()).click();
         /* confirm delete button */
         findButtonContainingText("Löschen").click();
 
         waitUntilDialogVisible("gelöscht");
 
-        assertTrue(exerciseSchemeRepository.findById(id).isEmpty());
+        assertTrue(exerciseSchemeRepository.findById(id.toString()).isEmpty());
     }
 
     /**

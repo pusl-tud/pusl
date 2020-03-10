@@ -6,11 +6,9 @@ import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -20,9 +18,14 @@ import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.service.ExerciseSchemeService;
+import de.bp2019.pusl.ui.dialogs.ConfirmDeletionDialog;
+import de.bp2019.pusl.ui.dialogs.ErrorDialog;
+import de.bp2019.pusl.ui.dialogs.SuccessDialog;
 import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
+import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
  * View that displays a list of all Exercises
@@ -31,7 +34,7 @@ import de.bp2019.pusl.ui.views.MainAppView;
  **/
 @PageTitle(PuslProperties.NAME + " | Übungsschemas")
 @Route(value = ManageExerciseSchemesView.ROUTE, layout = MainAppView.class)
-public class ManageExerciseSchemesView extends BaseView implements AccessibleByAdmin{
+public class ManageExerciseSchemesView extends BaseView implements AccessibleByAdmin {
 
     private static final long serialVersionUID = 1L;
 
@@ -39,22 +42,18 @@ public class ManageExerciseSchemesView extends BaseView implements AccessibleByA
 
     private ExerciseSchemeService exerciseSchemeService;
 
-    private ListDataProvider<ExerciseScheme> exerciseSchemeDataProvider;
-
     @Autowired
     public ManageExerciseSchemesView(ExerciseSchemeService exerciseSchemeService) {
         super("Übungsschemas");
 
         this.exerciseSchemeService = exerciseSchemeService;
- 
-        exerciseSchemeDataProvider = new ListDataProvider<>(exerciseSchemeService.getAllExerciseSchemes());
 
         /* -- Create Components -- */
 
         Grid<ExerciseScheme> grid = new Grid<>();
 
         grid.setWidth("100%");
-        grid.setDataProvider(exerciseSchemeDataProvider);
+        grid.setDataProvider(exerciseSchemeService);
 
         grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true);
         grid.addComponentColumn(item -> createInstitutesTag(item)).setAutoWidth(true);
@@ -115,44 +114,21 @@ public class ManageExerciseSchemesView extends BaseView implements AccessibleByA
      * @author Luca Dinies
      */
     private Button createDeleteButton(ExerciseScheme exerciseScheme) {
-
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {
-            Dialog dialog = new Dialog();
-            exerciseSchemeService.deleteExerciseScheme(exerciseScheme);
-            dialog.add(new Text("Wirklich Löschen?"));
-            dialog.setCloseOnEsc(false);
-            dialog.setCloseOnOutsideClick(false);
-
-            Button confirmButton = new Button("Löschen", event -> {
+            ConfirmDeletionDialog.open(exerciseScheme.getName(), () -> {
                 try {
-                    exerciseSchemeService.deleteExerciseScheme(exerciseScheme);
-                    exerciseSchemeDataProvider.getItems().remove(exerciseScheme);
-                    exerciseSchemeDataProvider.refreshAll();
-
-                    dialog.close();
-                    Dialog answerDialog = new Dialog();
-                    answerDialog.add(new Text("Übungsschema '" + exerciseScheme.getName() + "' gelöscht"));
-                    answerDialog.open();
-                } catch (Exception e) {
-                    Dialog answerDialog = new Dialog();
-                    answerDialog.add(new Text("Fehler beim Löschen des Übungsschemas!"));
-                    answerDialog.open();
-                    LOGGER.error("Could not delete ExerciseScheme! ExerciseScheme ID was: " + exerciseScheme.getId());
+                    exerciseSchemeService.delete(exerciseScheme);
+                    exerciseSchemeService.refreshAll();
+                    SuccessDialog.open(exerciseScheme.getName() + " erfolgreich gelöscht");
+                } catch (UnauthorizedException e) {
+                    UI.getCurrent().navigate(LecturesView.ROUTE);
+                    ErrorDialog.open("Nicht authorisiert um Übungsschema zu löschen!");
                 }
             });
-
-            Button cancelButton = new Button("Abbruch", event -> {
-                dialog.close();
-            });
-
-            dialog.add(confirmButton, cancelButton);
-            dialog.open();
-
         });
-
-        button.setId("delete-" + exerciseScheme.getId());
-
         button.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_ERROR);
+        /** makes testing a lot easier */
+        button.setId("delete-" + exerciseScheme.getId().toString());
         return button;
     }
 

@@ -305,8 +305,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         Select<Lecture> lectureSelect = new Select<>();
         lectureSelect.setItemLabelGenerator(Lecture::getName);
-        List<Lecture> lectures = lectureService.getAll();
-        lectureSelect.setItems(lectures);
+        lectureSelect.setDataProvider(lectureService);
         lectureSelect.setPlaceholder("Modul");
         lectureSelect.setLabel("Modul");
         form.add(lectureSelect);
@@ -418,7 +417,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         Location location = event.getLocation();
         QueryParameters queryParameters = location.getQueryParameters();
 
-        List<Lecture> allLectures = lectureService.getAll();
+        List<Lecture> allLectures = lectureService.fetch(new Query<Lecture, String>()).collect(Collectors.toList());
         Lecture cleanLecture = new Lecture("Alle Anzeigen", null, null, null, null);
         allLectures.add(0, cleanLecture);
         lectureDataProvider.getItems().addAll(allLectures);

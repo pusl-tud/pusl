@@ -6,11 +6,9 @@ import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -20,9 +18,14 @@ import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.service.LectureService;
+import de.bp2019.pusl.ui.dialogs.ConfirmDeletionDialog;
+import de.bp2019.pusl.ui.dialogs.ErrorDialog;
+import de.bp2019.pusl.ui.dialogs.SuccessDialog;
 import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
+import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
  * View that displays a list of all {@link Lecture}s accessible by the active
@@ -33,14 +36,13 @@ import de.bp2019.pusl.ui.views.MainAppView;
  */
 @PageTitle(PuslProperties.NAME + " | Veranstaltungen verwalten")
 @Route(value = ManageLecturesView.ROUTE, layout = MainAppView.class)
-public class ManageLecturesView extends BaseView implements AccessibleByAdmin{
+public class ManageLecturesView extends BaseView implements AccessibleByAdmin {
 
     private static final long serialVersionUID = 1L;
 
     public static final String ROUTE = "admin/lectures";
 
     private LectureService lectureService;
-    private ListDataProvider<Lecture> lectureDataProvider;
 
     @Autowired
     public ManageLecturesView(LectureService lectureService) {
@@ -48,14 +50,12 @@ public class ManageLecturesView extends BaseView implements AccessibleByAdmin{
 
         this.lectureService = lectureService;
 
-        lectureDataProvider = new ListDataProvider<>(lectureService.getAll());
-
         /* -- Create Components -- */
 
         Grid<Lecture> grid = new Grid<>();
 
         grid.setWidth("100%");
-        grid.setDataProvider(lectureDataProvider);
+        grid.setDataProvider(lectureService);
 
         grid.addComponentColumn(item -> createNameButton(item)).setAutoWidth(true);
         grid.addComponentColumn(item -> createInstitutesTag(item)).setAutoWidth(true);
@@ -116,37 +116,20 @@ public class ManageLecturesView extends BaseView implements AccessibleByAdmin{
      */
     protected Button createDeleteButton(Lecture lecture) {
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {
-            Dialog dialog = new Dialog();
-            dialog.add(new Text("Wirklich Löschen?"));
-            dialog.setCloseOnEsc(false);
-            dialog.setCloseOnOutsideClick(false);
-
-            Button confirmButton = new Button("Löschen", event -> {
+            ConfirmDeletionDialog.open(lecture.getName(), () -> {
                 try {
                     lectureService.delete(lecture);
-                    lectureDataProvider.getItems().remove(lecture);
-                    lectureDataProvider.refreshAll();
-
-                    dialog.close();
-                    Dialog answerDialog = new Dialog();
-                    answerDialog.add(new Text("Veranstaltung '" + lecture.getName() + "' gelöscht"));
-                    answerDialog.open();
-                } catch(Exception e){                    
-                    Dialog answerDialog = new Dialog();
-                    answerDialog.add(new Text("Fehler beim Löschen der Veranstaltung!"));
-                    answerDialog.open();
-                    LOGGER.error("Could not delete Lecture! Lecture ID was: " + lecture.getId());
+                    lectureService.refreshAll();
+                    SuccessDialog.open(lecture.getName() + " erfolgreich gelöscht");
+                } catch (UnauthorizedException e) {
+                    UI.getCurrent().navigate(LecturesView.ROUTE);
+                    ErrorDialog.open("Nicht authorisiert um Veranstaltung zu löschen!");
                 }
             });
-
-            Button cancelButton = new Button("Abbruch", event -> {
-                dialog.close();
-            });
-
-            dialog.add(confirmButton, cancelButton);
-            dialog.open();
         });
         button.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_ERROR);
+        /** makes testing a lot easier */
+        button.setId("delete-" + lecture.getId().toString());
         return button;
     }
 }

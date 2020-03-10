@@ -1,9 +1,9 @@
 package de.bp2019.pusl.ui.views;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.accordion.Accordion;
@@ -14,6 +14,7 @@ import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
@@ -39,8 +40,7 @@ public class LecturesView extends BaseView {
     public LecturesView(LectureService lectureService) {
         super("Meine Veranstaltungen");
 
-        List<Lecture> lectures = new ArrayList<>();
-        lectures.addAll(lectureService.getAll());
+        List<Lecture> lectures = lectureService.fetch(new Query<Lecture, String>()).collect(Collectors.toList());
 
         for (Lecture l : lectures) {
 

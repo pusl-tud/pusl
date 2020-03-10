@@ -3,11 +3,9 @@ package de.bp2019.pusl.ui.views.lecture;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.textfield.TextField;
@@ -18,7 +16,6 @@ import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.NotFoundException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -39,10 +36,12 @@ import de.bp2019.pusl.ui.components.ExerciseComposer;
 import de.bp2019.pusl.ui.components.PerformanceSchemeComposer;
 import de.bp2019.pusl.ui.components.VerticalTabs;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
+import de.bp2019.pusl.ui.dialogs.SuccessDialog;
 import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.util.exceptions.DataNotFoundException;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
@@ -67,10 +66,8 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
         /** Binder to bind the form Data to an Object */
         private Binder<Lecture> binder;
 
-        /**
-         * null if a new {@link Lecture} is being created
-         */
-        private ObjectId objectId;
+        /** empty if new institute is being created */
+        private Optional<ObjectId> lectureId = Optional.empty();
 
         private HiwiDataProvider hiwiDataProvider;
 
@@ -160,46 +157,57 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 });
 
                 save.addClickListener(event -> {
+
+                        if(!lectureService.checkNameAvailable(name.getValue(), lectureId)){
+                                ErrorDialog.open("Name bereits vergeben");
+                                return;
+                        }
+
                         Lecture lecture = new Lecture();
+
                         if (binder.writeBeanIfValid(lecture)) {
-                                if (objectId != null) {
-                                        lecture.setId(objectId);
+                                if (lectureId.isPresent()) {
+                                        lecture.setId(lectureId.get());
                                 }
                                 try {
                                         lectureService.save(lecture);
-                                        Dialog dialog = new Dialog();
-                                        dialog.add(new Text("Veranstaltungsschema erfolgreich gespeichert"));
                                         UI.getCurrent().navigate(ManageLecturesView.ROUTE);
-                                        dialog.open();
-                                } finally {
-                                        // TODO: implement ErrorHandeling
+                                        SuccessDialog.open("Veranstaltung erfolgreich gespeichert");
+                                } catch (UnauthorizedException e) {
+                                        ErrorDialog.open("nicht authorisiert um Veranstaltung zu speichern!");
                                 }
-
                         } else {
                                 BinderValidationStatus<Lecture> validate = binder.validate();
                                 String errorText = validate.getFieldValidationStatuses().stream()
                                                 .filter(BindingValidationStatus::isError)
                                                 .map(BindingValidationStatus::getMessage).map(Optional::get).distinct()
                                                 .collect(Collectors.joining(", "));
-                                LOGGER.debug("There are errors: " + errorText);
+                                LOGGER.info("Lecture could not be saved because of validation errors. Errors were: " + errorText);
                         }
                 });
         }
 
         @Override
-        public void setParameter(BeforeEvent event, String lectureId) {
-                if (lectureId.equals("new")) {
-                        objectId = null;
+        public void setParameter(BeforeEvent event, String idParameter) {
+
+                if (idParameter.equals("new")) {
+                        lectureId = Optional.empty();
                         /* clear fields by setting null */
                         binder.readBean(null);
                 } else {
-                        Lecture fetchedLecture = lectureService.getById(lectureId);
-                        /* getById returns null if no matching Lecture is found */
-                        if (fetchedLecture == null) {
-                                throw new NotFoundException();
-                        } else {
-                                objectId = fetchedLecture.getId();
+                        try {
+                                Lecture fetchedLecture;
+                                fetchedLecture = lectureService.getById(idParameter);                                
+                                lectureId = Optional.of(fetchedLecture.getId());
                                 binder.readBean(fetchedLecture);
+                        } catch (UnauthorizedException e) {
+                                event.rerouteTo(LecturesView.ROUTE);
+                                UI.getCurrent().navigate(LecturesView.ROUTE);      
+                                ErrorDialog.open("Nicht authorisiert um Veranstaltung zu bearbeiten!");
+                        } catch (DataNotFoundException e) {                   
+                                event.rerouteTo(LecturesView.ROUTE);       
+                                UI.getCurrent().navigate(LecturesView.ROUTE); 
+                                ErrorDialog.open("Veranstaltung nicht in Datenbank gefunden!");    
                         }
                 }
         }

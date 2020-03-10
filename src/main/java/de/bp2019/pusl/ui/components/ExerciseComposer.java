@@ -19,6 +19,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
 import org.slf4j.Logger;
@@ -47,8 +48,6 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
 
     private TextField nameTextField;
     private Select<ExerciseScheme> exerciseSchemeSelect;
-
-    private List<ExerciseScheme> allExerciseSchemes;
 
     public ExerciseComposer(ExerciseSchemeService exerciseSchemeService) {
         setWidth("100%");
@@ -79,11 +78,10 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
 
         exerciseSchemeSelect = new Select<>();
         exerciseSchemeSelect.setItemLabelGenerator(ExerciseScheme::getName);
-        allExerciseSchemes = exerciseSchemeService.getAllExerciseSchemes();
-        exerciseSchemeSelect.setItems(allExerciseSchemes);
-        if (allExerciseSchemes.size() > 0) {
-            exerciseSchemeSelect.setValue(allExerciseSchemes.get(0));
-        }
+        exerciseSchemeSelect.setDataProvider(exerciseSchemeService);
+        // if (allExerciseSchemes.size() > 0) {
+        //     exerciseSchemeSelect.setValue(allExerciseSchemes.get(0));
+        // }
         formLayout.add(exerciseSchemeSelect, 1);
 
         Button exerciseSchemesButton = new Button("hinzufügen", new Icon(VaadinIcon.PLUS_CIRCLE));
@@ -125,7 +123,7 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
 
         grid.asSingleSelect().addValueChangeListener(event -> {
             nameTextField.setValue(event.getValue().getName());
-            ExerciseScheme exerciseScheme = allExerciseSchemes.stream()
+            ExerciseScheme exerciseScheme = exerciseSchemeService.fetch(new Query<ExerciseScheme, String>())
                     .filter(es -> es.getId().equals(event.getValue().getScheme().getId())).findFirst().get();
             exerciseSchemeSelect.setValue(exerciseScheme);
         });
