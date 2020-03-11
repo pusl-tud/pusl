@@ -124,6 +124,8 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         actions.add(save);
         actions.setHorizontalComponentAlignment(FlexComponent.Alignment.END, save);
         form.add(actions);
+        
+        add(form);
 
         binder.forField(name).withValidator(new StringLengthValidator("Bitte Namen der Übung eingeben", 1, null))
                 .bind(ExerciseScheme::getName, ExerciseScheme::setName);
@@ -171,10 +173,6 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
                 LOGGER.info("ExerciseScheme could not be saved because of validation errors. Errors were: " + errorText);
             }
         });
-
-        /* Add Layout to Component */
-
-        add(form);
     }
 
     @Override

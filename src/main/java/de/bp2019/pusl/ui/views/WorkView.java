@@ -1,14 +1,14 @@
 package de.bp2019.pusl.ui.views;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -33,13 +33,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.firitin.components.DynamicFileDownloader;
 
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Exercise;
@@ -47,8 +43,9 @@ import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
+import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.components.VerticalTabs;
-import org.vaadin.firitin.components.DynamicFileDownloader;
+import de.bp2019.pusl.util.ExcelExporter;
 
 
 /**
@@ -83,25 +80,13 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
     private Map<String, List<String>> parametersMap;
 
-    XSSFWorkbook excelDownload = new XSSFWorkbook();
-    XSSFSheet worksheet = excelDownload.createSheet();
-    int rowNr = 0;
-    int colNr = 0;
-    XSSFRow row;
-    XSSFCell cell;
-    Font headerFont;
-    Font font;
-
-    Stream<Grade> dataStream;
-    List<String> keyList;
-
     /**
      * Filter for the Database Query, lookup Spring Data Query by Example!
      */
     private Grade filter;
 
     @Autowired
-    public WorkView(GradeService gradeService, LectureService lectureService) {
+    public WorkView(GradeService gradeService, LectureService lectureService, UserService userService) {
         super("Noten eintragen");
         LOGGER.debug("Started creation of WorkView");
 
@@ -197,7 +182,31 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         DynamicFileDownloader downloadButton = new DynamicFileDownloader("Download als Excelliste", "Notenliste.xlsx",
                 outputStream -> {
                     try {
-                        outputStream.write(ExcelExporter());
+                        ExcelExporter<Grade> excelExporter = new ExcelExporter<Grade>();
+                        
+                        excelExporter.setItems(new ArrayList<>(gradeDataProvider.getItems()));
+                        excelExporter.addColumn("Matr.Nummer", Grade::getMatrNumber);
+                        excelExporter.addColumn("Note", Grade::getGrade);
+                        excelExporter.addColumn("Veranstaltung", grade -> grade.getLecture().getName());
+                        excelExporter.addColumn("Übung", grade -> grade.getExercise().getName());
+                        excelExporter.addColumn("eingetragen von", grade -> {
+                            // TODO : nullabilität entfernen
+                            if(grade.getGradedBy() == null){
+                                return "";
+                            } else{
+                                return UserService.getFullName(grade.getGradedBy());
+                            }
+                        });
+                        excelExporter.addColumn("Datum", grade -> {
+                            // TODO : nullabilität entfernen
+                            if(grade.getLastModified() == null){
+                                return "";
+                            } else{
+                                return grade.getLastModified().format(DateTimeFormatter.RFC_1123_DATE_TIME);
+                            }
+                        });
+
+                        excelExporter.write(outputStream);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -369,6 +378,8 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
                 if (objectId != null) {
                     grade.setId(objectId);
                 }
+                grade.setLastModified(LocalDateTime.now());
+                grade.setGradedBy(userService.currentUser());
                 try {
                     gradeService.save(grade);
                 } finally {
@@ -452,111 +463,5 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             martrNumberFilter.setValue(parameterMartrikelNumber);
         }
 
-    }
-
-    public byte[] ExcelExporter() throws IOException {
-        resetContent();
-        createDataStream();
-        buildHeader(keyList);
-        dataStream.forEach(item -> {
-            buildRow(item, keyList);
-        });
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try {
-            excelDownload.write(bos);
-        } finally {
-            bos.close();
-        }
-        byte[] bytes = bos.toByteArray();
-        return bytes;
-
-    }
-
-    public void createDataStream() {
-        List<Grid.Column<Grade>> columns = grid.getColumns().stream().filter(item -> item.getKey() != null && item.isVisible()).collect(Collectors.toList());
-        keyList = new ArrayList<>();
-        columns.forEach(item -> {
-            keyList.add(item.getKey());
-        });
-
-        Query streamQuery = new Query(0, grid.getDataProvider().size(new Query<>()),
-                grid.getDataCommunicator().getBackEndSorting(), grid.getDataCommunicator().getInMemorySorting(), null);
-        dataStream = grid.getDataProvider().fetch(streamQuery);
-    }
-
-    public void buildRow(Grade grade, List<String> keylist) {
-        onNewRow();
-        onNewCell();
-        keyList.forEach(item -> {
-            switch (item) {
-                case ("matrNum"):
-                    cell.setCellValue(grade.getMatrNumber());
-                    break;
-                case ("lecture"):
-                    cell.setCellValue(grade.getLecture().getName());
-                    break;
-                case ("exercise"):
-                    cell.setCellValue(grade.getExercise().getName());
-                    break;
-                case ("handin"):
-                    cell.setCellValue(grade.getHandIn().toString());
-                    break;
-                case ("grade"):
-                    cell.setCellValue(grade.getGrade());
-                    break;
-            }
-            onNewCell();
-        });
-    }
-
-    public void buildHeader(List<String> keylist) {
-        onNewRow();
-        onNewCell();
-        keylist.forEach(item -> {
-            switch (item) {
-                case ("matrNum"):
-                    cell.setCellValue("Matrikel-Nummer");
-                    break;
-                case ("lecture"):
-                    cell.setCellValue("Modul");
-                    break;
-                case ("exercise"):
-                    cell.setCellValue("Übung");
-                    break;
-                case ("handin"):
-                    cell.setCellValue("Ausgabedatum");
-                    break;
-                case ("grade"):
-                    cell.setCellValue("Note");
-                    break;
-            }
-            onNewCell();
-        });
-    }
-
-    public void onNewRow() {
-        row = worksheet.createRow(rowNr);
-        rowNr++;
-        colNr = 0;
-    }
-
-    public void onNewCell() {
-        cell = row.createCell(colNr);
-        colNr++;
-    }
-
-    public void resetContent() {
-        excelDownload = new XSSFWorkbook();
-        worksheet = excelDownload.createSheet();
-        colNr = 0;
-        rowNr = 0;
-        row = null;
-        cell = null;
-        headerFont = excelDownload.createFont();
-        headerFont.setFontName("Arial");
-        headerFont.setBold(true);
-        font = excelDownload.createFont();
-        font.setFontName("Arial");
     }
 }

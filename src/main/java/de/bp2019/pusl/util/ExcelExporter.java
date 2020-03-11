@@ -8,21 +8,32 @@ import java.util.List;
 import com.vaadin.flow.function.ValueProvider;
 
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+
+/**
+ * 
+ * @param <T>
+ * @author Luca Dinies, Leon Chemnitz
+ */
 public class ExcelExporter<T> {
 
     private List<ValueProvider<T, String>> valueProviders;
     private List<T> items;
+    private List<String> headers;
 
     public ExcelExporter(){
         valueProviders = new ArrayList<ValueProvider<T, String>>();
         items = new ArrayList<T>();
+        headers = new ArrayList<String>();
     }
     
-    public void addColumn(ValueProvider<T, String> valueProvider){
+    public void addColumn(String header, ValueProvider<T, String> valueProvider){
+        headers.add(header);
         valueProviders.add(valueProvider);
     }
 
@@ -34,8 +45,22 @@ public class ExcelExporter<T> {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet worksheet = workbook.createSheet();
 
+        XSSFCellStyle headerStyle = workbook.createCellStyle();
+        XSSFFont headerFont = workbook.createFont();
+        headerFont.setFontName("Arial");
+        headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+
+        XSSFRow headerRow = worksheet.createRow(0);
+        for(int i = 0; i < headers.size(); i++){
+            XSSFCell cell = headerRow.createCell(i);
+            cell.setCellValue(headers.get(i));
+            cell.setCellStyle(headerStyle);
+        }
+
         for(int i = 0; i < items.size(); i++){
-            XSSFRow row = worksheet.createRow(i);            
+            /* +1 because of header */
+            XSSFRow row = worksheet.createRow(i + 1);            
             for(int j = 0; j < valueProviders.size(); j++){
                 XSSFCell cell = row.createCell(j);
 
@@ -44,57 +69,11 @@ public class ExcelExporter<T> {
             }
         }
 
+        for(int i = 0; i < headers.size(); i++){
+            worksheet.autoSizeColumn(i);
+        }
+
         workbook.write(outputStream);
         workbook.close();
     }
-
-    // public void onNewRow() {
-    //     row = worksheet.createRow(rowNr);
-    //     rowNr++;
-    //     colNr = 0;
-    // }
-
-    // public void onNewCell() {
-    //     cell = row.createCell(colNr);
-    //     colNr++;
-    // }
-
-    // public void buildHeader(List<String> keylist) {
-    //     onNewRow();
-    //     onNewCell();
-    //     keylist.forEach(item -> {
-    //         switch (item) {
-    //             case ("matrNum"):
-    //                 cell.setCellValue("Matrikel-Nummer");
-    //                 break;
-    //             case ("grades"):
-    //                 cell.setCellValue("Note");
-    //                 break;
-    //         }
-    //         onNewCell();
-    //     });
-    // }
-
-    // private void buildRow(FinalGrade finalGrade) {
-    //     onNewRow();
-    //     onNewCell();
-    //     cell.setCellValue(finalGrade.getMatrikelNumber());
-    //     onNewCell();
-    //     cell.setCellValue(finalGrade.getFinalGrade());
-    // }
-
-    // private void resetContent() {
-    //     workbook = new XSSFWorkbook();
-    //     worksheet = workbook.createSheet();
-    //     colNr = 0;
-    //     rowNr = 0;
-    //     row = null;
-    //     cell = null;
-    //     headerFont = workbook.createFont();
-    //     headerFont.setFontName("Arial");
-    //     headerFont.setBold(true);
-    //     font = workbook.createFont();
-    //     font.setFontName("Arial");
-    // }
-
 }

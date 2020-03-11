@@ -81,12 +81,12 @@ public class GradeService extends AbstractDataProvider<Grade, String>{
     public List<Grade> getAll(Grade filter) {
         if(filter == null){
             filter = new Grade();
-        }       
+        }        
+        // filter.setLectureRef(filter.getLectureEmb());
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withMatcher("matrNumber", GenericPropertyMatchers.contains())
-                .withMatcher("lecture", GenericPropertyMatchers.exact())
-                .withMatcher("grade", GenericPropertyMatchers.contains())
-                .withMatcher("exercise", GenericPropertyMatchers.contains());
+                .withIgnorePaths("lecture", "lectureEmb")
+                .withIgnoreNullValues();
 
         return gradeRepository.findAll(Example.of(filter, matcher));
     }

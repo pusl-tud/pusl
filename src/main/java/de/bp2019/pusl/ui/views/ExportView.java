@@ -136,8 +136,9 @@ public class ExportView extends BaseView implements AccessibleByWimi {
                     try {
                         ExcelExporter<Performance> exporter = new ExcelExporter<Performance>();
                         exporter.setItems(performanceList);
-                        exporter.addColumn(Performance::getMatriculationNumber);
-                        exporter.addColumn(Performance::getGrade);
+                        exporter.addColumn("Matr.Nummer", Performance::getMatriculationNumber);
+                        String performanceName = performanceSchemeSelect.getValue().getName();
+                        exporter.addColumn(performanceName, Performance::getGrade);
                         exporter.write(outputStream);
                     } catch (IOException e) {
                         e.printStackTrace();

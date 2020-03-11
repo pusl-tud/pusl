@@ -38,11 +38,5 @@ pipeline {
                 }
             }
         }
-
-        stage ('Production Build') {
-            steps {
-                sh 'mvn clean package -Pproduction'
-            }
-        }
     }
 }

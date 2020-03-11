@@ -1,6 +1,7 @@
 package de.bp2019.pusl.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -20,7 +21,7 @@ public class Grade {
 
 	@DBRef
 	private Lecture lectureRef;
-
+	
 	private Lecture lectureEmb;
 
 	private Exercise exercise;
@@ -36,6 +37,8 @@ public class Grade {
 
 	private LocalDate handIn;
 
+	private LocalDateTime lastModified;
+
 	public Grade() {
 	}
 
@@ -46,6 +49,8 @@ public class Grade {
 		this.matrNumber = matrNumber;
 		this.grade = grade;
 		this.handIn = handIn;
+
+		lastModified = LocalDateTime.now();
 	}
 
 	public void setLecture(Lecture lecture){
@@ -54,11 +59,12 @@ public class Grade {
 	}
 
 	public Lecture getLecture(){
-		if(lectureRef != null){
-			return lectureRef;
-		}else{
-			return lectureEmb;
-		}
+		// if(lectureRef != null){
+		// 	return lectureRef;
+		// }else{
+		// 	return lectureEmb;
+		// }
+		return lectureRef;
 	}
 
 	public String getMatrNumber() {
@@ -154,5 +160,13 @@ public class Grade {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+
+	public LocalDateTime getLastModified() {
+		return lastModified;
+	}
+
+	public void setLastModified(LocalDateTime lastModified) {
+		this.lastModified = lastModified;
 	}
 }
