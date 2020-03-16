@@ -1,5 +1,10 @@
 package de.bp2019.pusl.model;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 /**
@@ -49,30 +54,20 @@ public class Exercise {
 	public void setAssignableByHIWI(boolean assignableByHIWI) {
 		this.assignableByHIWI = assignableByHIWI;
 	}
-
+	
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Exercise other = (Exercise) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return true;
+	public int hashCode() {
+		return new HashCodeBuilder().append(name).toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return EqualsBuilder.reflectionEquals(this, o, Arrays.asList("scheme", "assignableByHIWI"));
 	}
 
 }

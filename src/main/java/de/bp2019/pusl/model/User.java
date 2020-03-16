@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -149,33 +152,17 @@ public class User implements UserDetails {
 
 	@Override
 	public String toString() {
-		return "User [emailAddress=" + emailAddress + ", firstName=" + firstName + ", id=" + id + ", institutes="
-				+ institutes + ", lastName=" + lastName + ", password=" + password + ", type=" + type + "]";
+		return ToStringBuilder.reflectionToString(this);
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
+		return new HashCodeBuilder().append(id).toHashCode();
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		User other = (User) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+	public boolean equals(Object o) {
+		return EqualsBuilder.reflectionEquals(this, o,
+				Arrays.asList("firstName", "lastName", "emailAddress", "password", "institutes", "type"));
 	}
-
 }

@@ -1,5 +1,11 @@
 package de.bp2019.pusl.model;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 /**
  * Model of a Performance
  * 
@@ -40,46 +46,19 @@ public class Performance {
         this.grade = grade;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((grade == null) ? 0 : grade.hashCode());
-        result = prime * result + ((matriculationNumber == null) ? 0 : matriculationNumber.hashCode());
-        result = prime * result + ((performanceScheme == null) ? 0 : performanceScheme.hashCode());
-        return result;
-    }
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Performance other = (Performance) obj;
-        if (grade == null) {
-            if (other.grade != null)
-                return false;
-        } else if (!grade.equals(other.grade))
-            return false;
-        if (matriculationNumber == null) {
-            if (other.matriculationNumber != null)
-                return false;
-        } else if (!matriculationNumber.equals(other.matriculationNumber))
-            return false;
-        if (performanceScheme == null) {
-            if (other.performanceScheme != null)
-                return false;
-        } else if (!performanceScheme.equals(other.performanceScheme))
-            return false;
-        return true;
-    }
+	@Override
+	public int hashCode() {
+		return HashCodeBuilder.reflectionHashCode(this);
+	}
 
-    @Override
-    public String toString() {
-        return "Performance [grade=" + grade + ", matriculationNumber=" + matriculationNumber + "]";
-    }
-
+	@Override
+	public boolean equals(Object o) {
+		return EqualsBuilder.reflectionEquals(this, o,
+				Arrays.asList());
+	}
 }

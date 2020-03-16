@@ -80,8 +80,8 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
                 try {
                         hiwiDataProvider = new HiwiDataProvider(userService);
-                } catch (UnauthorizedException e) {                
-                        UI.getCurrent().navigate(LecturesView.ROUTE); 
+                } catch (UnauthorizedException e) {
+                        UI.getCurrent().navigate(LecturesView.ROUTE);
                         ErrorDialog.open("Nicht authorisiert um alle HIWIs abzurufen");
                         return;
                 }
@@ -141,8 +141,10 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                                 new StringLengthValidator("Bitte Name der Veranstaltung angeben", 1, null))
                                 .bind(Lecture::getName, Lecture::setName);
 
-                binder.forField(institutes).withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
-                                "Bitte mind. ein Institut angeben").bind(Lecture::getInstitutes, Lecture::setInstitutes);
+                binder.forField(institutes)
+                                .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
+                                                "Bitte mind. ein Institut angeben")
+                                .bind(Lecture::getInstitutes, Lecture::setInstitutes);
 
                 binder.bind(hasAccess, Lecture::getHasAccess, Lecture::setHasAccess);
 
@@ -159,7 +161,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
                 save.addClickListener(event -> {
 
-                        if(!lectureService.checkNameAvailable(name.getValue(), lectureId)){
+                        if (!lectureService.checkNameAvailable(name.getValue(), lectureId)) {
                                 ErrorDialog.open("Name bereits vergeben");
                                 return;
                         }
@@ -183,7 +185,8 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                                                 .filter(BindingValidationStatus::isError)
                                                 .map(BindingValidationStatus::getMessage).map(Optional::get).distinct()
                                                 .collect(Collectors.joining(", "));
-                                LOGGER.info("Lecture could not be saved because of validation errors. Errors were: " + errorText);
+                                LOGGER.info("Lecture could not be saved because of validation errors. Errors were: "
+                                                + errorText);
                         }
                 });
         }
@@ -192,24 +195,26 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
         public void setParameter(BeforeEvent event, String idParameter) {
 
                 /* binder == null if constructor was aborted due to unauthorized exception */
-                if (idParameter.equals("new") || binder != null) {
+                if (binder == null) {
+                        return;
+                } else if (idParameter.equals("new")) {
                         lectureId = Optional.empty();
                         /* clear fields by setting null */
                         binder.readBean(null);
                 } else {
                         try {
                                 Lecture fetchedLecture;
-                                fetchedLecture = lectureService.getById(idParameter);                                
+                                fetchedLecture = lectureService.getById(idParameter);
                                 lectureId = Optional.of(fetchedLecture.getId());
                                 binder.readBean(fetchedLecture);
                         } catch (UnauthorizedException e) {
                                 event.rerouteTo(LecturesView.ROUTE);
-                                UI.getCurrent().navigate(LecturesView.ROUTE);      
+                                UI.getCurrent().navigate(LecturesView.ROUTE);
                                 ErrorDialog.open("Nicht authorisiert um Veranstaltung zu bearbeiten!");
-                        } catch (DataNotFoundException e) {                   
-                                event.rerouteTo(LecturesView.ROUTE);       
-                                UI.getCurrent().navigate(LecturesView.ROUTE); 
-                                ErrorDialog.open("Veranstaltung nicht in Datenbank gefunden!");    
+                        } catch (DataNotFoundException e) {
+                                event.rerouteTo(LecturesView.ROUTE);
+                                UI.getCurrent().navigate(LecturesView.ROUTE);
+                                ErrorDialog.open("Veranstaltung nicht in Datenbank gefunden!");
                         }
                 }
         }
