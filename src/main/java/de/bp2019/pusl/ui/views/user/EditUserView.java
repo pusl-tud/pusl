@@ -173,7 +173,7 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                 Binding<User, String> passwordBinder = binder.forField(password)
                                 .withValidator((enteredPassword, valueContext) -> {
 
-                                        if (userId != null && enteredPassword == "") {
+                                        if (userId.isPresent() && enteredPassword == "") {
                                                 /*
                                                  * User already exists and has entered no new password, therefore a new
                                                  * password is not needed

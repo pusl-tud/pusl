@@ -26,12 +26,13 @@ import de.bp2019.pusl.model.Performance;
 import de.bp2019.pusl.model.PerformanceScheme;
 import de.bp2019.pusl.service.CalculationService;
 import de.bp2019.pusl.service.LectureService;
+import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.interfaces.AccessibleByWimi;
 import de.bp2019.pusl.util.ExcelExporter;
 import de.bp2019.pusl.util.ExcelUtil;
 
 /**
- * View to calculate and list the Final Grades and export them as a Excelsheet;
+ * View to calculate and list the {@link Performance}s and export them as a Excelsheet;
  *
  * @author Luca Dinies
  **/
@@ -141,7 +142,8 @@ public class ExportView extends BaseView implements AccessibleByWimi {
                         exporter.addColumn(performanceName, Performance::getGrade);
                         exporter.write(outputStream);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        ErrorDialog.open("Fehler beim erstellen der Datei");
+                        LOGGER.error(e.toString());
                     }
                 });
 
@@ -157,8 +159,8 @@ public class ExportView extends BaseView implements AccessibleByWimi {
 
             uploadBuffer.getInputStream().close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            ErrorDialog.open("Fehler beim öffnen der Datei");
+            LOGGER.error(e.toString());
         }
 
         Lecture lecture = lectureSelect.getValue();

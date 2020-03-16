@@ -31,9 +31,8 @@ public final class ExcelUtil {
             
             workbook.close();
         } catch (IOException e) {
-            LOGGER.error("There was an error opening excelfile");
-            e.printStackTrace();
-            ErrorDialog.open("Es gab einen Fehler beim öffnen der Datei");
+            ErrorDialog.open("Es gab einen Fehler beim Öffnen der Datei");
+            LOGGER.error(e.toString());
         }
         return result;
     }

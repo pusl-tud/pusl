@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -77,7 +78,14 @@ public class TestUtils {
         superadmin.setPassword(passwordEncoder.encode(superadminPassword));
         superadmin.setInstitutes(new HashSet<Institute>());
         userRepository.save(superadmin);
-        superadmin = userRepository.findByEmailAddress(superadmin.getEmailAddress()).get();
+
+        Optional<User> foundUser = userRepository.findByEmailAddress(superadmin.getEmailAddress());
+        if(foundUser.isPresent()){
+            superadmin = foundUser.get();
+        }else{
+            LOGGER.error("Error with database couldn't create User");
+            assertTrue(false);
+        }
 
         LOGGER.info("creating admin user");
         admin = new User();
@@ -93,7 +101,14 @@ public class TestUtils {
         admin.setPassword(passwordEncoder.encode(adminPassword));
         admin.setInstitutes(new HashSet<Institute>());
         userRepository.save(admin);
-        admin = userRepository.findByEmailAddress(admin.getEmailAddress()).get();
+
+        foundUser = userRepository.findByEmailAddress(admin.getEmailAddress());
+        if(foundUser.isPresent()){
+            admin = foundUser.get();
+        }else{
+            LOGGER.error("Error with database couldn't create User");
+            assertTrue(false);
+        }
 
         LOGGER.info("creating wimi user");
         wimi = new User();
@@ -109,7 +124,15 @@ public class TestUtils {
         wimi.setPassword(passwordEncoder.encode(wimiPassword));
         wimi.setInstitutes(new HashSet<Institute>());
         userRepository.save(wimi);
-        wimi = userRepository.findByEmailAddress(wimi.getEmailAddress()).get();
+
+        foundUser = userRepository.findByEmailAddress(wimi.getEmailAddress());
+        if(foundUser.isPresent()){
+            wimi = foundUser.get();
+        }else{
+            LOGGER.error("Error with database couldn't create User");
+            assertTrue(false);
+        }
+
 
         LOGGER.info("creating hiwi user");
         hiwi = new User();
@@ -125,8 +148,14 @@ public class TestUtils {
         hiwi.setPassword(passwordEncoder.encode(hiwiPassword));
         hiwi.setInstitutes(new HashSet<Institute>());
         userRepository.save(hiwi);
-        hiwi = userRepository.findByEmailAddress(hiwi.getEmailAddress()).get();
-
+        
+        foundUser = userRepository.findByEmailAddress(hiwi.getEmailAddress());
+        if(foundUser.isPresent()){
+            hiwi = foundUser.get();
+        }else{
+            LOGGER.error("Error with database couldn't create User");
+            assertTrue(false);
+        }
     }
 
     /**

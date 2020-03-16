@@ -43,9 +43,6 @@ public class GradeService extends AbstractDataProvider<Grade, String>{
     @Autowired
     UserRepository userRepository;
 
-    public GradeService() {
-    }
-
     @Override
     public boolean isInMemory() {
         return false;

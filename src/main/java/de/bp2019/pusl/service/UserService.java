@@ -80,6 +80,7 @@ public class UserService extends AbstractDataProvider<User, String> implements U
             UI.getCurrent().getSession().close();
             UI.getCurrent().navigate(LoginView.ROUTE);
             ErrorDialog.open("Angemeldeter Nutzer existiert nicht mehr in Datenbank!");
+            return new User();
         }
 
         return user.get();
@@ -168,8 +169,6 @@ public class UserService extends AbstractDataProvider<User, String> implements U
             userRepository.delete(user);
             return;
         }
-
-        LOGGER.info("user is not authorized!");
         throw new UnauthorizedException();
     }
 
@@ -193,8 +192,6 @@ public class UserService extends AbstractDataProvider<User, String> implements U
             userRepository.save(user);
             return;
         }
-
-        LOGGER.info("user is not authorized!");
         throw new UnauthorizedException();
     }
 
@@ -226,7 +223,6 @@ public class UserService extends AbstractDataProvider<User, String> implements U
                 LOGGER.info("returned because user is authorized");
                 return user;
             } else {
-                LOGGER.info("user is not authorized");
                 throw new UnauthorizedException();
             }
         }
@@ -308,8 +304,5 @@ public class UserService extends AbstractDataProvider<User, String> implements U
             return userRepository.findAll(pageable).stream();
         }
         return userRepository.findByInstitutesIn(currentUserInstitutes(), pageable);
-    }
-
-    public UserService() {
     }
 }

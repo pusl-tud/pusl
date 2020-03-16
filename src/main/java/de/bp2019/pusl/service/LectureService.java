@@ -37,9 +37,6 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
     @Autowired
     UserService userService;
 
-    public LectureService() {
-    }
-
     /**
      * Get a {@link Lecture} based on its Id. Only return {@link Lecture}s the
      * active User is authenticated to see.

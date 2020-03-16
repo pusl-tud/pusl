@@ -42,8 +42,6 @@ public class DemoView extends BaseView implements AccessibleBySuperadmin {
 
         public static final String ROUTE = "admin/demo";
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(DemoView.class);
-
         @Autowired
         public DemoView(InstituteRepository instituteRepository, UserRepository userRepository,
                         ExerciseSchemeRepository exerciseSchemeRepository, LectureRepository lectureRepository,

@@ -38,9 +38,6 @@ public class ExerciseSchemeService extends AbstractDataProvider<ExerciseScheme, 
     @Autowired
     UserService userService;
 
-    public ExerciseSchemeService() {
-    }
-
     /**
      * Get a {@link ExerciseScheme} based on its Id. Only return
      * {@link ExerciseScheme}s the active User is authenticated to see.

@@ -26,8 +26,6 @@ public class CalculationService {
     @Autowired
     GradeService gradeService;
 
-    public CalculationService(){}
-
     public List<Performance> calculatePerformances(List<String> matrNumbers, Lecture lecture,
             PerformanceScheme performanceScheme) {
         List<Performance> result = new ArrayList<>();

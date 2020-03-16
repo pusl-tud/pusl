@@ -2,6 +2,7 @@ package de.bp2019.pusl.model;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.bson.types.ObjectId;
@@ -41,6 +42,12 @@ public class User implements UserDetails {
 	private UserType type;
 
 	public User() {
+		firstName = "";
+		lastName = "";
+		emailAddress = "";
+		password = "";
+		institutes = new HashSet<>();
+		type = UserType.HIWI;
 	}
 
 	public User(String firstName, String lastName, String emailAddress, String password, Set<Institute> institutes,

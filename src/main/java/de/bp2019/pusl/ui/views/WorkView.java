@@ -45,8 +45,8 @@ import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.components.VerticalTabs;
+import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.util.ExcelExporter;
-
 
 /**
  * View that displays all Grades and contains a form to add New Grades
@@ -63,7 +63,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
     public static final String ROUTE = "grades";
 
     private ListDataProvider<Grade> gradeDataProvider;
-    private ListDataProvider<Lecture> lectureDataProvider  = new ListDataProvider<Lecture>(new ArrayList<>());
+    private ListDataProvider<Lecture> lectureDataProvider = new ListDataProvider<Lecture>(new ArrayList<>());
 
     private GradeService gradeService;
     private LectureService lectureService;
@@ -183,7 +183,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
                 outputStream -> {
                     try {
                         ExcelExporter<Grade> excelExporter = new ExcelExporter<Grade>();
-                        
+
                         excelExporter.setItems(new ArrayList<>(gradeDataProvider.getItems()));
                         excelExporter.addColumn("Matr.Nummer", Grade::getMatrNumber);
                         excelExporter.addColumn("Note", Grade::getGrade);
@@ -191,24 +191,25 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
                         excelExporter.addColumn("Übung", grade -> grade.getExercise().getName());
                         excelExporter.addColumn("eingetragen von", grade -> {
                             // TODO : nullabilität entfernen
-                            if(grade.getGradedBy() == null){
+                            if (grade.getGradedBy() == null) {
                                 return "";
-                            } else{
+                            } else {
                                 return UserService.getFullName(grade.getGradedBy());
                             }
                         });
                         excelExporter.addColumn("Datum", grade -> {
                             // TODO : nullabilität entfernen
-                            if(grade.getLastModified() == null){
+                            if (grade.getLastModified() == null) {
                                 return "";
-                            } else{
+                            } else {
                                 return grade.getLastModified().format(DateTimeFormatter.RFC_1123_DATE_TIME);
                             }
                         });
 
                         excelExporter.write(outputStream);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        ErrorDialog.open("Fehler beim Erstellen der Datei");
+                        LOGGER.error(e.toString());
                     }
                 });
 
@@ -408,7 +409,6 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         binder.bind(datePicker, Grade::getHandIn, Grade::setHandIn);
 
-
     }
 
     /**
@@ -440,8 +440,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             String lectureId = parametersMap.get("lecture").get(0);
             Optional<Lecture> parameterLecture = lectureDataProvider.getItems().stream()
                     .filter(lecture -> lecture.getId() != null)
-                    .filter(lecture -> lecture.getId().equals( new ObjectId(lectureId)))
-                    .findFirst();
+                    .filter(lecture -> lecture.getId().equals(new ObjectId(lectureId))).findFirst();
 
             if (parameterLecture.isPresent()) {
                 lectureFilter.setValue(parameterLecture.get());
@@ -449,10 +448,12 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
                 if (parametersMap.get("exercise") != null) {
                     String parameterExerciseName = parametersMap.get("exercise").get(0);
-                    Exercise parameterExercise = parameterLecture.get().getExercises().stream()
-                            .filter(exercise -> exercise.getName().equals(parameterExerciseName)).findFirst().get();
+                    Optional<Exercise> parameterExercise = parameterLecture.get().getExercises().stream()
+                            .filter(exercise -> exercise.getName().equals(parameterExerciseName)).findFirst();
 
-                    exerciseFilter.setValue(parameterExercise);
+                    if (parameterExercise.isPresent()) {
+                        exerciseFilter.setValue(parameterExercise.get());
+                    }
                 }
             }
 

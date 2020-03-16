@@ -110,7 +110,7 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
         if (tabs.getNumTabs() > 1) {
             deleteButton.setEnabled(true);
         } else {
-            deleteButton.setEnabled(true);
+            deleteButton.setEnabled(false);
         }
     }
 

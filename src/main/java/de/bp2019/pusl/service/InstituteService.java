@@ -171,7 +171,4 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
                 userService.currentUserInstitutes().stream().map(Institute::getId).collect(Collectors.toList()),
                 pageable);
     }
-
-    public InstituteService() {
-    }
 }

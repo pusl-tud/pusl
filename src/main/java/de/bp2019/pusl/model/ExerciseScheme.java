@@ -89,10 +89,6 @@ public class ExerciseScheme {
 		this.hasAccess = hasAccess;
 	}
 
-	public void setNumeric(boolean isNumeric) {
-		this.isNumeric = isNumeric;
-	}
-
 	public boolean isFlexHandin() {
 		return flexHandin;
 	}
@@ -126,18 +122,23 @@ public class ExerciseScheme {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		ExerciseScheme other = (ExerciseScheme) obj;
 		if (id == null) {
-			if (other.id != null)
+			if (other.id != null) {
 				return false;
-		} else if (!id.equals(other.id))
+			}
+		} else if (!id.equals(other.id)) {
 			return false;
+		}
 		return true;
 	}
 
