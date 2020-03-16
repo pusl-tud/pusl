@@ -192,7 +192,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
         public void setParameter(BeforeEvent event, String idParameter) {
 
                 /* binder == null if constructor was aborted due to unauthorized exception */
-                if (idParameter.equals("new") && binder != null) {
+                if (idParameter.equals("new") || binder != null) {
                         lectureId = Optional.empty();
                         /* clear fields by setting null */
                         binder.readBean(null);
