@@ -402,7 +402,7 @@ public abstract class BaseUITest {
             url = classLoader.getResource(testProperties.getChromedriverWin());
         } else if (SystemUtils.IS_OS_LINUX) {
             LOGGER.info("Platform Linux detected");
-            url = classLoader.getResource(testProperties.getChromedriverLinux());
+            url = new URL(testProperties.getChromedriverLinux());
         } else if (SystemUtils.IS_OS_MAC) {
             LOGGER.info("Platform Mac detected");
             url = classLoader.getResource(testProperties.getChromedriverMac());
