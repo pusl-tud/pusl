@@ -83,6 +83,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 } catch (UnauthorizedException e) {                
                         UI.getCurrent().navigate(LecturesView.ROUTE); 
                         ErrorDialog.open("Nicht authorisiert um alle HIWIs abzurufen");
+                        return;
                 }
 
                 FormLayout formLayout = new FormLayout();
@@ -190,7 +191,8 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
         @Override
         public void setParameter(BeforeEvent event, String idParameter) {
 
-                if (idParameter.equals("new")) {
+                /* binder == null if constructor was aborted due to unauthorized exception */
+                if (idParameter.equals("new") && binder != null) {
                         lectureId = Optional.empty();
                         /* clear fields by setting null */
                         binder.readBean(null);

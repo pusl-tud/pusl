@@ -1,5 +1,6 @@
 package de.bp2019.pusl.config;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
@@ -203,21 +204,29 @@ public abstract class BaseUITest {
     /**
      * @author Leon Chemnitz
      */
-    protected void goToURL(String url) throws InterruptedException {
-        driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
-        driver.navigate().to(baseUrl + url);
-        waitForURL(url);
-        waitForPageload();
+    protected void goToURL(String url) {
+        try {
+            driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+            driver.navigate().to(baseUrl + url);
+            waitForURL(url);
+            waitForPageload();
+        } catch (Exception e) {
+            assertTrue(e.toString(), false);
+        }
     }
 
     /**
      * @author Leon Chemnitz
      */
-    protected void goToURLandWaitForRedirect(String url, String RedirectUrl) throws InterruptedException {
-        driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
-        driver.navigate().to(baseUrl + url);
-        waitForURL(RedirectUrl);
-        waitForPageload();
+    protected void goToURLandWaitForRedirect(String url, String RedirectUrl) {
+        try {
+            driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+            driver.navigate().to(baseUrl + url);
+            waitForURL(RedirectUrl);
+            waitForPageload();
+        } catch (Exception e) {
+            assertTrue(e.toString(), false);
+        }
     }
 
     /**

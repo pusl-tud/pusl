@@ -16,9 +16,11 @@ import org.slf4j.LoggerFactory;
  */
 public final class ConfirmDeletionDialog {    
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfirmDeletionDialog.class);
+    public static final String ID = "confirm-deletion-dialog";
 
     public static void open(String name, Runnable callback) {
         Dialog dialog = new Dialog();
+        dialog.setId(ID);
 
         VerticalLayout layout = new VerticalLayout();
         layout.add(new Text("Möchten sie " + name + " wirklich Löschen?"));

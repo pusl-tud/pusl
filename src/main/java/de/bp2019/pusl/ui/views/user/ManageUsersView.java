@@ -30,7 +30,7 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
  */
 @PageTitle(PuslProperties.NAME + " | Benutzer")
 @Route(value = ManageUsersView.ROUTE, layout = MainAppView.class)
-public class ManageUsersView extends BaseView implements AccessibleByAdmin{
+public class ManageUsersView extends BaseView implements AccessibleByAdmin {
 
     private static final long serialVersionUID = -5763725756205681478L;
 
@@ -81,6 +81,8 @@ public class ManageUsersView extends BaseView implements AccessibleByAdmin{
             UI.getCurrent().navigate(EditUserView.ROUTE + "/" + user.getId());
         });
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        /** makes testing a lot easier */
+        button.setId("create-" + user.getId().toString());
         return button;
     }
 
@@ -94,12 +96,12 @@ public class ManageUsersView extends BaseView implements AccessibleByAdmin{
     protected Button createDeleteButton(User user) {
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {
             ConfirmDeletionDialog.open(user.getEmailAddress(), () -> {
-                try{
+                try {
                     userService.delete(user);
                     userService.refreshAll();
                     SuccessDialog.open(user.getEmailAddress() + " erfolgreich gelöscht");
-                }catch(UnauthorizedException e){
-                    UI.getCurrent().navigate(LecturesView.ROUTE);      
+                } catch (UnauthorizedException e) {
+                    UI.getCurrent().navigate(LecturesView.ROUTE);
                     ErrorDialog.open("Nicht authorisiert um Nutzer zu löschen!");
                 }
             });
