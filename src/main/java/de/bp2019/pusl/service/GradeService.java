@@ -65,7 +65,7 @@ public class GradeService extends AbstractDataProvider<Grade, String>{
      * @return list of all grades
      * @author Luca Dinies
      */
-    public List<Grade> getAll() {
+    private List<Grade> getAll() {
         return getAll(null);
     }
 
@@ -75,7 +75,7 @@ public class GradeService extends AbstractDataProvider<Grade, String>{
      * @return list of all {@link Grade}s
      * @author Leon Chemnitz
      */
-    public List<Grade> getAll(Grade filter) {
+    private List<Grade> getAll(Grade filter) {
         if(filter == null){
             filter = new Grade();
         }        
@@ -95,16 +95,6 @@ public class GradeService extends AbstractDataProvider<Grade, String>{
      * @author Luca Dinies
      */
     public void save(Grade grade) {
-        gradeRepository.save(grade);
-    }
-
-    /**
-     * Update one Grade in Database
-     *
-     * @param grade to update
-     * @author Luca Dinies
-     */
-    public void update(Grade grade) {
         gradeRepository.save(grade);
     }
 

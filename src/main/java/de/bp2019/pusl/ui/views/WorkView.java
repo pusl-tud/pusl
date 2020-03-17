@@ -44,6 +44,7 @@ import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.service.UserService;
+import de.bp2019.pusl.service.dataproviders.FilteringGradeDataProvider;
 import de.bp2019.pusl.ui.components.VerticalTabs;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.util.ExcelExporter;
@@ -62,11 +63,8 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
     public static final String ROUTE = "grades";
 
-    private ListDataProvider<Grade> gradeDataProvider;
-    private ListDataProvider<Lecture> lectureDataProvider = new ListDataProvider<Lecture>(new ArrayList<>());
-
-    private GradeService gradeService;
-    private LectureService lectureService;
+    private ListDataProvider<Lecture> lectureDataProvider;
+    private FilteringGradeDataProvider filteringGradeDataProvider;
 
     private ObjectId objectId;
 
@@ -86,14 +84,17 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
     private Grade filter;
 
     @Autowired
-    public WorkView(GradeService gradeService, LectureService lectureService, UserService userService) {
+    public WorkView(GradeService gradeService, LectureService lectureService, UserService userService,
+            FilteringGradeDataProvider filteringGradeDataProvider) {
         super("Noten eintragen");
         LOGGER.debug("Started creation of WorkView");
 
-        this.gradeService = gradeService;
-        this.lectureService = lectureService;
+        this.filteringGradeDataProvider = filteringGradeDataProvider;
 
-        gradeDataProvider = new ListDataProvider<Grade>(gradeService.getAll());
+        List<Lecture> allLectures = new ArrayList<>();
+        allLectures.add(new Lecture("Alle Anzeigen", null, null, null, null));
+        allLectures.addAll(lectureService.fetch(new Query<>()).collect(Collectors.toList()));
+        lectureDataProvider = new ListDataProvider<>(allLectures);
 
         filter = new Grade();
 
@@ -101,7 +102,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         VerticalTabs verticalTabs = new VerticalTabs();
         verticalTabs.setHeight("100%");
-        verticalTabs.setWidth("120%");
+        verticalTabs.setWidth("100%");
 
         VerticalLayout gridAndFilter = new VerticalLayout();
 
@@ -155,7 +156,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         grid = new Grid<>();
 
         grid.setWidth("100%");
-        grid.setDataProvider(gradeDataProvider);
+        grid.setDataProvider(filteringGradeDataProvider);
 
         grid.addColumn(Grade::getMatrNumber).setHeader("Matr. Nr.").setAutoWidth(true).setKey("matrNum");
         grid.addColumn(item -> item.getLecture().getName()).setHeader("Veranstaltung").setAutoWidth(true)
@@ -175,7 +176,8 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
                     try {
                         ExcelExporter<Grade> excelExporter = new ExcelExporter<Grade>();
 
-                        excelExporter.setItems(new ArrayList<>(gradeDataProvider.getItems()));
+                        List<Grade> allGrades = filteringGradeDataProvider.fetch(new Query<>()).collect(Collectors.toList());
+                        excelExporter.setItems(allGrades);
                         excelExporter.addColumn("Matr.Nummer", Grade::getMatrNumber);
                         excelExporter.addColumn("Note", Grade::getGrade);
                         excelExporter.addColumn("Veranstaltung", grade -> grade.getLecture().getName());
@@ -259,7 +261,6 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         matrNumber.addValueChangeListener(event -> {
             filter.setMatrNumber(event.getValue());
             reloadFilter();
-
         });
 
         gradeFilter.addValueChangeListener(event -> {
@@ -277,8 +278,8 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
                 exerciseSelect.setValue(filterCleanExercise);
                 exerciseSelect.setEnabled(false);
 
-            } else {
 
+            } else {
                 filter.setLecture(event.getValue());
                 reloadFilter();
 
@@ -333,7 +334,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             LocalDate endDate = endDateFilter.getValue();
             if (selectedDate != null) {
                 endDateFilter.setMin(selectedDate);
-                gradeDataProvider.addFilter(grade -> grade.getHandIn().isAfter(startDateFilter.getValue()));
+                //filteringGradeDataProvider.addFilter(grade -> grade.getHandIn().isAfter(startDateFilter.getValue()));
                 if (endDate == null) {
                     endDateFilter.setOpened(true);
                 }
@@ -347,7 +348,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             LocalDate startDate = startDateFilter.getValue();
             if (selectedDate != null) {
                 startDateFilter.setMax(selectedDate);
-                gradeDataProvider.addFilter(grade -> grade.getHandIn().isBefore(endDateFilter.getValue()));
+                //gradeDataProvider.addFilter(grade -> grade.getHandIn().isBefore(endDateFilter.getValue()));
                 if (startDate == null) {
                     startDateFilter.setOpened(true);
                 }
@@ -407,21 +408,13 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
      */
     private void reloadFilter() {
         LOGGER.debug(filter.toString());
-        gradeDataProvider.getItems().clear();
-        gradeDataProvider.getItems().addAll(gradeService.getAll(filter));
-        gradeDataProvider.refreshAll();
+        filteringGradeDataProvider.refreshAll();
     }
 
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
         Location location = event.getLocation();
         QueryParameters queryParameters = location.getQueryParameters();
-
-        List<Lecture> allLectures = lectureService.fetch(new Query<Lecture, String>()).collect(Collectors.toList());
-        Lecture cleanLecture = new Lecture("Alle Anzeigen", null, null, null, null);
-        allLectures.add(0, cleanLecture);
-        lectureDataProvider.getItems().addAll(allLectures);
-        lectureDataProvider.refreshAll();
 
         parametersMap = queryParameters.getParameters();
 

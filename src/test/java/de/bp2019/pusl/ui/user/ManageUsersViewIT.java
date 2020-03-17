@@ -1,7 +1,5 @@
 package de.bp2019.pusl.ui.user;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +9,6 @@ import de.bp2019.pusl.config.BaseUITest;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
-import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.LoginViewIT;
 import de.bp2019.pusl.ui.dialogs.ConfirmDeletionDialog;
 import de.bp2019.pusl.ui.views.LecturesView;

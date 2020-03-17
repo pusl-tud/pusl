@@ -2,7 +2,11 @@ package de.bp2019.pusl.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -20,9 +24,7 @@ public class Grade {
 	private ObjectId id;
 
 	@DBRef
-	private Lecture lectureRef;
-	
-	private Lecture lectureEmb;
+	private Lecture lecture;
 
 	private Exercise exercise;
 
@@ -43,8 +45,7 @@ public class Grade {
 	}
 
 	public Grade(Lecture lecture, Exercise exercise, String matrNumber, String grade, LocalDate handIn) {
-		this.lectureRef = lecture;
-		this.lectureEmb = lecture;
+		this.lecture = lecture;
 		this.exercise = exercise;
 		this.matrNumber = matrNumber;
 		this.grade = grade;
@@ -54,17 +55,11 @@ public class Grade {
 	}
 
 	public void setLecture(Lecture lecture){
-		this.lectureEmb = lecture;
-		this.lectureRef = lecture;
+		this.lecture = lecture;
 	}
 
 	public Lecture getLecture(){
-		// if(lectureRef != null){
-		// 	return lectureRef;
-		// }else{
-		// 	return lectureEmb;
-		// }
-		return lectureRef;
+		return lecture;
 	}
 
 	public String getMatrNumber() {
@@ -99,22 +94,6 @@ public class Grade {
 		this.id = id;
 	}
 
-	public Lecture getLectureRef() {
-		return lectureRef;
-	}
-
-	public void setLectureRef(Lecture lectureRef) {
-		this.lectureRef = lectureRef;
-	}
-
-	public Lecture getLectureEmb() {
-		return lectureEmb;
-	}
-
-	public void setLectureEmb(Lecture lectureEmb) {
-		this.lectureEmb = lectureEmb;
-	}
-
 	public User getGradedBy() {
 		return gradedBy;
 	}
@@ -131,37 +110,6 @@ public class Grade {
 		this.exercise = exercise;
 	}
 
-	@Override
-	public String toString() {
-		return "Grade [exercise=" + exercise + ", grade=" + grade + ", gradedBy=" + gradedBy + ", handIn="
-				+ handIn + ", lectureEmb=" + lectureEmb + ", matrNumber=" + matrNumber + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Grade other = (Grade) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
 	public LocalDateTime getLastModified() {
 		return lastModified;
 	}
@@ -169,4 +117,21 @@ public class Grade {
 	public void setLastModified(LocalDateTime lastModified) {
 		this.lastModified = lastModified;
 	}
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(id).toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return EqualsBuilder.reflectionEquals(this, o,
+				Arrays.asList("lecture", "exercise", "matrNumber", "gradedBy", "grade", "handIn", "lastModified"));
+	}
+
 }

@@ -69,22 +69,13 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
         /** empty if new institute is being created */
         private Optional<ObjectId> lectureId = Optional.empty();
 
-        private HiwiDataProvider hiwiDataProvider;
-
         @Autowired
         public EditLectureView(InstituteService instituteService, UserService userService,
-                        LectureService lectureService, ExerciseSchemeService exerciseSchemeService) {
+                        LectureService lectureService, ExerciseSchemeService exerciseSchemeService,
+                        HiwiDataProvider hiwiDataProvider) {
                 super("Veranstaltung bearbeiten");
 
                 this.lectureService = lectureService;
-
-                try {
-                        hiwiDataProvider = new HiwiDataProvider(userService);
-                } catch (UnauthorizedException e) {                
-                        UI.getCurrent().navigate(LecturesView.ROUTE); 
-                        ErrorDialog.open("Nicht authorisiert um alle HIWIs abzurufen");
-                        return;
-                }
 
                 FormLayout formLayout = new FormLayout();
                 formLayout.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
@@ -141,8 +132,10 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                                 new StringLengthValidator("Bitte Name der Veranstaltung angeben", 1, null))
                                 .bind(Lecture::getName, Lecture::setName);
 
-                binder.forField(institutes).withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
-                                "Bitte mind. ein Institut angeben").bind(Lecture::getInstitutes, Lecture::setInstitutes);
+                binder.forField(institutes)
+                                .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
+                                                "Bitte mind. ein Institut angeben")
+                                .bind(Lecture::getInstitutes, Lecture::setInstitutes);
 
                 binder.bind(hasAccess, Lecture::getHasAccess, Lecture::setHasAccess);
 
@@ -159,7 +152,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
                 save.addClickListener(event -> {
 
-                        if(!lectureService.checkNameAvailable(name.getValue(), lectureId)){
+                        if (!lectureService.checkNameAvailable(name.getValue(), lectureId)) {
                                 ErrorDialog.open("Name bereits vergeben");
                                 return;
                         }
@@ -183,33 +176,32 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                                                 .filter(BindingValidationStatus::isError)
                                                 .map(BindingValidationStatus::getMessage).map(Optional::get).distinct()
                                                 .collect(Collectors.joining(", "));
-                                LOGGER.info("Lecture could not be saved because of validation errors. Errors were: " + errorText);
+                                LOGGER.info("Lecture could not be saved because of validation errors. Errors were: "
+                                                + errorText);
                         }
                 });
         }
 
         @Override
         public void setParameter(BeforeEvent event, String idParameter) {
-
-                /* binder == null if constructor was aborted due to unauthorized exception */
-                if (idParameter.equals("new") && binder != null) {
+                if (idParameter.equals("new")) {
                         lectureId = Optional.empty();
                         /* clear fields by setting null */
                         binder.readBean(null);
                 } else {
                         try {
                                 Lecture fetchedLecture;
-                                fetchedLecture = lectureService.getById(idParameter);                                
+                                fetchedLecture = lectureService.getById(idParameter);
                                 lectureId = Optional.of(fetchedLecture.getId());
                                 binder.readBean(fetchedLecture);
                         } catch (UnauthorizedException e) {
                                 event.rerouteTo(LecturesView.ROUTE);
-                                UI.getCurrent().navigate(LecturesView.ROUTE);      
+                                UI.getCurrent().navigate(LecturesView.ROUTE);
                                 ErrorDialog.open("Nicht authorisiert um Veranstaltung zu bearbeiten!");
-                        } catch (DataNotFoundException e) {                   
-                                event.rerouteTo(LecturesView.ROUTE);       
-                                UI.getCurrent().navigate(LecturesView.ROUTE); 
-                                ErrorDialog.open("Veranstaltung nicht in Datenbank gefunden!");    
+                        } catch (DataNotFoundException e) {
+                                event.rerouteTo(LecturesView.ROUTE);
+                                UI.getCurrent().navigate(LecturesView.ROUTE);
+                                ErrorDialog.open("Veranstaltung nicht in Datenbank gefunden!");
                         }
                 }
         }

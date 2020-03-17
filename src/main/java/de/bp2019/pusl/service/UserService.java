@@ -15,6 +15,9 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -113,27 +116,27 @@ public class UserService extends AbstractDataProvider<User, String> implements U
         return currentUser().getInstitutes();
     }
 
-    /**
-     * Get a List of all Users with type Hiwi
-     * 
-     * @return
-     * @throws UnauthorizedException
-     */
-    public List<User> findAllHiwis() throws UnauthorizedException {
-        LOGGER.info("getting all HIWIs");
-        if (currentUserType() != UserType.SUPERADMIN && currentUserType() != UserType.ADMIN) {
-            LOGGER.info("user is not authorized!");
-            throw new UnauthorizedException();
-        }
-        return userRepository.findByType(UserType.HIWI);
-    }
+    // /**
+    //  * Get a List of all Users with type Hiwi
+    //  * 
+    //  * @return
+    //  * @throws UnauthorizedException
+    //  */
+    // public List<User> findAllHiwis() throws UnauthorizedException {
+    //     LOGGER.info("getting all HIWIs");
+    //     if (currentUserType() != UserType.SUPERADMIN && currentUserType() != UserType.ADMIN) {
+    //         LOGGER.info("user is not authorized!");
+    //         throw new UnauthorizedException();
+    //     }
+    //     return userRepository.findByType(UserType.HIWI);
+    // }
 
     /**
      * Get the full name of a user. Returns the users email address if no firstname
      * is set
      * 
      * @param user User
-     * @return Full name of the found User as a String. null if no user is found
+     * @return Full name of the found User. Empty String if no user is found
      * @author Leon Chemnitz
      */
     public static String getFullName(User user) {
@@ -144,7 +147,32 @@ public class UserService extends AbstractDataProvider<User, String> implements U
             }
             return user.getFirstName() + " " + user.getLastName();
         } else {
-            return null;
+            return "";
+        }
+    }
+
+    /**
+     * Save one User
+     *
+     * @param user to persist
+     * @author Leon Chemnitz
+     * @throws UnauthorizedException
+     */
+    public void save(User user) throws UnauthorizedException {
+        LOGGER.info("saving user");
+        LOGGER.debug(user.toString());
+
+        switch (currentUserType()) {
+            case SUPERADMIN:
+                userRepository.save(user);
+                return;
+            case ADMIN:
+                if (currentUserInstitutes().containsAll(user.getInstitutes())) {
+                    userRepository.save(user);
+                    return;
+                }
+            default:
+                throw new UnauthorizedException();
         }
     }
 
@@ -159,40 +187,18 @@ public class UserService extends AbstractDataProvider<User, String> implements U
         LOGGER.info("deleting user");
         LOGGER.debug(user.toString());
 
-        if (currentUserType() == UserType.SUPERADMIN) {
-            userRepository.delete(user);
-            return;
+        switch (currentUserType()) {
+            case SUPERADMIN:
+                userRepository.delete(user);
+                return;
+            case ADMIN:
+                if (Utils.containsAny(currentUserInstitutes(), user.getInstitutes())) {
+                    userRepository.delete(user);
+                    return;
+                }
+            default:
+                throw new UnauthorizedException();
         }
-
-        if (currentUserType() == UserType.ADMIN
-                && Utils.containsAny(currentUserInstitutes(), user.getInstitutes())) {
-            userRepository.delete(user);
-            return;
-        }
-        throw new UnauthorizedException();
-    }
-
-    /**
-     * Save one User
-     *
-     * @param user to persist
-     * @author Leon Chemnitz
-     * @throws UnauthorizedException
-     */
-    public void save(User user) throws UnauthorizedException {
-        LOGGER.info("saving user");
-        LOGGER.debug(user.toString());
-
-        if (currentUserType() == UserType.SUPERADMIN) {
-            userRepository.save(user);
-            return;
-        }
-
-        if (currentUserType() == UserType.ADMIN && currentUserInstitutes().containsAll(user.getInstitutes())) {
-            userRepository.save(user);
-            return;
-        }
-        throw new UnauthorizedException();
     }
 
     /**
@@ -257,21 +263,24 @@ public class UserService extends AbstractDataProvider<User, String> implements U
             LOGGER.info("email is already taken by User with id " + foundId.toString());
             return false;
         }
-
     }
 
     /**
+     * Returns all the UserTypes the current User is allowed to act upon.
+     * 
      * @return
      * @author Leon Chemnitz
      * @throws UnauthorizedException
      */
     public List<UserType> getUserTypes() {
-        if (currentUserType() == UserType.SUPERADMIN) {
-            return Arrays.asList(UserType.values());
-        }else if(currentUserType() == UserType.ADMIN) {
-            return Arrays.asList(UserType.ADMIN, UserType.WIMI, UserType.HIWI);
+        switch (currentUserType()) {
+            case SUPERADMIN:
+                return Arrays.asList(UserType.values());
+            case ADMIN:
+                return Arrays.asList(UserType.ADMIN, UserType.WIMI, UserType.HIWI);
+            default:
+                return new ArrayList<UserType>();
         }
-        return new ArrayList<UserType>();
     }
 
     /**
@@ -282,15 +291,42 @@ public class UserService extends AbstractDataProvider<User, String> implements U
         return false;
     }
 
+    private ExampleMatcher matcher() {
+        ExampleMatcher matcher = ExampleMatcher.matching().withMatcher("firstName", GenericPropertyMatchers.contains())
+                .withMatcher("lastName", GenericPropertyMatchers.contains())
+                .withMatcher("emailAddress", GenericPropertyMatchers.contains()).withIgnoreNullValues();
+
+        return matcher;
+    }
+
+    /**
+     * 
+     * @param query
+     * @param filter
+     * @return
+     * @author Leon Chemnitz
+     */
+    public int size(Query<User, String> query, User filter) {
+        if (filter == null) {
+            filter = new User();
+        }
+
+        switch (currentUserType()) {
+            case SUPERADMIN:
+                return (int) userRepository.count(Example.of(filter, matcher()));
+            case ADMIN:
+                return (int) userRepository.countByInstitutesIn(currentUserInstitutes(),Example.of(filter, matcher()));
+            default:
+                return 0;
+        }
+    }
+
     /**
      * @author Leon Chemnitz
      */
     @Override
     public int size(Query<User, String> query) {
-        if (currentUserType() == UserType.SUPERADMIN) {
-            return (int) userRepository.count();
-        }
-        return userRepository.countByInstitutesIn(currentUserInstitutes());
+        return size(query, null);
     }
 
     /**
@@ -298,11 +334,31 @@ public class UserService extends AbstractDataProvider<User, String> implements U
      */
     @Override
     public Stream<User> fetch(Query<User, String> query) {
+        return fetch(query, null);
+    }
+
+    /**
+     * 
+     * @param query
+     * @param filter
+     * @return
+     * @author Leon Chemnitz
+     */
+    public Stream<User> fetch(Query<User, String> query, User filter) {
+        if (filter == null) {
+            filter = new User();
+        }
+
         Pageable pageable = new LimitOffsetPageRequest(query.getLimit(), query.getOffset());
 
-        if (currentUserType() == UserType.SUPERADMIN) {
-            return userRepository.findAll(pageable).stream();
+        switch (currentUserType()) {
+            case SUPERADMIN:
+                return userRepository.findAll(Example.of(filter, matcher()), pageable).stream();
+            case ADMIN:
+                return userRepository.findByInstitutesIn(currentUserInstitutes(), Example.of(filter, matcher()), pageable);
+            default:
+                return Stream.empty();
         }
-        return userRepository.findByInstitutesIn(currentUserInstitutes(), pageable);
     }
+
 }
