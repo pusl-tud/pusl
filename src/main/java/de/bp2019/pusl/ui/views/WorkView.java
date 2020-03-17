@@ -2,18 +2,17 @@ package de.bp2019.pusl.ui.views;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -33,6 +32,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 
+import de.bp2019.pusl.model.Token;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.firitin.components.DynamicFileDownloader;
@@ -70,9 +70,9 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
     private Binder<Grade> binder;
 
-    private Select<Lecture> lectureFilter;
-    private Select<Exercise> exerciseFilter;
-    private TextField martrNumberFilter;
+    private Select<Lecture> lectureSelect;
+    private Select<Exercise> exerciseSelect;
+    private TextField matrNumber;
 
     Grid<Grade> grid;
 
@@ -108,57 +108,48 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         /* ########### Create the filter Fields ########### */
 
-        HorizontalLayout filterLayout = new HorizontalLayout();
-        filterLayout.setWidth("100%");
-        filterLayout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+        HorizontalLayout unattachedSelects = new HorizontalLayout();
+        unattachedSelects.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
-        VerticalLayout martrGradeLayout = new VerticalLayout();
+        HorizontalLayout gridFilter = new HorizontalLayout();
 
-        martrNumberFilter = new TextField();
-        martrNumberFilter.setLabel("Matrikelnummer");
-        martrNumberFilter.setPlaceholder("Matrikelnummer");
-        martrNumberFilter.setValueChangeMode(ValueChangeMode.EAGER);
-        martrGradeLayout.add(martrNumberFilter);
+        matrNumber = new TextField();
+        matrNumber.setLabel("Matrikelnummer");
+        matrNumber.setPlaceholder("Matrikelnummer");
+        matrNumber.setValueChangeMode(ValueChangeMode.EAGER);
+        unattachedSelects.add(matrNumber);
 
         TextField gradeFilter = new TextField();
         gradeFilter.setLabel("Note");
         gradeFilter.setPlaceholder("Note");
         gradeFilter.setValueChangeMode(ValueChangeMode.EAGER);
-        martrGradeLayout.add(gradeFilter);
+        gridFilter.add(gradeFilter);
 
-        filterLayout.add(martrGradeLayout);
+        lectureSelect = new Select<>();
+        lectureSelect.setItemLabelGenerator(Lecture::getName);
+        lectureSelect.setDataProvider(lectureDataProvider);
+        lectureSelect.setLabel("Modul");
+        unattachedSelects.add(lectureSelect);
 
-        VerticalLayout moduleExerciseLayout = new VerticalLayout();
+        exerciseSelect = new Select<>();
+        exerciseSelect.setItemLabelGenerator(Exercise::getName);
+        exerciseSelect.setEnabled(false);
+        exerciseSelect.setLabel("Übung");
 
-        lectureFilter = new Select<>();
-        lectureFilter.setItemLabelGenerator(Lecture::getName);
-        lectureFilter.setDataProvider(lectureDataProvider);
-        lectureFilter.setLabel("Modul");
-        moduleExerciseLayout.add(lectureFilter);
-
-        exerciseFilter = new Select<>();
-        exerciseFilter.setItemLabelGenerator(Exercise::getName);
-        exerciseFilter.setEnabled(false);
-        exerciseFilter.setLabel("Übung");
-
-        exerciseFilter.setValue(filterCleanExercise);
-        moduleExerciseLayout.add(exerciseFilter);
-
-        filterLayout.add(moduleExerciseLayout);
-
-        VerticalLayout dateLayout = new VerticalLayout();
+        exerciseSelect.setValue(filterCleanExercise);
+        unattachedSelects.add(exerciseSelect);
 
         DatePicker startDateFilter = new DatePicker();
         startDateFilter.setLabel("Start");
-        dateLayout.add(startDateFilter);
+        gridFilter.add(startDateFilter);
 
         DatePicker endDateFilter = new DatePicker();
         endDateFilter.setLabel("End");
-        dateLayout.add(endDateFilter);
+        gridFilter.add(endDateFilter);
 
-        filterLayout.add(dateLayout);
+        gridAndFilter.add(gridFilter);
 
-        gridAndFilter.add(filterLayout);
+        add(unattachedSelects);
 
         /* ########### Create the Grid ########### */
 
@@ -217,9 +208,57 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         gridAndFilter.add(downloadButton);
 
+        /* ############## FORM TO INPUT A NEW GRADE ############# */
+
+        binder = new Binder<>();
+
+        FormLayout form = new FormLayout();
+        form.setResponsiveSteps(new FormLayout.ResponsiveStep("5em", 1), new FormLayout.ResponsiveStep("5em", 2));
+        form.setWidth("100%");
+        form.getStyle().set("marginLeft", "1em");
+        form.getStyle().set("marginTop", "-0.5em");
+
+        DatePicker datePicker = new DatePicker();
+        datePicker.setLabel("Abgabe-Datum");
+        datePicker.setValue(LocalDate.now());
+        datePicker.setVisible(true);
+        form.add(datePicker);
+
+        TextField gradeField = new TextField();
+        gradeField.setLabel("Note");
+        gradeField.setPlaceholder("Note");
+        gradeField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        form.add(gradeField);
+
+        Select<Token> tokenSelect = new Select<>();
+        tokenSelect.setItemLabelGenerator(Token::getName);
+        tokenSelect.setLabel("Token");
+        tokenSelect.setVisible(false);
+        form.add(tokenSelect);
+
+        /* Invisible TextField, to Bind Token and Grade */
+        TextField tokenOrGrade = new TextField();
+
+        /* ########### Save Button and Layout ########### */
+
+        Button save = new Button();
+        save.setText("Speichern");
+
+        VerticalLayout gradeInputLayout = new VerticalLayout();
+
+        gradeInputLayout.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER, form);
+        gradeInputLayout.setHorizontalComponentAlignment(FlexComponent.Alignment.END, save);
+
+        gradeInputLayout.add(form);
+        gradeInputLayout.add(save);
+
+        verticalTabs.addTab("Note eintragen", gradeInputLayout);
+
+        add(verticalTabs);
+
         /* ############## CHANGE LISTENERS ############# */
 
-        martrNumberFilter.addValueChangeListener(event -> {
+        matrNumber.addValueChangeListener(event -> {
             filter.setMatrNumber(event.getValue());
             reloadFilter();
         });
@@ -229,43 +268,65 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             reloadFilter();
         });
 
-        lectureFilter.addValueChangeListener(event -> {
+        lectureSelect.addValueChangeListener(event -> {
             if (event.getValue().getId() == null) {
                 filter.setLecture(null);
                 reloadFilter();
                 grid.getColumnByKey("lecture").setVisible(true);
                 grid.getColumnByKey("exercise").setVisible(true);
 
-                exerciseFilter.setValue(filterCleanExercise);
-                exerciseFilter.setEnabled(false);
+                exerciseSelect.setValue(filterCleanExercise);
+                exerciseSelect.setEnabled(false);
+
+
             } else {
                 filter.setLecture(event.getValue());
                 reloadFilter();
 
                 grid.getColumnByKey("lecture").setVisible(false);
                 grid.getColumnByKey("exercise").setVisible(true);
-                exerciseFilter.setValue(filterCleanExercise);
+                exerciseSelect.setValue(filterCleanExercise);
 
                 List<Exercise> lectureExercises = event.getValue().getExercises();
 
-                exerciseFilter.setItems(lectureExercises);
-                exerciseFilter.setEnabled(true);
+                exerciseSelect.setItems(lectureExercises);
+                exerciseSelect.setEnabled(true);
 
             }
 
         });
 
-        exerciseFilter.addValueChangeListener(event -> {
-            if (!exerciseFilter.isEmpty()) {
-                if (exerciseFilter.getValue().getName().contains("Alle Anzeigen")) {
+        exerciseSelect.addValueChangeListener(event -> {
+            if (!exerciseSelect.isEmpty()) {
+                if (exerciseSelect.getValue().getName().contains("Alle Anzeigen")) {
                     filter.setExercise(null);
                     reloadFilter();
                 } else {
                     filter.setExercise(event.getValue());
                     reloadFilter();
                     grid.getColumnByKey("exercise").setVisible(false);
+                    if (event.getValue().getScheme().getIsNumeric()) {
+                        gradeField.setVisible(true);
+                        tokenSelect.setVisible(false);
+                    } else {
+                        gradeField.setVisible(false);
+                        tokenSelect.setVisible(true);
+                        Set<Token> tokens = event.getValue().getScheme().getTokens();
+                        tokenSelect.setItems(tokens);
+
+                    }
                 }
             }
+        });
+
+        tokenSelect.addValueChangeListener(event -> {
+            if (event.getValue() != null) {
+                tokenOrGrade.setValue(event.getValue().getName());
+            }
+        });
+
+        gradeField.addValueChangeListener(event -> {
+            tokenOrGrade.setValue(event.getValue());
         });
 
         startDateFilter.addValueChangeListener(event -> {
@@ -296,118 +357,48 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             }
         });
 
-        /* ############## FORM TO INPUT A NEW GRADE ############# */
-
-        binder = new Binder<>();
-
-        FormLayout form = new FormLayout();
-        form.setResponsiveSteps(new FormLayout.ResponsiveStep("5em", 1), new FormLayout.ResponsiveStep("5em", 2));
-        form.setWidth("100%");
-        form.getStyle().set("marginLeft", "1em");
-        form.getStyle().set("marginTop", "-0.5em");
-
-        TextField matrikelNum = new TextField();
-        matrikelNum.setPlaceholder("Matrikel Nummer");
-        matrikelNum.setLabel("Matrikel Nummer");
-        matrikelNum.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        form.add(matrikelNum);
-
-        Select<Lecture> lectureSelect = new Select<>();
-        lectureSelect.setItemLabelGenerator(Lecture::getName);
-        lectureSelect.setDataProvider(lectureService);
-        lectureSelect.setPlaceholder("Modul");
-        lectureSelect.setLabel("Modul");
-        form.add(lectureSelect);
-
-        DatePicker datePicker = new DatePicker();
-        datePicker.setLabel("Abgabe-Datum");
-        datePicker.setValue(LocalDate.now());
-        datePicker.setVisible(true);
-        form.add(datePicker);
-
-        Select<Exercise> exerciseSelect = new Select<>();
-        exerciseSelect.setItemLabelGenerator(Exercise::getName);
-        exerciseSelect.setEnabled(false);
-        exerciseSelect.setLabel("Übung");
-        form.add(exerciseSelect);
-
-        TextField gradeField = new TextField();
-        gradeField.setLabel("Note");
-        gradeField.setPlaceholder("Note");
-        gradeField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        form.add(gradeField);
-
-        /* ########### Save Button and Layout ########### */
-
-        Button save = new Button();
-        save.setText("Speichern");
-
-        VerticalLayout gradeInputLayout = new VerticalLayout();
-
-        gradeInputLayout.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER, form);
-        gradeInputLayout.setHorizontalComponentAlignment(FlexComponent.Alignment.END, save);
-
-        gradeInputLayout.add(form);
-        gradeInputLayout.add(save);
-
-        verticalTabs.addTab("Note eintragen", gradeInputLayout);
-
-        add(verticalTabs);
-
-        /* ########### Change Listeners for Selects ########### */
-
-        lectureSelect.addValueChangeListener(event -> {
-            Lecture selectedLecture = lectureSelect.getValue();
-            if (event.getValue() != null) {
-                List<Exercise> exercises = selectedLecture.getExercises();
-                exerciseSelect.setItems(exercises);
-                exerciseSelect.setEnabled(true);
-                exerciseSelect.setValue(exercises.get(0));
-            } else {
-                exerciseSelect.setEnabled(false);
-                exerciseSelect.setValue(null);
-            }
-
-        });
-
         /* ########### Click Listeners for Buttons ########### */
 
         save.addClickListener(event -> {
-            Grade grade = new Grade();
-            if (binder.writeBeanIfValid(grade)) {
-                if (objectId != null) {
-                    grade.setId(objectId);
+            if (lectureSelect.getValue() == null || exerciseSelect.getValue() == null ||
+                    lectureSelect.getValue().getId() == null || exerciseSelect.getValue().getName().contains("Alle Anzeigen")) {
+                Dialog errorDialog = new Dialog();
+                errorDialog.add(new Label("Bitte Modul und Übung angeben"));
+                errorDialog.open();
+            } else {
+                Grade grade = new Grade();
+                if (binder.writeBeanIfValid(grade)) {
+                    if (objectId != null) {
+                        grade.setId(objectId);
+                    }
+                    try {
+                        gradeService.save(grade);
+                    } finally {
+                        // TODO: implement ErrorHandling
+                    }
                 }
-                grade.setLastModified(LocalDateTime.now());
-                grade.setGradedBy(userService.currentUser());
-                try {
-                    gradeService.save(grade);
-                } finally {
-                    // TODO: implement ErrorHandling
-                }
+                reloadFilter();
+                matrNumber.clear();
+                tokenSelect.clear();
+                datePicker.setValue(LocalDate.now());
+                gradeField.clear();
+                tokenOrGrade.clear();
             }
-            reloadFilter();
-            matrikelNum.clear();
-            exerciseSelect.clear();
-            lectureSelect.clear();
-            datePicker.setValue(LocalDate.now());
-            gradeField.clear();
         });
 
         /* ########### Data Binding and validation ########### */
 
         // TODO: Validator
-        binder.forField(matrikelNum).withValidator(new StringLengthValidator("Bitte Matrikelnummer eingeben", 1, null))
+        binder.forField(matrNumber).withValidator(new StringLengthValidator("Bitte Matrikelnummer eingeben", 1, null))
                 .bind(Grade::getMatrNumber, Grade::setMatrNumber);
 
         binder.bind(lectureSelect, Grade::getLecture, Grade::setLecture);
 
         binder.bind(exerciseSelect, Grade::getExercise, Grade::setExercise);
 
-        binder.bind(gradeField, Grade::getGrade, Grade::setGrade);
+        binder.bind(tokenOrGrade, Grade::getGrade, Grade::setGrade);
 
         binder.bind(datePicker, Grade::getHandIn, Grade::setHandIn);
-
     }
 
     /**
@@ -434,8 +425,8 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
                     .filter(lecture -> lecture.getId().equals(new ObjectId(lectureId))).findFirst();
 
             if (parameterLecture.isPresent()) {
-                lectureFilter.setValue(parameterLecture.get());
-                lectureFilter.setPlaceholder(parameterLecture.get().getName());
+                lectureSelect.setValue(parameterLecture.get());
+                lectureSelect.setPlaceholder(parameterLecture.get().getName());
 
                 if (parametersMap.get("exercise") != null) {
                     String parameterExerciseName = parametersMap.get("exercise").get(0);
@@ -443,16 +434,15 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
                             .filter(exercise -> exercise.getName().equals(parameterExerciseName)).findFirst();
 
                     if (parameterExercise.isPresent()) {
-                        exerciseFilter.setValue(parameterExercise.get());
+                        exerciseSelect.setValue(parameterExercise.get());
                     }
                 }
             }
-
         }
 
         if (parametersMap.get("martrNumber") != null) {
             String parameterMartrikelNumber = parametersMap.get("martrNumber").get(0);
-            martrNumberFilter.setValue(parameterMartrikelNumber);
+            matrNumber.setValue(parameterMartrikelNumber);
         }
 
     }
