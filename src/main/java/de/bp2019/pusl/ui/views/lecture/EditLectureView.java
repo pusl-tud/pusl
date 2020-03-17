@@ -69,22 +69,13 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
         /** empty if new institute is being created */
         private Optional<ObjectId> lectureId = Optional.empty();
 
-        private HiwiDataProvider hiwiDataProvider;
-
         @Autowired
         public EditLectureView(InstituteService instituteService, UserService userService,
-                        LectureService lectureService, ExerciseSchemeService exerciseSchemeService) {
+                        LectureService lectureService, ExerciseSchemeService exerciseSchemeService,
+                        HiwiDataProvider hiwiDataProvider) {
                 super("Veranstaltung bearbeiten");
 
                 this.lectureService = lectureService;
-
-                try {
-                        hiwiDataProvider = new HiwiDataProvider(userService);
-                } catch (UnauthorizedException e) {
-                        UI.getCurrent().navigate(LecturesView.ROUTE);
-                        ErrorDialog.open("Nicht authorisiert um alle HIWIs abzurufen");
-                        return;
-                }
 
                 FormLayout formLayout = new FormLayout();
                 formLayout.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
@@ -193,11 +184,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
         @Override
         public void setParameter(BeforeEvent event, String idParameter) {
-
-                /* binder == null if constructor was aborted due to unauthorized exception */
-                if (binder == null) {
-                        return;
-                } else if (idParameter.equals("new")) {
+                if (idParameter.equals("new")) {
                         lectureId = Optional.empty();
                         /* clear fields by setting null */
                         binder.readBean(null);

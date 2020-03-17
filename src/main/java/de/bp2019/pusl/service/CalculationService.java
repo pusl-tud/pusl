@@ -42,7 +42,8 @@ public class CalculationService {
         Grade filter = new Grade();
         filter.setMatrNumber(matrNumber);
         filter.setLecture(lecture);
-        List<Grade> grades = gradeService.getAll(filter);
+        //////////////////////////////////////
+        List<Grade> grades = new ArrayList<Grade>();
         LOGGER.info(grades.toString());
 
         List<Object> gradeValues = new ArrayList<>();
