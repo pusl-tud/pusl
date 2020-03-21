@@ -47,6 +47,6 @@ class MongoConfig extends AbstractMongoClientConfiguration {
   
   @Override
   public boolean autoIndexCreation() {
-    return false;
+    return true;
   }
 }

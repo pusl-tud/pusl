@@ -11,6 +11,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
  * @author Leon Chemnitz
  */
 @Service
+@Scope("session")
 public class InstituteService extends AbstractDataProvider<Institute, String> {
     private static final long serialVersionUID = -1382092534461892569L;
 
@@ -61,12 +63,11 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
             Institute institute = foundInstitute.get();
             LOGGER.debug(institute.toString());
 
-            if (userService.currentUserType() == UserType.SUPERADMIN
-                    || userService.currentUserInstitutes().contains(foundInstitute.get())) {
+            if (userIsAuthorized(institute)) {
                 LOGGER.info("returned because user is authorized");
                 return institute;
             } else {
-                LOGGER.info("user is not authorized");
+                LOGGER.error("user is not authorized");
                 throw new UnauthorizedException();
             }
         }
@@ -82,11 +83,13 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
     public void save(Institute institute) throws UnauthorizedException {
         LOGGER.info("saving institute");
         LOGGER.debug(institute.toString());
-        if (userService.currentUserType() != UserType.SUPERADMIN) {
-            LOGGER.info("user is not authorized!");
+
+        if (userIsAuthorized(institute)) {
+            instituteRepository.save(institute);
+        } else {
+            LOGGER.error("user is not authorized to access Institute!");
             throw new UnauthorizedException();
         }
-        instituteRepository.save(institute);
     }
 
     /**
@@ -99,11 +102,33 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
     public void delete(Institute institute) throws UnauthorizedException {
         LOGGER.info("deleting institute");
         LOGGER.debug(institute.toString());
-        if (userService.currentUserType() != UserType.SUPERADMIN) {
-            LOGGER.info("user is not authorized!");
+
+        if (userIsAuthorized(institute)) {
+            instituteRepository.delete(institute);
+        } else {
+            LOGGER.error("user is not authorized to access Institute!");
             throw new UnauthorizedException();
         }
-        instituteRepository.delete(institute);
+    }
+
+    /**
+     * Check if current user is authorized to access the {@link Institute}
+     * 
+     * @param institute
+     * @return
+     * @author Leon Chemnitz
+     */
+    private boolean userIsAuthorized(Institute institute) {
+        switch (userService.currentUserType()) {
+            default:
+            case HIWI:
+            case WIMI:
+            case ADMIN:
+                break;
+            case SUPERADMIN:
+                return true;
+        }
+        return false;
     }
 
     /**

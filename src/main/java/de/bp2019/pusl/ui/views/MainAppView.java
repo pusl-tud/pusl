@@ -15,7 +15,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.server.PWA;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import de.bp2019.pusl.config.PuslProperties;
@@ -25,6 +24,7 @@ import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
 import de.bp2019.pusl.ui.views.institute.ManageInstitutesView;
 import de.bp2019.pusl.ui.views.lecture.ManageLecturesView;
 import de.bp2019.pusl.ui.views.user.ManageUsersView;
+import de.bp2019.pusl.util.Service;
 
 /**
  * Main View used as a overlay for all other Application views (excluding
@@ -39,8 +39,9 @@ public class MainAppView extends AppLayout {
 
     private static final long serialVersionUID = 5473180730294862712L;
 
-    @Autowired
-    public MainAppView(UserService userService) {
+    public MainAppView() {
+        UserService userService = Service.get(UserService.class);
+
         HorizontalLayout titleLayout = new HorizontalLayout();
         Label title = new Label(PuslProperties.NAME);
         title.getStyle().set("font-size", "1.2em");
@@ -73,9 +74,12 @@ public class MainAppView extends AppLayout {
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(false);
 
-        content.add(generateMenuButton("Startseite", new Icon(VaadinIcon.HOME), LecturesView.ROUTE));
+        content.add(generateMenuButton("Startseite", new Icon(VaadinIcon.HOME), WorkView.ROUTE));
+
+        if(userService.currentUserType() != UserType.HIWI) {
+            content.add(generateMenuButton("Noten Export", new Icon(VaadinIcon.DOWNLOAD), ExportView.ROUTE));
+        }
         content.add(generateMenuButton("Mein Account", new Icon(VaadinIcon.USER), AccountView.ROUTE));
-        content.add(generateMenuButton("Noten Export", new Icon(VaadinIcon.DOWNLOAD), ExportView.ROUTE));
 
         if (userService.currentUserType().ordinal() <= UserType.ADMIN.ordinal()) {
             content.add(generateSeperator());
@@ -91,7 +95,7 @@ public class MainAppView extends AppLayout {
                 content.add(generateSectionLabel("Global"));
                 content.add(
                         generateMenuButton("Institute", new Icon(VaadinIcon.WORKPLACE), ManageInstitutesView.ROUTE));
-                content.add(generateMenuButton("Demo", new Icon(VaadinIcon.BUG), DemoView.ROUTE));
+                content.add(generateMenuButton("Datenbank", new Icon(VaadinIcon.DATABASE), DatabaseView.ROUTE));
             }
         }
 

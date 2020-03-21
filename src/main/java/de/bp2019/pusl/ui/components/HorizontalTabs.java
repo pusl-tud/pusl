@@ -26,6 +26,7 @@ public class HorizontalTabs<T extends Component> extends VerticalLayout {
     private static final Logger LOGGER = LoggerFactory.getLogger(HorizontalTabs.class);
 
     private Map<String, T> titleToPages = new HashMap<String, T>();
+    private Map<String, Tab> titleToTabs = new HashMap<String, Tab>();
     private Tabs tabsComponent;
     private Set<T> pages = new HashSet<T>();
 
@@ -47,10 +48,11 @@ public class HorizontalTabs<T extends Component> extends VerticalLayout {
             component.setVisible(false);
         }
         Tab tab = new Tab(title);
-
+        
+        titleToPages.put(title, component);
+        titleToTabs.put(title, tab);
         tabsComponent.add(tab);
         pages.add(component);
-        titleToPages.put(title, component);
 
         add(component);
     }
@@ -67,6 +69,19 @@ public class HorizontalTabs<T extends Component> extends VerticalLayout {
         return titleToPages.get(title);
     }
 
+    public void removeTab(String title) {
+        LOGGER.debug("deleting tab: " + title);
+
+        T page = titleToPages.get(title);
+        Tab tab = titleToTabs.get(title);
+
+        pages.remove(page);
+        tabsComponent.remove(tab);
+        titleToPages.remove(title);
+        titleToTabs.remove(title);
+        remove(page);
+    }
+
     /**
      * Delete selected Tab
      * 
@@ -74,14 +89,9 @@ public class HorizontalTabs<T extends Component> extends VerticalLayout {
      */
     public void deleteSelectedTab() {
         var selectedTab = tabsComponent.getSelectedTab();
-        LOGGER.debug("deleting tab: " + selectedTab.getLabel());
+        String title = selectedTab.getLabel();
 
-        T selectedPage = titleToPages.get(selectedTab.getLabel());
-        LOGGER.info(selectedPage.toString());
-        pages.remove(selectedPage);
-        titleToPages.remove(selectedTab.getLabel());
-        tabsComponent.remove(selectedTab);
-        remove(selectedPage);
+        removeTab(title);
     }
 
     /**
@@ -102,6 +112,7 @@ public class HorizontalTabs<T extends Component> extends VerticalLayout {
      */
     public void deleteAllTabs() {
         titleToPages.clear();
+        titleToTabs.clear();
         pages.clear();
         removeAll();
         createTabsComponent();
@@ -116,10 +127,11 @@ public class HorizontalTabs<T extends Component> extends VerticalLayout {
 
         tabsComponent.addSelectedChangeListener(event -> {
             var selectedTab = tabsComponent.getSelectedTab();
-            LOGGER.debug("changed tab selection to:" + selectedTab.getLabel());
 
-            T selectedPage = titleToPages.get(selectedTab.getLabel());
-            if (selectedPage != null) {
+            if (selectedTab != null) {
+                LOGGER.debug("changed tab selection to:" + selectedTab.getLabel());
+                T selectedPage = titleToPages.get(selectedTab.getLabel());
+
                 pages.forEach(page -> page.setVisible(false));
                 selectedPage.setVisible(true);
             }

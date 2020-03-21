@@ -12,8 +12,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Institute;
@@ -25,6 +23,7 @@ import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
@@ -42,11 +41,10 @@ public class ManageExerciseSchemesView extends BaseView implements AccessibleByA
 
     private ExerciseSchemeService exerciseSchemeService;
 
-    @Autowired
-    public ManageExerciseSchemesView(ExerciseSchemeService exerciseSchemeService) {
+    public ManageExerciseSchemesView() {
         super("Übungsschemas");
 
-        this.exerciseSchemeService = exerciseSchemeService;
+        this.exerciseSchemeService = Service.get(ExerciseSchemeService.class);
 
         /* -- Create Components -- */
 

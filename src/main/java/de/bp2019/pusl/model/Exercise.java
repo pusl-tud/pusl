@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
  * A class to model a instance of an exercise. Always an embedded Document in a
@@ -17,7 +17,6 @@ public class Exercise {
 
 	private String name;
 	
-	@DBRef
 	private ExerciseScheme scheme;
 
 	private boolean assignableByHIWI;
@@ -57,7 +56,7 @@ public class Exercise {
 	
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
 	}
 
 	@Override

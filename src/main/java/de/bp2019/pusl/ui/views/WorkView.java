@@ -1,29 +1,22 @@
 package de.bp2019.pusl.ui.views;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Optional;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.data.provider.Query;
-import com.vaadin.flow.data.validator.StringLengthValidator;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Location;
@@ -31,28 +24,29 @@ import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
-
-import de.bp2019.pusl.model.Token;
-import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.firitin.components.DynamicFileDownloader;
+import com.vaadin.flow.server.StreamResource;
 
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.Lecture;
-import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.service.dataproviders.FilteringGradeDataProvider;
+import de.bp2019.pusl.service.dataproviders.GradeFilter;
+import de.bp2019.pusl.ui.components.EditGradePopup;
+import de.bp2019.pusl.ui.components.GradeComposer;
 import de.bp2019.pusl.ui.components.VerticalTabs;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.util.ExcelExporter;
+import de.bp2019.pusl.util.Service;
+import de.bp2019.pusl.util.exceptions.DataNotFoundException;
+import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
  * View that displays all Grades and contains a form to add New Grades
  *
- * @author Luca Dinies
+ * @author Luca Dinies, Leon Chemnitz
  **/
 
 @PageTitle(PuslProperties.NAME + " | Noten")
@@ -61,354 +55,161 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String ROUTE = "grades";
+    public static final String ROUTE = "";
 
-    private ListDataProvider<Lecture> lectureDataProvider;
     private FilteringGradeDataProvider filteringGradeDataProvider;
-
-    private ObjectId objectId;
-
-    private Binder<Grade> binder;
-
-    private Select<Lecture> lectureSelect;
-    private Select<Exercise> exerciseSelect;
-    private TextField matrNumber;
-
-    Grid<Grade> grid;
+    private LectureService lectureService;
 
     private Map<String, List<String>> parametersMap;
 
-    /**
-     * Filter for the Database Query, lookup Spring Data Query by Example!
-     */
-    private Grade filter;
+    private Binder<Grade> binder;
 
-    @Autowired
-    public WorkView(GradeService gradeService, LectureService lectureService, UserService userService,
-            FilteringGradeDataProvider filteringGradeDataProvider) {
-        super("Noten eintragen");
-        LOGGER.debug("Started creation of WorkView");
+    private Grid<Grade> grid;
 
-        this.filteringGradeDataProvider = filteringGradeDataProvider;
+    private GradeFilter filter;
 
-        List<Lecture> allLectures = new ArrayList<>();
-        allLectures.add(new Lecture("Alle Anzeigen", null, null, null, null));
-        allLectures.addAll(lectureService.fetch(new Query<>()).collect(Collectors.toList()));
-        lectureDataProvider = new ListDataProvider<>(allLectures);
+    public WorkView() {
+        super("Noten");
 
-        filter = new Grade();
+        this.filteringGradeDataProvider = Service.get(FilteringGradeDataProvider.class);
+        this.lectureService = Service.get(LectureService.class);
 
-        Exercise filterCleanExercise = new Exercise("Alle Anzeigen", null, false);
+        filter = new GradeFilter();
+
+        GradeComposer gradeComposer = new GradeComposer();
+        gradeComposer.setWidthFull();
+        add(gradeComposer);
 
         VerticalTabs verticalTabs = new VerticalTabs();
-        verticalTabs.setHeight("100%");
-        verticalTabs.setWidth("100%");
+        verticalTabs.setHeight("30em");
+        verticalTabs.setWidthFull();
+        add(verticalTabs);
 
-        VerticalLayout gridAndFilter = new VerticalLayout();
+        /* ########### create Grade ########### */
 
-        /* ########### Create the filter Fields ########### */
+        FormLayout createGrade = new FormLayout();
+        createGrade.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
+        createGrade.setWidth("100%");
+        createGrade.getStyle().set("marginLeft", "1em");
+        createGrade.getStyle().set("marginTop", "-0.5em");
 
-        HorizontalLayout unattachedSelects = new HorizontalLayout();
-        unattachedSelects.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        DatePicker creationDatePicker = new DatePicker();
+        creationDatePicker.setLabel("Abgabe-Datum");
+        creationDatePicker.setValue(LocalDate.now());
+        creationDatePicker.setVisible(true);
+        createGrade.add(creationDatePicker, 1);
 
-        HorizontalLayout gridFilter = new HorizontalLayout();
+        Button createGradeButton = new Button();
+        createGradeButton.setText("Note eintragen");
+        createGradeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        createGrade.add(createGradeButton, 1);
 
-        matrNumber = new TextField();
-        matrNumber.setLabel("Matrikelnummer");
-        matrNumber.setPlaceholder("Matrikelnummer");
-        matrNumber.setValueChangeMode(ValueChangeMode.EAGER);
-        unattachedSelects.add(matrNumber);
+        verticalTabs.addTab("Eintragen", createGrade);
 
-        TextField gradeFilter = new TextField();
-        gradeFilter.setLabel("Note");
-        gradeFilter.setPlaceholder("Note");
-        gradeFilter.setValueChangeMode(ValueChangeMode.EAGER);
-        gridFilter.add(gradeFilter);
+        /* ########### show Grades ########### */
 
-        lectureSelect = new Select<>();
-        lectureSelect.setItemLabelGenerator(Lecture::getName);
-        lectureSelect.setDataProvider(lectureDataProvider);
-        lectureSelect.setLabel("Modul");
-        unattachedSelects.add(lectureSelect);
+        VerticalLayout showGrades = new VerticalLayout();
 
-        exerciseSelect = new Select<>();
-        exerciseSelect.setItemLabelGenerator(Exercise::getName);
-        exerciseSelect.setEnabled(false);
-        exerciseSelect.setLabel("Übung");
-
-        exerciseSelect.setValue(filterCleanExercise);
-        unattachedSelects.add(exerciseSelect);
+        FormLayout showGradesHeader = new FormLayout();
+        showGradesHeader.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2),
+                new ResponsiveStep("5em", 3));
+        showGradesHeader.setWidthFull();
 
         DatePicker startDateFilter = new DatePicker();
         startDateFilter.setLabel("Start");
-        gridFilter.add(startDateFilter);
+        startDateFilter.getElement().setAttribute("theme", "small");
+        showGradesHeader.add(startDateFilter, 1);
 
         DatePicker endDateFilter = new DatePicker();
         endDateFilter.setLabel("End");
-        gridFilter.add(endDateFilter);
+        endDateFilter.getElement().setAttribute("theme", "small");
+        showGradesHeader.add(endDateFilter, 1);
 
-        gridAndFilter.add(gridFilter);
+        ExcelExporter<Grade> excelExporter = createExcelExporter();
+        Anchor download = new Anchor(
+                new StreamResource("noten.xlsx", (stream, session) -> excelExporter.createResource(stream, session)),
+                "");
+        download.getElement().setAttribute("download", true);
+        Button downloadButton = new Button("Download Excel");
+        downloadButton.setWidthFull();
+        downloadButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+        download.add(downloadButton);
+        download.setWidthFull();
 
-        add(unattachedSelects);
+        showGradesHeader.add(download, 1);
+        showGrades.add(showGradesHeader);
 
-        /* ########### Create the Grid ########### */
+        grid = new Grid<>(Grade.class);
+        grid.removeAllColumns();
 
-        grid = new Grid<>();
-
-        grid.setWidth("100%");
+        grid.addThemeVariants(GridVariant.LUMO_COMPACT);
+        grid.setWidthFull();
+        grid.setHeightFull();
         grid.setDataProvider(filteringGradeDataProvider);
 
-        grid.addColumn(Grade::getMatrNumber).setHeader("Matr. Nr.").setAutoWidth(true).setKey("matrNum");
-        grid.addColumn(item -> item.getLecture().getName()).setHeader("Veranstaltung").setAutoWidth(true)
-                .setKey("lecture");
-        grid.addColumn(item -> item.getExercise().getName()).setHeader("Übung").setAutoWidth(true).setKey("exercise");
-        grid.addColumn(item -> item.getHandIn()).setHeader("Abgabedatum").setAutoWidth(true).setKey("handin");
-        grid.addColumn(item -> item.getGrade()).setHeader("Note").setAutoWidth(true).setKey("grade");
+        grid.addColumn(Grade::getMatrNumber).setKey("matrNumber").setHeader("Matr. Nr.").setAutoWidth(true);
+        grid.addColumn(item -> item.getLecture().getName()).setKey("lecture").setHeader("Veranstaltung")
+                .setAutoWidth(true);
+        grid.addColumn(item -> item.getExercise().getName()).setKey("exercise").setHeader("Übung").setAutoWidth(true);
+        grid.addColumn(item -> item.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM. uuuu")))
+                .setHeader("Abgabedatum").setAutoWidth(true);
+        grid.addColumn(item -> item.getValue()).setHeader("Note").setAutoWidth(true);
+        grid.setSortableColumns("matrNumber");
+        grid.addItemClickListener(event -> {
+            if (event.getClickCount() == 2) {
+                EditGradePopup.open(event.getItem());
+            }
+        });
 
-        gridAndFilter.add(grid);
+        showGrades.add(grid);
 
-        verticalTabs.addTab("Alle Noten", gridAndFilter);
-
-        /* ############## Download Button ############# */
-
-        DynamicFileDownloader downloadButton = new DynamicFileDownloader("Download als Excelliste", "Notenliste.xlsx",
-                outputStream -> {
-                    try {
-                        ExcelExporter<Grade> excelExporter = new ExcelExporter<Grade>();
-
-                        List<Grade> allGrades = filteringGradeDataProvider.fetch(new Query<>()).collect(Collectors.toList());
-                        excelExporter.setItems(allGrades);
-                        excelExporter.addColumn("Matr.Nummer", Grade::getMatrNumber);
-                        excelExporter.addColumn("Note", Grade::getGrade);
-                        excelExporter.addColumn("Veranstaltung", grade -> grade.getLecture().getName());
-                        excelExporter.addColumn("Übung", grade -> grade.getExercise().getName());
-                        excelExporter.addColumn("eingetragen von", grade -> {
-                            // TODO : nullabilität entfernen
-                            if (grade.getGradedBy() == null) {
-                                return "";
-                            } else {
-                                return UserService.getFullName(grade.getGradedBy());
-                            }
-                        });
-                        excelExporter.addColumn("Datum", grade -> {
-                            // TODO : nullabilität entfernen
-                            if (grade.getLastModified() == null) {
-                                return "";
-                            } else {
-                                return grade.getLastModified().format(DateTimeFormatter.RFC_1123_DATE_TIME);
-                            }
-                        });
-
-                        excelExporter.write(outputStream);
-                    } catch (IOException e) {
-                        ErrorDialog.open("Fehler beim Erstellen der Datei");
-                        LOGGER.error(e.toString());
-                    }
-                });
-
-        gridAndFilter.add(downloadButton);
-
-        /* ############## FORM TO INPUT A NEW GRADE ############# */
-
-        binder = new Binder<>();
-
-        FormLayout form = new FormLayout();
-        form.setResponsiveSteps(new FormLayout.ResponsiveStep("5em", 1), new FormLayout.ResponsiveStep("5em", 2));
-        form.setWidth("100%");
-        form.getStyle().set("marginLeft", "1em");
-        form.getStyle().set("marginTop", "-0.5em");
-
-        DatePicker datePicker = new DatePicker();
-        datePicker.setLabel("Abgabe-Datum");
-        datePicker.setValue(LocalDate.now());
-        datePicker.setVisible(true);
-        form.add(datePicker);
-
-        TextField gradeField = new TextField();
-        gradeField.setLabel("Note");
-        gradeField.setPlaceholder("Note");
-        gradeField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        form.add(gradeField);
-
-        Select<Token> tokenSelect = new Select<>();
-        tokenSelect.setItemLabelGenerator(Token::getName);
-        tokenSelect.setLabel("Token");
-        tokenSelect.setVisible(false);
-        form.add(tokenSelect);
-
-        /* Invisible TextField, to Bind Token and Grade */
-        TextField tokenOrGrade = new TextField();
-
-        /* ########### Save Button and Layout ########### */
-
-        Button save = new Button();
-        save.setText("Speichern");
-
-        VerticalLayout gradeInputLayout = new VerticalLayout();
-
-        gradeInputLayout.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER, form);
-        gradeInputLayout.setHorizontalComponentAlignment(FlexComponent.Alignment.END, save);
-
-        gradeInputLayout.add(form);
-        gradeInputLayout.add(save);
-
-        verticalTabs.addTab("Note eintragen", gradeInputLayout);
-
-        add(verticalTabs);
+        verticalTabs.addTab("Einsehen", showGrades);
 
         /* ############## CHANGE LISTENERS ############# */
 
-        matrNumber.addValueChangeListener(event -> {
-            filter.setMatrNumber(event.getValue());
-            reloadFilter();
-        });
+        gradeComposer.addValueChangeListener(event -> {
+            LOGGER.debug("GradeComposer value changed");
+            GradeFilter newValue = event.getValue();
 
-        gradeFilter.addValueChangeListener(event -> {
-            filter.setGrade(event.getValue());
-            reloadFilter();
-        });
+            filter.setMatrNumber(newValue.getMatrNumber());
+            filter.setLecture(newValue.getLecture());
+            filter.setExercise(newValue.getExercise());
+            filter.setGrade(newValue.getGrade());
 
-        lectureSelect.addValueChangeListener(event -> {
-            if (event.getValue().getId() == null) {
-                filter.setLecture(null);
-                reloadFilter();
-                grid.getColumnByKey("lecture").setVisible(true);
-                grid.getColumnByKey("exercise").setVisible(true);
+            filteringGradeDataProvider.setFilter(filter);
+            filteringGradeDataProvider.refreshAll();
 
-                exerciseSelect.setValue(filterCleanExercise);
-                exerciseSelect.setEnabled(false);
-
-
-            } else {
-                filter.setLecture(event.getValue());
-                reloadFilter();
-
+            if (filter.getLecture() != null) {
                 grid.getColumnByKey("lecture").setVisible(false);
+            } else {
+                grid.getColumnByKey("lecture").setVisible(true);
+            }
+
+            if (filter.getExercise() != null) {
+                grid.getColumnByKey("exercise").setVisible(false);
+            } else {
                 grid.getColumnByKey("exercise").setVisible(true);
-                exerciseSelect.setValue(filterCleanExercise);
-
-                List<Exercise> lectureExercises = event.getValue().getExercises();
-
-                exerciseSelect.setItems(lectureExercises);
-                exerciseSelect.setEnabled(true);
-
             }
-
-        });
-
-        exerciseSelect.addValueChangeListener(event -> {
-            if (!exerciseSelect.isEmpty()) {
-                if (exerciseSelect.getValue().getName().contains("Alle Anzeigen")) {
-                    filter.setExercise(null);
-                    reloadFilter();
-                } else {
-                    filter.setExercise(event.getValue());
-                    reloadFilter();
-                    grid.getColumnByKey("exercise").setVisible(false);
-                    if (event.getValue().getScheme().getIsNumeric()) {
-                        gradeField.setVisible(true);
-                        tokenSelect.setVisible(false);
-                    } else {
-                        gradeField.setVisible(false);
-                        tokenSelect.setVisible(true);
-                        Set<Token> tokens = event.getValue().getScheme().getTokens();
-                        tokenSelect.setItems(tokens);
-
-                    }
-                }
-            }
-        });
-
-        tokenSelect.addValueChangeListener(event -> {
-            if (event.getValue() != null) {
-                tokenOrGrade.setValue(event.getValue().getName());
-            }
-        });
-
-        gradeField.addValueChangeListener(event -> {
-            tokenOrGrade.setValue(event.getValue());
         });
 
         startDateFilter.addValueChangeListener(event -> {
-            LocalDate selectedDate = event.getValue();
-            LocalDate endDate = endDateFilter.getValue();
-            if (selectedDate != null) {
-                endDateFilter.setMin(selectedDate);
-                //filteringGradeDataProvider.addFilter(grade -> grade.getHandIn().isAfter(startDateFilter.getValue()));
-                if (endDate == null) {
-                    endDateFilter.setOpened(true);
-                }
-            } else {
-                endDateFilter.setMin(null);
-            }
+            LocalDate startDate = event.getValue();
+
+            filter.setStartDate(startDate);
+
+            filteringGradeDataProvider.setFilter(filter);
+            filteringGradeDataProvider.refreshAll();
         });
 
         endDateFilter.addValueChangeListener(event -> {
-            LocalDate selectedDate = event.getValue();
-            LocalDate startDate = startDateFilter.getValue();
-            if (selectedDate != null) {
-                startDateFilter.setMax(selectedDate);
-                //gradeDataProvider.addFilter(grade -> grade.getHandIn().isBefore(endDateFilter.getValue()));
-                if (startDate == null) {
-                    startDateFilter.setOpened(true);
-                }
-            } else {
-                startDateFilter.setMax(null);
-            }
+            LocalDate startDate = event.getValue();
+
+            filter.setStartDate(startDate);
+
+            filteringGradeDataProvider.setFilter(filter);
+            filteringGradeDataProvider.refreshAll();
         });
 
-        /* ########### Click Listeners for Buttons ########### */
-
-        save.addClickListener(event -> {
-            if (lectureSelect.getValue() == null || exerciseSelect.getValue() == null ||
-                    lectureSelect.getValue().getId() == null || exerciseSelect.getValue().getName().contains("Alle Anzeigen")) {
-                Dialog errorDialog = new Dialog();
-                errorDialog.add(new Label("Bitte Modul und Übung angeben"));
-                errorDialog.open();
-            } else {
-                Grade grade = new Grade();
-                if (binder.writeBeanIfValid(grade)) {
-                    if (objectId != null) {
-                        grade.setId(objectId);
-                    }
-                    try {
-                        gradeService.save(grade);
-                    } finally {
-                        // TODO: implement ErrorHandling
-                    }
-                }
-                reloadFilter();
-                matrNumber.clear();
-                tokenSelect.clear();
-                datePicker.setValue(LocalDate.now());
-                gradeField.clear();
-                tokenOrGrade.clear();
-            }
-        });
-
-        /* ########### Data Binding and validation ########### */
-
-        // TODO: Validator
-        binder.forField(matrNumber).withValidator(new StringLengthValidator("Bitte Matrikelnummer eingeben", 1, null))
-                .bind(Grade::getMatrNumber, Grade::setMatrNumber);
-
-        binder.bind(lectureSelect, Grade::getLecture, Grade::setLecture);
-
-        binder.bind(exerciseSelect, Grade::getExercise, Grade::setExercise);
-
-        binder.bind(tokenOrGrade, Grade::getGrade, Grade::setGrade);
-
-        binder.bind(datePicker, Grade::getHandIn, Grade::setHandIn);
-    }
-
-    /**
-     * Fetch new Data from database, that matches the Filter
-     *
-     * @author Leon Chemnitz
-     */
-    private void reloadFilter() {
-        LOGGER.debug(filter.toString());
-        filteringGradeDataProvider.refreshAll();
     }
 
     @Override
@@ -418,32 +219,57 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         parametersMap = queryParameters.getParameters();
 
-        if (parametersMap.get("lecture") != null) {
-            String lectureId = parametersMap.get("lecture").get(0);
-            Optional<Lecture> parameterLecture = lectureDataProvider.getItems().stream()
-                    .filter(lecture -> lecture.getId() != null)
-                    .filter(lecture -> lecture.getId().equals(new ObjectId(lectureId))).findFirst();
+        try {
+            if (parametersMap.get("lecture") != null) {
+                String lectureId = parametersMap.get("lecture").get(0);
+                Lecture parameterLecture = lectureService.getById(lectureId);
 
-            if (parameterLecture.isPresent()) {
-                lectureSelect.setValue(parameterLecture.get());
-                lectureSelect.setPlaceholder(parameterLecture.get().getName());
+                filter.setLecture(parameterLecture);
 
                 if (parametersMap.get("exercise") != null) {
                     String parameterExerciseName = parametersMap.get("exercise").get(0);
-                    Optional<Exercise> parameterExercise = parameterLecture.get().getExercises().stream()
+                    Optional<Exercise> parameterExercise = parameterLecture.getExercises().stream()
                             .filter(exercise -> exercise.getName().equals(parameterExerciseName)).findFirst();
 
                     if (parameterExercise.isPresent()) {
-                        exerciseSelect.setValue(parameterExercise.get());
+                        filter.setExercise(parameterExercise.get());
                     }
                 }
+
+                filteringGradeDataProvider.setFilter(filter);
+                filteringGradeDataProvider.refreshAll();
             }
+        } catch (DataNotFoundException e) {
+            filter.setLecture(null);
+            filter.setExercise(null);
+
+            filteringGradeDataProvider.setFilter(filter);
+            filteringGradeDataProvider.refreshAll();
+        } catch (UnauthorizedException e) {
+            UI.getCurrent().navigate(LecturesView.ROUTE);
+            ErrorDialog.open("Nicht authorisiert um Noten zu bearbeiten!");
         }
 
         if (parametersMap.get("martrNumber") != null) {
             String parameterMartrikelNumber = parametersMap.get("martrNumber").get(0);
-            matrNumber.setValue(parameterMartrikelNumber);
+            filter.setMatrNumber(parameterMartrikelNumber);
         }
+    }
 
+    private ExcelExporter<Grade> createExcelExporter() {
+        ExcelExporter<Grade> excelExporter = new ExcelExporter<>();
+
+        excelExporter.setDataProvider(filteringGradeDataProvider);
+        excelExporter.addColumn("Matr.Nummer", Grade::getMatrNumber);
+        excelExporter.addColumn("Note", Grade::getValue);
+        excelExporter.addColumn("Veranstaltung", grade -> grade.getLecture().getName());
+        excelExporter.addColumn("Übung", grade -> grade.getExercise().getName());
+        excelExporter.addColumn("Eingetragen von", grade -> UserService.getFullName(grade.getGradedBy()));
+        excelExporter.addColumn("Abgegeben am",
+                grade -> grade.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM. uuuu")));
+        excelExporter.addColumn("Zuletzt verändert",
+                grade -> grade.getLastModified().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+        return excelExporter;
     }
 }

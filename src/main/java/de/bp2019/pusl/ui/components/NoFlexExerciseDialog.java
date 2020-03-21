@@ -24,7 +24,7 @@ import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.model.Token;
 import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
-
+import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
  * Creates a dialog window to start an exercise for one student.
@@ -48,8 +48,7 @@ public class NoFlexExerciseDialog {
         /* ########### Create the Fields ########### */
 
         FormLayout form = new FormLayout();
-        form.setResponsiveSteps(new FormLayout.ResponsiveStep("5em", 1),
-                new FormLayout.ResponsiveStep("5em", 2));
+        form.setResponsiveSteps(new FormLayout.ResponsiveStep("5em", 1), new FormLayout.ResponsiveStep("5em", 2));
         form.setWidth("100%");
         form.getStyle().set("marginLeft", "1em");
         form.getStyle().set("marginTop", "-0.5em");
@@ -108,7 +107,7 @@ public class NoFlexExerciseDialog {
         });
 
         exerciseSelect.addValueChangeListener(event -> {
-            if(!exerciseSelect.isEmpty()) {
+            if (!exerciseSelect.isEmpty()) {
                 Exercise selectedExercise = exerciseSelect.getValue();
                 Set<Token> token = selectedExercise.getScheme().getTokens();
                 tokenSelect.setItems(token);
@@ -141,15 +140,15 @@ public class NoFlexExerciseDialog {
 
         /* ########### Data Binding and validation ########### */
 
-        //TODO: Validator
+        // TODO: Validator
         binder.forField(matrikelNum).withValidator(new StringLengthValidator("Bitte Matrikelnummer eingeben", 1, null))
                 .bind(Grade::getMatrNumber, Grade::setMatrNumber);
 
         binder.bind(lectureSelect, Grade::getLecture, Grade::setLecture);
 
-        binder.bind(exerciseSelect, Grade::getExercise,Grade::setExercise);
+        binder.bind(exerciseSelect, Grade::getExercise, Grade::setExercise);
 
-        binder.bind(gradeField, Grade::getGrade, Grade::setGrade);
+        binder.bind(gradeField, Grade::getValue, Grade::setValue);
 
         binder.bind(datePicker, Grade::getHandIn, Grade::setHandIn);
 
@@ -162,11 +161,15 @@ public class NoFlexExerciseDialog {
         save.addClickListener(event -> {
             Grade grade = new Grade();
             if (binder.writeBeanIfValid(grade)) {
-                if(objectId != null){
+                if (objectId != null) {
                     grade.setId(objectId);
-                } try {
+                }
+                try {
                     gradeService.save(grade);
                     dialog.close();
+                } catch (UnauthorizedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 } finally {
                     // TODO: implement ErrorHandling
                 }

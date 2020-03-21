@@ -20,7 +20,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
 import de.bp2019.pusl.config.PuslProperties;
@@ -41,6 +40,7 @@ import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
@@ -57,11 +57,10 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
         public static final String ROUTE = "admin/lecture";
 
-        /*
-         * no @Autowire because service is injected by constructor. Vaadin likes it
-         * better this way...
-         */
+        private InstituteService instituteService;
         private LectureService lectureService;
+        private ExerciseSchemeService exerciseSchemeService;
+        private HiwiDataProvider hiwiDataProvider;
 
         /** Binder to bind the form Data to an Object */
         private Binder<Lecture> binder;
@@ -69,13 +68,13 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
         /** empty if new institute is being created */
         private Optional<ObjectId> lectureId = Optional.empty();
 
-        @Autowired
-        public EditLectureView(InstituteService instituteService, UserService userService,
-                        LectureService lectureService, ExerciseSchemeService exerciseSchemeService,
-                        HiwiDataProvider hiwiDataProvider) {
+        public EditLectureView() {
                 super("Veranstaltung bearbeiten");
 
-                this.lectureService = lectureService;
+                this.instituteService = Service.get(InstituteService.class);
+                this.lectureService = Service.get(LectureService.class);
+                this.exerciseSchemeService = Service.get(ExerciseSchemeService.class);
+                this.hiwiDataProvider = Service.get(HiwiDataProvider.class);
 
                 FormLayout formLayout = new FormLayout();
                 formLayout.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
@@ -93,7 +92,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 name.setValueChangeMode(ValueChangeMode.EAGER);
                 formLayout.add(name, 1);
 
-                MultiselectComboBox<Institute> institutes = new MultiselectComboBox<Institute>();
+                MultiselectComboBox<Institute> institutes = new MultiselectComboBox<>();
                 institutes.setLabel("Institute");
                 institutes.setDataProvider(instituteService);
                 institutes.setItemLabelGenerator(Institute::getName);
@@ -109,7 +108,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 PerformanceSchemeComposer performanceSchemes = new PerformanceSchemeComposer();
                 verticalTabs.addTab("Leistungen", performanceSchemes);
 
-                MultiselectComboBox<User> hasAccess = new MultiselectComboBox<User>();
+                MultiselectComboBox<User> hasAccess = new MultiselectComboBox<>();
                 hasAccess.setWidth("100%");
                 hasAccess.setHeight("10em");
                 hasAccess.setLabel("Zugriff");

@@ -123,7 +123,7 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
 
         grid.asSingleSelect().addValueChangeListener(event -> {
             nameTextField.setValue(event.getValue().getName());
-            ExerciseScheme exerciseScheme = exerciseSchemeService.fetch(new Query<ExerciseScheme, String>())
+            ExerciseScheme exerciseScheme = exerciseSchemeService.fetch(new Query<>())
                     .filter(es -> es.getId().equals(event.getValue().getScheme().getId())).findFirst().get();
             exerciseSchemeSelect.setValue(exerciseScheme);
         });

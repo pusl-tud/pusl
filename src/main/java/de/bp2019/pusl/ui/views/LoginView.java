@@ -6,7 +6,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.util.CustomRequestCache;
+import de.bp2019.pusl.util.Service;
 
 /**
  * LoginView used as the Login page for unauthenticated users.
@@ -31,8 +31,14 @@ public class LoginView extends VerticalLayout {
 
 	private LoginOverlay login = new LoginOverlay();
 
-	@Autowired
-	public LoginView(AuthenticationManager authenticationManager, CustomRequestCache requestCache) {
+	private AuthenticationManager authenticationManager;
+    private CustomRequestCache requestCache;
+
+	public LoginView() {
+
+		this.authenticationManager = Service.get(AuthenticationManager.class);
+		this.requestCache = Service.get(CustomRequestCache.class);
+
 		/* configures login dialog and adds it to the main view */
 		login.setOpened(true);
 		login.setTitle(PuslProperties.NAME);

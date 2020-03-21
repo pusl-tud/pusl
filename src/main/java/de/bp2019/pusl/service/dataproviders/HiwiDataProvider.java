@@ -1,9 +1,7 @@
 package de.bp2019.pusl.service.dataproviders;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
@@ -20,7 +18,6 @@ import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.views.lecture.EditLectureView;
-import de.bp2019.pusl.util.Utils;
 
 /**
  * Dataprovider for Hiwis, filtered on a Set of {@link Institute}s. Used in
@@ -42,36 +39,24 @@ public class HiwiDataProvider extends AbstractDataProvider<User, String>
 
     private Set<Institute> filter;
 
-    private List<User> allHiwis;
-
     @PostConstruct
     public void init() {
-        //allHiwis = userService.findAllHiwis();
         filter = new HashSet<Institute>();
     }
 
     @Override
     public boolean isInMemory() {
-        return true;
+        return false;
     }
 
     @Override
     public int size(Query<User, String> query) {
-        return (int) allHiwis.stream().filter(hiwi -> Utils.containsAny(hiwi.getInstitutes(), filter)).count();
+        return userService.sizeHiwis(query, filter);
     }
 
     @Override
     public Stream<User> fetch(Query<User, String> query) {
-        List<User> hiwis = allHiwis.stream().filter(hiwi -> Utils.containsAny(hiwi.getInstitutes(), filter))
-                .collect(Collectors.toList());
-
-        int toIndex = query.getLimit() + query.getOffset();
-
-        if (toIndex > hiwis.size()) {
-            toIndex = hiwis.size();
-        }
-
-        return hiwis.subList(query.getOffset(), toIndex).stream();
+        return userService.fetchHiwis(query, filter);
     }
 
     @Override

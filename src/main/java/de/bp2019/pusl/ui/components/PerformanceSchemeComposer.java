@@ -1,7 +1,9 @@
 package de.bp2019.pusl.ui.components;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -15,6 +17,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
 import de.bp2019.pusl.model.PerformanceScheme;
+import de.bp2019.pusl.ui.views.lecture.EditLectureView;
 
 /**
  * Field Component used in {@link EditLectureView} to manage PerformanceSchemes
@@ -25,20 +28,21 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
 
     private static final long serialVersionUID = -1741662181318687543L;
 
-    private List<String> performanceNames;
-    HorizontalTabs<TextArea> tabs;
-    Button deleteButton;
+    private List<String> performanceNames = new ArrayList<>();
+    private HorizontalTabs<TextArea> tabs;
+    private Button deleteButton;
+    private String defaultCalculationRule;
 
     public PerformanceSchemeComposer() {
         setWidth("100%");
 
-        tabs = new HorizontalTabs<TextArea>();
+        defaultCalculationRule = "function calculate(results) { \n";
+        defaultCalculationRule += "     \n";
+        defaultCalculationRule += "    return 'nicht definiert';\n";
+        defaultCalculationRule += "}";
+
+        tabs = new HorizontalTabs<>();
         tabs.setHeight("22.8em");
-
-        performanceNames = new ArrayList<String>();
-
-        var firstPerformanceName = "Prüfungsleistung";
-        tabs.addTab(firstPerformanceName, createCalculationRuleField());
 
         add(tabs);
 
@@ -65,14 +69,17 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
 
         add(formLayout);
 
+        setPresentationValue(Arrays.asList(new PerformanceScheme("Prüfungsleistung", defaultCalculationRule)));
+
         /* ######### Listeners ######## */
 
         createButton.addClickListener(event -> {
             var performanceName = nameField.getValue();
 
-            if (!performanceNames.contains(performanceName)) {
+            if (!performanceNames.contains(performanceName) && performanceName != "") {
                 performanceNames.add(performanceName);
-                tabs.addTab(performanceName, createCalculationRuleField());
+                tabs.addTab(performanceName, createCalculationRuleField(defaultCalculationRule));
+                nameField.setValue("");
                 setPresentationValue(generateModelValue());
             }
         });
@@ -80,9 +87,12 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
         deleteButton.addClickListener(event -> {
             performanceNames.remove(tabs.getSelectedTabTitle());
             tabs.deleteSelectedTab();
+
             if (tabs.getNumTabs() <= 1) {
                 deleteButton.setEnabled(false);
             }
+
+            setValue(generateModelValue());
         });
     }
 
@@ -96,16 +106,25 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
 
     @Override
     protected void setPresentationValue(List<PerformanceScheme> newPresentationValue) {
-        tabs.deleteAllTabs();
-        performanceNames.clear();
 
         newPresentationValue.forEach(performanceScheme -> {
             String name = performanceScheme.getName();
-            performanceNames.add(name);
-            TextArea calculationRule = createCalculationRuleField();
-            calculationRule.setValue(performanceScheme.getCalculationRule());
-            tabs.addTab(name, calculationRule);
+
+            if (performanceNames.contains(name)) {
+                tabs.getComponentFromTitle(name).setValue(performanceScheme.getCalculationRule());
+            } else {
+                tabs.addTab(name, createCalculationRuleField(performanceScheme.getCalculationRule()));
+            }
         });
+
+        performanceNames = newPresentationValue.stream().map(PerformanceScheme::getName).collect(Collectors.toList());
+
+        for (String name : performanceNames) {
+            if (newPresentationValue.stream().filter(scheme -> scheme.getName() == name).findFirst().isEmpty()) {
+                tabs.removeTab(name);
+            }
+        }
+
 
         if (tabs.getNumTabs() > 1) {
             deleteButton.setEnabled(true);
@@ -114,19 +133,17 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
         }
     }
 
-    private TextArea createCalculationRuleField() {
-
+    private TextArea createCalculationRuleField(String calculationRule) {
         TextArea editor = new TextArea();
         editor.setValueChangeMode(ValueChangeMode.EAGER);
         editor.setWidth("100%");
         editor.getStyle().set("minHeight", "18em");
+        editor.setValue(calculationRule);
 
-        String defaultValue = "function calcuate(results) { \n";
-        defaultValue += "     \n";
-        defaultValue += "    return ergebnis;\n";
-        defaultValue += "}";
+        editor.addValueChangeListener(event -> {
+            setValue(generateModelValue());
+        });
 
-        editor.setValue(defaultValue);
         return editor;
     }
 

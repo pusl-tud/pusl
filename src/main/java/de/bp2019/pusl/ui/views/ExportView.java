@@ -6,19 +6,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.firitin.components.DynamicFileDownloader;
+import com.vaadin.flow.server.StreamResource;
 
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Lecture;
@@ -30,9 +30,12 @@ import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.interfaces.AccessibleByWimi;
 import de.bp2019.pusl.util.ExcelExporter;
 import de.bp2019.pusl.util.ExcelUtil;
+import de.bp2019.pusl.util.Service;
+import de.bp2019.pusl.util.Utils;
 
 /**
- * View to calculate and list the {@link Performance}s and export them as a Excelsheet;
+ * View to calculate and list the {@link Performance}s and export them as a
+ * Excelsheet;
  *
  * @author Luca Dinies
  **/
@@ -48,17 +51,21 @@ public class ExportView extends BaseView implements AccessibleByWimi {
     private ListDataProvider<Performance> performanceDataProvider;
 
     private CalculationService calculationService;
+    private LectureService lectureService;
 
     private MemoryBuffer uploadBuffer;
 
     private Select<Lecture> lectureSelect;
     private Select<PerformanceScheme> performanceSchemeSelect;
 
-    @Autowired
-    public ExportView(LectureService lectureService, CalculationService calculationService) {
+    private ExcelExporter<Performance> exporter;
+    private Grid<Performance> grid;
+
+    public ExportView() {
         super("Noten exportieren");
 
-        this.calculationService = calculationService;
+        this.calculationService = Service.get(CalculationService.class);
+        this.lectureService = Service.get(LectureService.class);
 
         performanceList = new ArrayList<>();
         performanceDataProvider = new ListDataProvider<>(performanceList);
@@ -84,30 +91,40 @@ public class ExportView extends BaseView implements AccessibleByWimi {
 
         /* ######## Upload Component and Calculate Button ######## */
 
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-
-        Upload upload = new Upload(uploadBuffer);
+        Upload upload = new Upload(uploadBuffer);        
         upload.setDropLabel(new Span("Excelliste hier abelegen"));
         upload.setUploadButton(new Button("Matrikelnummern hochladen"));
         upload.setAcceptedFileTypes(".xlsx");
-        buttonLayout.add(upload);
+        upload.setWidth("96%");
 
-        Button calculateButton = new Button("Berechnen");
-        buttonLayout.setVerticalComponentAlignment((Alignment.CENTER), calculateButton);
-        buttonLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-        buttonLayout.add(calculateButton);
-
-        add(buttonLayout);
+        add(upload);
 
         /* ######## Grid for the calculated Performances ######## */
 
-        Grid<Performance> performanceGrid = new Grid<>();
-        performanceGrid.setDataProvider(performanceDataProvider);
+        grid = new Grid<>();
+        grid.addThemeVariants(GridVariant.LUMO_COMPACT);
+        grid.setDataProvider(performanceDataProvider);
 
-        performanceGrid.addColumn(Performance::getMatriculationNumber).setHeader("Matrikel-Nummer").setAutoWidth(true);
-        performanceGrid.addColumn(Performance::getGrade).setHeader("Note").setAutoWidth(true);
+        grid.addColumn(Performance::getMatriculationNumber).setHeader("Matrikel-Nummer").setAutoWidth(true);        
+        grid.addColumn(Performance::getGrade).setKey("performance").setHeader("");
 
-        add(performanceGrid);
+        add(grid);
+
+        exporter = new ExcelExporter<Performance>();
+        exporter.setDataProvider(performanceDataProvider);
+        exporter.addColumn("Matr.Nummer", Performance::getMatriculationNumber);
+
+        Anchor download = new Anchor(
+                new StreamResource("leistungen.xlsx", (stream, session) -> exporter.createResource(stream, session)),
+                "");
+        download.getElement().setAttribute("download", true);
+        Button downloadButton = new Button("Download Excel");
+        downloadButton.setWidthFull();
+        downloadButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+        download.add(downloadButton);
+        download.setWidthFull();
+
+        add(download);
 
         /* ######## Listeners ######## */
 
@@ -130,27 +147,24 @@ public class ExportView extends BaseView implements AccessibleByWimi {
             refreshGrid();
         });
 
-        /* ######## Excel Download Button ######## */
-
-        DynamicFileDownloader downloadButton = new DynamicFileDownloader("Download Excel", "endnoten.xlsx",
-                outputStream -> {
-                    try {
-                        ExcelExporter<Performance> exporter = new ExcelExporter<Performance>();
-                        exporter.setItems(performanceList);
-                        exporter.addColumn("Matr.Nummer", Performance::getMatriculationNumber);
-                        String performanceName = performanceSchemeSelect.getValue().getName();
-                        exporter.addColumn(performanceName, Performance::getGrade);
-                        exporter.write(outputStream);
-                    } catch (IOException e) {
-                        ErrorDialog.open("Fehler beim erstellen der Datei");
-                        LOGGER.error(e.toString());
-                    }
-                });
-
-        add(downloadButton);
     }
 
     private void refreshGrid() {
+        Lecture lecture = lectureSelect.getValue();
+        PerformanceScheme performanceScheme = performanceSchemeSelect.getValue();
+
+        exporter.removeAllColumns();
+
+        exporter.addColumn("Matr.Nummer", Performance::getMatriculationNumber);
+
+        if(performanceScheme != null){
+            grid.getColumnByKey("performance").setHeader(performanceScheme.getName());
+            exporter.addColumn(performanceScheme.getName(), Performance::getGrade);
+        }else{
+            grid.getColumnByKey("performance").setHeader("");
+        }
+
+
         List<String> matrNumbers = new ArrayList<String>();
         try {
             if (uploadBuffer.getInputStream().available() > 0) {
@@ -163,8 +177,16 @@ public class ExportView extends BaseView implements AccessibleByWimi {
             LOGGER.error(e.toString());
         }
 
-        Lecture lecture = lectureSelect.getValue();
-        PerformanceScheme performanceScheme = performanceSchemeSelect.getValue();
+        matrNumbers = matrNumbers.stream().distinct().map(m -> {
+            String subStrings[] = m.split("\\.");
+            if(subStrings.length == 2){
+                return subStrings[0];
+            }else{
+                return "";
+            }
+        }).filter(Utils::isMatrNumber).collect(Collectors.toList());
+
+        LOGGER.debug("read matrNumbers " + matrNumbers.toString());
 
         if (lecture != null && performanceScheme != null) {
             performanceList.clear();

@@ -7,10 +7,12 @@ import java.util.Arrays;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -19,23 +21,23 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author Leon Chemnitz
  */
 @Document
+@CompoundIndexes({
+    @CompoundIndex(name = "filter_asc", def = "{'matrNumber' : 1, 'lecture._id': 1, 'exercise.name': 1, 'handIn': 1}")
+})
 public class Grade {
 	@Id
 	private ObjectId id;
 
-	@DBRef
 	private Lecture lecture;
 
 	private Exercise exercise;
 
-	@Indexed(unique = false)
+	@Indexed(name= "grade_matr", unique = false)
 	private String matrNumber;
 
-	@DBRef
 	private User gradedBy;
 
-	/** Grade is stored as a string to enable non-numeric entries */
-	private String grade;
+	private String value;
 
 	private LocalDate handIn;
 
@@ -44,11 +46,11 @@ public class Grade {
 	public Grade() {
 	}
 
-	public Grade(Lecture lecture, Exercise exercise, String matrNumber, String grade, LocalDate handIn) {
+	public Grade(Lecture lecture, Exercise exercise, String matrNumber, String value, LocalDate handIn) {
 		this.lecture = lecture;
 		this.exercise = exercise;
 		this.matrNumber = matrNumber;
-		this.grade = grade;
+		this.value = value;
 		this.handIn = handIn;
 
 		lastModified = LocalDateTime.now();
@@ -56,26 +58,29 @@ public class Grade {
 
 	public void setLecture(Lecture lecture){
 		this.lecture = lecture;
+		lastModified = LocalDateTime.now();
 	}
 
 	public Lecture getLecture(){
 		return lecture;
 	}
-
+	
 	public String getMatrNumber() {
 		return matrNumber;
 	}
 
 	public void setMatrNumber(String matrNumber) {
 		this.matrNumber = matrNumber;
+		lastModified = LocalDateTime.now();
 	}
 
-	public String getGrade() {
-		return grade;
+	public String getValue() {
+		return value;
 	}
 
-	public void setGrade(String grade) {
-		this.grade = grade;
+	public void setValue(String grade) {
+		this.value = grade;
+		lastModified = LocalDateTime.now();
 	}
 
 	public LocalDate getHandIn() {
@@ -84,6 +89,7 @@ public class Grade {
 
 	public void setHandIn(LocalDate handIn) {
 		this.handIn = handIn;
+		lastModified = LocalDateTime.now();
 	}
 
 	public ObjectId getId() {
@@ -92,6 +98,7 @@ public class Grade {
 
 	public void setId(ObjectId id) {
 		this.id = id;
+		lastModified = LocalDateTime.now();
 	}
 
 	public User getGradedBy() {
@@ -100,6 +107,7 @@ public class Grade {
 
 	public void setGradedBy(User gradedBy) {
 		this.gradedBy = gradedBy;
+		lastModified = LocalDateTime.now();
 	}
 
 	public Exercise getExercise() {
@@ -108,6 +116,7 @@ public class Grade {
 
 	public void setExercise(Exercise exercise) {
 		this.exercise = exercise;
+		lastModified = LocalDateTime.now();
 	}
 
 	public LocalDateTime getLastModified() {
@@ -116,11 +125,12 @@ public class Grade {
 
 	public void setLastModified(LocalDateTime lastModified) {
 		this.lastModified = lastModified;
+		lastModified = LocalDateTime.now();
 	}
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
 	}
 
 	@Override
@@ -131,7 +141,7 @@ public class Grade {
 	@Override
 	public boolean equals(Object o) {
 		return EqualsBuilder.reflectionEquals(this, o,
-				Arrays.asList("lecture", "exercise", "matrNumber", "gradedBy", "grade", "handIn", "lastModified"));
+				Arrays.asList("lecture", "lectureEmb", "exercise", "matrNumber", "gradedBy", "grade", "handIn", "lastModified"));
 	}
 
 }

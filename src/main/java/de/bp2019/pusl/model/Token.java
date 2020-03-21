@@ -1,5 +1,11 @@
 package de.bp2019.pusl.model;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -43,4 +49,20 @@ public class Token {
     public void setAssignableByHIWI(boolean assignableByHIWI) {
         this.assignableByHIWI = assignableByHIWI;
     }
+
+    @Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(name).toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return EqualsBuilder.reflectionEquals(this, o,
+				Arrays.asList("assignableByHIWI"));
+	}
 }

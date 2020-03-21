@@ -23,6 +23,7 @@ import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.service.LectureService;
+import de.bp2019.pusl.util.Service;
 
 /**
  * View displaying a list of all {@link Lecture}s
@@ -35,10 +36,14 @@ public class LecturesView extends BaseView {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String ROUTE = "";
+    public static final String ROUTE = "unused";
 
-    public LecturesView(LectureService lectureService) {
+    private LectureService lectureService;
+
+    public LecturesView() {
         super("Meine Veranstaltungen");
+
+        this.lectureService = Service.get(LectureService.class);
 
         List<Lecture> lectures = lectureService.fetch(new Query<Lecture, String>()).collect(Collectors.toList());
 

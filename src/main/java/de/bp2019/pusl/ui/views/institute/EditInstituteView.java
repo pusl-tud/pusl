@@ -21,7 +21,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Institute;
@@ -32,6 +31,7 @@ import de.bp2019.pusl.ui.interfaces.AccessibleBySuperadmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
@@ -56,11 +56,10 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
         /** empty if new institute is being created */
         private Optional<ObjectId> instituteId = Optional.empty();
 
-        @Autowired
-        public EditInstituteView(InstituteService instituteService) {
+        public EditInstituteView() {
                 super("Institut bearbeiten");
 
-                this.instituteService = instituteService;
+                this.instituteService = Service.get(InstituteService.class);
 
                 FormLayout form = new FormLayout();
                 form.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));

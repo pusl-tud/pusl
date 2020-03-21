@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.bp2019.pusl.ui.views;
 
 import java.util.Optional;
@@ -11,6 +8,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -24,7 +22,6 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import de.bp2019.pusl.config.PuslProperties;
@@ -33,6 +30,7 @@ import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.dialogs.SuccessDialog;
 import de.bp2019.pusl.ui.views.user.ManageUsersView;
+import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
@@ -52,12 +50,14 @@ public class AccountView extends BaseView {
 
 	private User currentUser;
 
-	@Autowired
-	PasswordEncoder passwordEncoder;
+	private UserService userService;       
+	private PasswordEncoder passwordEncoder;
 
-	@Autowired
-	public AccountView(UserService userService) {
+	public AccountView() {
 		super("Account verwalten");
+
+		this.userService = Service.get(UserService.class);
+		this.passwordEncoder = Service.get(PasswordEncoder.class);
 
 		currentUser = userService.currentUser();
 
@@ -87,10 +87,15 @@ public class AccountView extends BaseView {
 		form.add(password, 1);
 		form.add(confirmPassword, 1);
 
-		Button saveButton = new Button("Änderungen speichern");
-		saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		Button save = new Button("Änderungen speichern");
+		save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		VerticalLayout actions = new VerticalLayout();
+		actions.add(save);
+		actions.setHorizontalComponentAlignment(Alignment.END, save);
 
-		add(form, saveButton);
+		form.add(actions, 2);
+		
+		add(form);
 		
 		/* ########### Data Binding and validation ########### */
 		
@@ -134,7 +139,7 @@ public class AccountView extends BaseView {
 
 		password.addValueChangeListener(e -> passwordBinder.validate());
 
-		saveButton.addClickListener(event -> {
+		save.addClickListener(event -> {
 
 			if (!userService.checkEmailAvailable(emailAddress.getValue(), Optional.of(currentUser.getId()))) {
 				ErrorDialog.open("Email Adresse bereits vergeben");

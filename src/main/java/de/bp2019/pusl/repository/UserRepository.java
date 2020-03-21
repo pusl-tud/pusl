@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -22,7 +21,9 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findByEmailAddress(String emailAddress);
     List<User> findByType(UserType type);
     Stream<User> findByInstitutesIn(Set<Institute> institutes, Pageable pageable);
-    Stream<User> findByInstitutesIn(Set<Institute> institutes, Example<User> example, Pageable pageable);
+    Stream<User> findByType(UserType type, Pageable pageable);
+    Stream<User> findByInstitutesInAndType(Set<Institute> institutes, UserType type, Pageable pageable);
     int countByInstitutesIn(Set<Institute> institutes);
-    int countByInstitutesIn(Set<Institute> institutes, Example<User> example);
+    int countByType(UserType type);
+    int countByInstitutesInAndType(Set<Institute> institutes, UserType type);
 }

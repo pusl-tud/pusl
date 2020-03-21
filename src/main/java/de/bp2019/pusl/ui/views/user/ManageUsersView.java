@@ -9,8 +9,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.service.UserService;
@@ -21,6 +19,7 @@ import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
@@ -38,11 +37,10 @@ public class ManageUsersView extends BaseView implements AccessibleByAdmin {
 
     private UserService userService;
 
-    @Autowired
-    public ManageUsersView(UserService userService) {
+    public ManageUsersView() {
         super("Benutzer");
 
-        this.userService = userService;
+        this.userService = Service.get(UserService.class);
 
         /* -- Create Components -- */
 

@@ -10,6 +10,7 @@ import org.mozilla.javascript.Scriptable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.model.Exercise;
@@ -17,9 +18,11 @@ import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.model.Performance;
 import de.bp2019.pusl.model.PerformanceScheme;
+import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.util.exceptions.JSException;
 
 @Service
+@Scope("session")
 public class CalculationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CalculationService.class);
 
@@ -30,9 +33,17 @@ public class CalculationService {
             PerformanceScheme performanceScheme) {
         List<Performance> result = new ArrayList<>();
 
-        matrNumbers.forEach(matrNumber -> {
-            result.add(calculatePerformance(matrNumber, lecture, performanceScheme));
-        });
+        try{
+            matrNumbers.forEach(matrNumber -> {
+                result.add(calculatePerformance(matrNumber, lecture, performanceScheme));
+            });
+        } catch(Exception e) {
+            ErrorDialog.open("Es gab einen Fehler mit der Berechnungsregel");
+
+            matrNumbers.forEach(matrNumber -> {
+                result.add(new Performance(matrNumber, performanceScheme, " "));
+            });
+        }
 
         return result;
     }
@@ -43,7 +54,7 @@ public class CalculationService {
         filter.setMatrNumber(matrNumber);
         filter.setLecture(lecture);
         //////////////////////////////////////
-        List<Grade> grades = new ArrayList<Grade>();
+        List<Grade> grades = new ArrayList<>();
         LOGGER.info(grades.toString());
 
         List<Object> gradeValues = new ArrayList<>();
@@ -54,9 +65,9 @@ public class CalculationService {
 
             if (grade.isPresent()) {
                 if (exercise.getScheme().getIsNumeric()) {
-                    gradeValues.add(Float.valueOf(grade.get().getGrade()));
+                    gradeValues.add(Float.valueOf(grade.get().getValue()));
                 } else {
-                    gradeValues.add(grade.get().getGrade());
+                    gradeValues.add(grade.get().getValue());
                 }
             } else {
                 gradeValues.add(exercise.getScheme().getDefaultValue());

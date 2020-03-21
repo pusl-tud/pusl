@@ -10,6 +10,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
  * @author Leon Chemnitz
  */
 @Service
+@Scope("session")
 public class LectureService extends AbstractDataProvider<Lecture, String> {
     private static final long serialVersionUID = -4325095502734352010L;
 
@@ -82,18 +84,13 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
         LOGGER.info("saving lecture");
         LOGGER.debug(lecture.toString());
 
-        if (userService.currentUserType() == UserType.SUPERADMIN) {
+        if (userIsAuthorized(lecture)) {
             lectureRepository.save(lecture);
-            return;
+        }else{
+            LOGGER.error("user is not authorized to delete lecture!");
+            throw new UnauthorizedException();
         }
 
-        if (userService.currentUserType() == UserType.ADMIN && userService.currentUserInstitutes().containsAll(lecture.getInstitutes())) {
-            lectureRepository.save(lecture);
-            return;
-        }
-
-        LOGGER.info("user is not authorized!");
-        throw new UnauthorizedException();
     }
 
     /**
@@ -107,25 +104,42 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
         LOGGER.info("deleting lecture");
         LOGGER.debug(lecture.toString());
 
-        if (userService.currentUserType() == UserType.SUPERADMIN) {
+        if (userIsAuthorized(lecture)) {
             lectureRepository.delete(lecture);
-            return;
+        }else{
+            LOGGER.error("user is not authorized to delete lecture!");
+            throw new UnauthorizedException();
         }
 
-        if (userService.currentUserType() == UserType.ADMIN && Utils.containsAny(userService.currentUserInstitutes(), lecture.getInstitutes())) {
-            lectureRepository.delete(lecture);
-            return;
-        }
-
-        LOGGER.info("user is not authorized!");
-        throw new UnauthorizedException();
     }
 
-    
     /**
-     * Check wether a {@link Lecture} with a given name already exists in
-     * Database. Also takes an id parameter which excludes the entity with matching
-     * Id from the check. This is neccessairy for updating an existing {@link Lecture}.
+     * Check if current user is authorized to access the {@link Lecture}
+     * 
+     * @param lecture
+     * @return
+     * @author Leon Chemnitz
+     */
+    private boolean userIsAuthorized(Lecture lecture) {
+
+        switch (userService.currentUserType()) {
+            default:
+            case HIWI:
+            case WIMI:
+                break;
+            case ADMIN:
+                if (!Utils.containsAny(userService.currentUserInstitutes(), lecture.getInstitutes()))
+                    break;
+            case SUPERADMIN:
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check wether a {@link Lecture} with a given name already exists in Database.
+     * Also takes an id parameter which excludes the entity with matching Id from
+     * the check. This is neccessairy for updating an existing {@link Lecture}.
      * 
      * @param name
      * @param id

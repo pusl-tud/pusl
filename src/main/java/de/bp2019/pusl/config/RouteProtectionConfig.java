@@ -6,6 +6,7 @@ import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import de.bp2019.pusl.enums.UserType;
@@ -26,6 +27,7 @@ import de.bp2019.pusl.util.Utils;
  * @author Leon Chemnitz
  */
 @Component
+@Scope("session")
 public class RouteProtectionConfig implements VaadinServiceInitListener {
 
     private static final long serialVersionUID = 1L;

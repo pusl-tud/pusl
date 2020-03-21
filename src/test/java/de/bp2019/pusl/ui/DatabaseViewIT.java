@@ -6,16 +6,16 @@ import org.slf4j.LoggerFactory;
 
 import de.bp2019.pusl.config.BaseUITest;
 import de.bp2019.pusl.enums.UserType;
-import de.bp2019.pusl.ui.views.DemoView;
+import de.bp2019.pusl.ui.views.DatabaseView;
 import de.bp2019.pusl.ui.views.LecturesView;
 
 /**
- * UI test for {@link DemoView}
+ * UI test for {@link DatabaseView}
  * 
  * @author Leon Chemnitz
  */
-public class DemoViewIT extends BaseUITest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DemoViewIT.class);
+public class DatabaseViewIT extends BaseUITest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseViewIT.class);
 
     /**
      * @author Leon Chemnitz
@@ -27,21 +27,21 @@ public class DemoViewIT extends BaseUITest {
 
         LOGGER.info("Testing access as SUPERADMIN");
         login(UserType.SUPERADMIN);
-        goToURL(DemoView.ROUTE);
+        goToURL(DatabaseView.ROUTE);
         logout();
 
         LOGGER.info("Testing access as ADMIN");
         login(UserType.ADMIN);
-        goToURLandWaitForRedirect(DemoView.ROUTE, LecturesView.ROUTE);
+        goToURLandWaitForRedirect(DatabaseView.ROUTE, LecturesView.ROUTE);
         logout();
 
         LOGGER.info("Testing access as WIWI");
         login(UserType.WIMI);
-        goToURLandWaitForRedirect(DemoView.ROUTE, LecturesView.ROUTE);
+        goToURLandWaitForRedirect(DatabaseView.ROUTE, LecturesView.ROUTE);
         logout();
 
         LOGGER.info("Testing access as HIWI");
         login(UserType.HIWI);
-        goToURLandWaitForRedirect(DemoView.ROUTE, LecturesView.ROUTE);
+        goToURLandWaitForRedirect(DatabaseView.ROUTE, LecturesView.ROUTE);
     }
 }

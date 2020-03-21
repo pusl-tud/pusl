@@ -27,7 +27,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
@@ -43,6 +42,7 @@ import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
@@ -61,6 +61,8 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
         public static final String ROUTE = "admin/user";
 
         private UserService userService;
+        private InstituteService instituteService;        
+        private PasswordEncoder passwordEncoder;
 
         /** Binder to bind the form Data to an Object */
         private Binder<User> binder;
@@ -68,14 +70,12 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
         /** empty if new institute is being created */
         private Optional<ObjectId> userId;
 
-        @Autowired
-        PasswordEncoder passwordEncoder;
-
-        @Autowired
-        public EditUserView(UserService userService, InstituteService instituteService) {
+        public EditUserView() {
                 super("Nutzer bearbeiten");
 
-                this.userService = userService;
+                this.userService = Service.get(UserService.class);
+                this.instituteService = Service.get(InstituteService.class);
+                this.passwordEncoder = Service.get(PasswordEncoder.class);
 
                 FormLayout form = new FormLayout();
                 form.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));

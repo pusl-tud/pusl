@@ -10,6 +10,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
  * @author Leon Chemnitz
  */
 @Service
+@Scope("session")
 public class ExerciseSchemeService extends AbstractDataProvider<ExerciseScheme, String> {
     private static final long serialVersionUID = 5319757533859168120L;
 
@@ -61,12 +63,10 @@ public class ExerciseSchemeService extends AbstractDataProvider<ExerciseScheme, 
             ExerciseScheme exerciseScheme = foundExerciseScheme.get();
             LOGGER.debug(exerciseScheme.toString());
 
-            if (userService.currentUserType() == UserType.SUPERADMIN
-                    || Utils.containsAny(userService.currentUserInstitutes(), exerciseScheme.getInstitutes())) {
-                LOGGER.info("returned because user is authorized");
+            if (userIsAuthorized(exerciseScheme)){
                 return exerciseScheme;
             } else {
-                LOGGER.info("user is not authorized");
+                LOGGER.error("user is not authorized to access Exercise Sheme");
                 throw new UnauthorizedException();
             }
         }
@@ -83,19 +83,12 @@ public class ExerciseSchemeService extends AbstractDataProvider<ExerciseScheme, 
         LOGGER.info("saving lecture");
         LOGGER.debug(exerciseScheme.toString());
 
-        if (userService.currentUserType() == UserType.SUPERADMIN) {
+        if (userIsAuthorized(exerciseScheme)) {
             exerciseSchemeRepository.save(exerciseScheme);
-            return;
+        }else{ 
+            LOGGER.error("user is not authorized to access ExerciseScheme!");
+            throw new UnauthorizedException();
         }
-
-        if (userService.currentUserType() == UserType.ADMIN
-                && userService.currentUserInstitutes().containsAll(exerciseScheme.getInstitutes())) {
-            exerciseSchemeRepository.save(exerciseScheme);
-            return;
-        }
-
-        LOGGER.info("user is not authorized!");
-        throw new UnauthorizedException();
     }
 
     /**
@@ -109,25 +102,41 @@ public class ExerciseSchemeService extends AbstractDataProvider<ExerciseScheme, 
         LOGGER.info("deleting lecture");
         LOGGER.debug(exerciseScheme.toString());
 
-        if (userService.currentUserType() == UserType.SUPERADMIN) {
+        if (userIsAuthorized(exerciseScheme)) {
             exerciseSchemeRepository.delete(exerciseScheme);
-            return;
+        }else{ 
+            LOGGER.error("user is not authorized to access ExerciseScheme!");
+            throw new UnauthorizedException();
         }
-
-        if (userService.currentUserType() == UserType.ADMIN
-                && Utils.containsAny(userService.currentUserInstitutes(), exerciseScheme.getInstitutes())) {
-            exerciseSchemeRepository.delete(exerciseScheme);
-            return;
-        }
-
-        LOGGER.info("user is not authorized!");
-        throw new UnauthorizedException();
     }
 
     /**
-     * Check wether a {@link ExerciseScheme} with a given name already exists in Database.
-     * Also takes an id parameter which excludes the entity with matching Id from
-     * the check. This is neccessairy for updating an existing {@link ExerciseScheme}.
+     * Check if current user is authorized to access the {@link ExerciseScheme}
+     * 
+     * @param exerciseScheme
+     * @return
+     * @author Leon Chemnitz
+     */
+    private boolean userIsAuthorized(ExerciseScheme exerciseScheme) {
+        switch (userService.currentUserType()) {
+            default:
+            case HIWI:
+            case WIMI:
+                break;
+            case ADMIN:
+                if (!Utils.containsAny(userService.currentUserInstitutes(), exerciseScheme.getInstitutes()))
+                    break;
+            case SUPERADMIN:
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check wether a {@link ExerciseScheme} with a given name already exists in
+     * Database. Also takes an id parameter which excludes the entity with matching
+     * Id from the check. This is neccessairy for updating an existing
+     * {@link ExerciseScheme}.
      * 
      * @param name
      * @param id

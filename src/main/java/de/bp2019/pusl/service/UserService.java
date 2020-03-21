@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import com.google.common.collect.Sets;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.data.provider.AbstractDataProvider;
 import com.vaadin.flow.data.provider.Query;
@@ -15,15 +16,11 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.enums.UserType;
@@ -44,7 +41,8 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
  * @author Leon Chemnitz
  */
 @Service
-public class UserService extends AbstractDataProvider<User, String> implements UserDetailsService {
+@Scope("session")
+public class UserService extends AbstractDataProvider<User, String> {
     private static final long serialVersionUID = 1866448855648692985L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
@@ -52,14 +50,7 @@ public class UserService extends AbstractDataProvider<User, String> implements U
     @Autowired
     UserRepository userRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) {
-        Optional<User> user = userRepository.findByEmailAddress(username);
-        if (user.isEmpty()) {
-            throw new UsernameNotFoundException(username);
-        }
-        return user.get();
-    }
+    private User currentUser;
 
     /**
      * Returns the currently logged in User as a {@link User} Object. If Current
@@ -71,22 +62,29 @@ public class UserService extends AbstractDataProvider<User, String> implements U
      */
     public User currentUser() {
         LOGGER.debug("getting current user");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
 
-        Optional<User> user = userRepository.findByEmailAddress(email);
+        if (currentUser == null) {
+            LOGGER.debug("fetching currentUser from database");
 
-        if (user.isEmpty()) {
-            LOGGER.info("currently logged in user with email: '" + email
-                    + "' was not found in Database. User is being logged out.");
-            SecurityContextHolder.clearContext();
-            UI.getCurrent().getSession().close();
-            UI.getCurrent().navigate(LoginView.ROUTE);
-            ErrorDialog.open("Angemeldeter Nutzer existiert nicht mehr in Datenbank!");
-            return new User();
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+
+            Optional<User> user = userRepository.findByEmailAddress(email);
+
+            if (user.isEmpty()) {
+                LOGGER.info("currently logged in user with email: '" + email
+                        + "' was not found in Database. User is being logged out.");
+                SecurityContextHolder.clearContext();
+                UI.getCurrent().getSession().close();
+                UI.getCurrent().navigate(LoginView.ROUTE);
+                ErrorDialog.open("Angemeldeter Nutzer existiert nicht mehr in Datenbank!");
+                return new User();
+            }
+
+            currentUser = user.get();
         }
 
-        return user.get();
+        return currentUser;
     }
 
     /**
@@ -115,21 +113,6 @@ public class UserService extends AbstractDataProvider<User, String> implements U
     public Set<Institute> currentUserInstitutes() {
         return currentUser().getInstitutes();
     }
-
-    // /**
-    //  * Get a List of all Users with type Hiwi
-    //  * 
-    //  * @return
-    //  * @throws UnauthorizedException
-    //  */
-    // public List<User> findAllHiwis() throws UnauthorizedException {
-    //     LOGGER.info("getting all HIWIs");
-    //     if (currentUserType() != UserType.SUPERADMIN && currentUserType() != UserType.ADMIN) {
-    //         LOGGER.info("user is not authorized!");
-    //         throw new UnauthorizedException();
-    //     }
-    //     return userRepository.findByType(UserType.HIWI);
-    // }
 
     /**
      * Get the full name of a user. Returns the users email address if no firstname
@@ -162,17 +145,11 @@ public class UserService extends AbstractDataProvider<User, String> implements U
         LOGGER.info("saving user");
         LOGGER.debug(user.toString());
 
-        switch (currentUserType()) {
-            case SUPERADMIN:
-                userRepository.save(user);
-                return;
-            case ADMIN:
-                if (currentUserInstitutes().containsAll(user.getInstitutes())) {
-                    userRepository.save(user);
-                    return;
-                }
-            default:
-                throw new UnauthorizedException();
+        if (userIsAuthorized(user)) {
+            userRepository.save(user);
+        } else {
+            LOGGER.error("user is not authorized to access User!");
+            throw new UnauthorizedException();
         }
     }
 
@@ -187,17 +164,11 @@ public class UserService extends AbstractDataProvider<User, String> implements U
         LOGGER.info("deleting user");
         LOGGER.debug(user.toString());
 
-        switch (currentUserType()) {
-            case SUPERADMIN:
-                userRepository.delete(user);
-                return;
-            case ADMIN:
-                if (Utils.containsAny(currentUserInstitutes(), user.getInstitutes())) {
-                    userRepository.delete(user);
-                    return;
-                }
-            default:
-                throw new UnauthorizedException();
+        if (userIsAuthorized(user)) {
+            userRepository.delete(user);
+        } else {
+            LOGGER.error("user is not authorized to access User!");
+            throw new UnauthorizedException();
         }
     }
 
@@ -224,14 +195,37 @@ public class UserService extends AbstractDataProvider<User, String> implements U
             User user = foundUser.get();
             LOGGER.debug(user.toString());
 
-            if (currentUserType() == UserType.SUPERADMIN
-                    || Utils.containsAny(currentUserInstitutes(), user.getInstitutes())) {
+            if (userIsAuthorized(user)) {
                 LOGGER.info("returned because user is authorized");
                 return user;
             } else {
+                LOGGER.error("user is not authorized to access User!");
                 throw new UnauthorizedException();
             }
         }
+    }
+
+    /**
+     * Check if current user is authorized to access the {@link User}
+     * 
+     * @param user
+     * @return
+     * @author Leon Chemnitz
+     */
+    private boolean userIsAuthorized(User user) {
+
+        switch (currentUserType()) {
+            default:
+            case HIWI:
+            case WIMI:
+                break;
+            case ADMIN:
+                if (!Utils.containsAny(currentUserInstitutes(), user.getInstitutes()))
+                    break;
+            case SUPERADMIN:
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -291,14 +285,6 @@ public class UserService extends AbstractDataProvider<User, String> implements U
         return false;
     }
 
-    private ExampleMatcher matcher() {
-        ExampleMatcher matcher = ExampleMatcher.matching().withMatcher("firstName", GenericPropertyMatchers.contains())
-                .withMatcher("lastName", GenericPropertyMatchers.contains())
-                .withMatcher("emailAddress", GenericPropertyMatchers.contains()).withIgnoreNullValues();
-
-        return matcher;
-    }
-
     /**
      * 
      * @param query
@@ -306,16 +292,13 @@ public class UserService extends AbstractDataProvider<User, String> implements U
      * @return
      * @author Leon Chemnitz
      */
-    public int size(Query<User, String> query, User filter) {
-        if (filter == null) {
-            filter = new User();
-        }
-
+    public int sizeHiwis(Query<User, String> query, Set<Institute> institutes) {
         switch (currentUserType()) {
             case SUPERADMIN:
-                return (int) userRepository.count(Example.of(filter, matcher()));
+                return (int) userRepository.countByInstitutesInAndType(institutes, UserType.HIWI);
             case ADMIN:
-                return (int) userRepository.countByInstitutesIn(currentUserInstitutes(),Example.of(filter, matcher()));
+                Set<Institute> intersection = Sets.intersection(institutes, currentUserInstitutes());
+                return (int) userRepository.countByInstitutesInAndType(intersection, UserType.HIWI);
             default:
                 return 0;
         }
@@ -326,7 +309,14 @@ public class UserService extends AbstractDataProvider<User, String> implements U
      */
     @Override
     public int size(Query<User, String> query) {
-        return size(query, null);
+        switch (currentUserType()) {
+            case SUPERADMIN:
+                return (int) userRepository.count();
+            case ADMIN:
+                return (int) userRepository.countByInstitutesIn(currentUserInstitutes());
+            default:
+                return 0;
+        }
     }
 
     /**
@@ -334,7 +324,16 @@ public class UserService extends AbstractDataProvider<User, String> implements U
      */
     @Override
     public Stream<User> fetch(Query<User, String> query) {
-        return fetch(query, null);
+        Pageable pageable = new LimitOffsetPageRequest(query.getLimit(), query.getOffset());
+
+        switch (currentUserType()) {
+            case SUPERADMIN:
+                return userRepository.findAll(pageable).stream();
+            case ADMIN:
+                return userRepository.findByInstitutesIn(currentUserInstitutes(), pageable);
+            default:
+                return Stream.empty();
+        }
     }
 
     /**
@@ -344,21 +343,17 @@ public class UserService extends AbstractDataProvider<User, String> implements U
      * @return
      * @author Leon Chemnitz
      */
-    public Stream<User> fetch(Query<User, String> query, User filter) {
-        if (filter == null) {
-            filter = new User();
-        }
-
+    public Stream<User> fetchHiwis(Query<User, String> query, Set<Institute> institutes) {
         Pageable pageable = new LimitOffsetPageRequest(query.getLimit(), query.getOffset());
 
         switch (currentUserType()) {
             case SUPERADMIN:
-                return userRepository.findAll(Example.of(filter, matcher()), pageable).stream();
+                return userRepository.findByInstitutesInAndType(institutes, UserType.HIWI, pageable);
             case ADMIN:
-                return userRepository.findByInstitutesIn(currentUserInstitutes(), Example.of(filter, matcher()), pageable);
+                Set<Institute> intersection = Sets.intersection(institutes, currentUserInstitutes());
+                return userRepository.findByInstitutesInAndType(intersection, UserType.HIWI, pageable);
             default:
                 return Stream.empty();
         }
     }
-
 }

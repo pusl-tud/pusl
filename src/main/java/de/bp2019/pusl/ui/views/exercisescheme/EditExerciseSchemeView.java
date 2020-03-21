@@ -23,7 +23,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
 import de.bp2019.pusl.config.PuslProperties;
@@ -38,6 +37,7 @@ import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
 import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
@@ -57,17 +57,17 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
 
     private Binder<ExerciseScheme> binder;
 
-    /* Binder to bind the form Data to an Object */
     private ExerciseSchemeService exerciseSchemeService;
+    private InstituteService instituteService;
 
     /** empty if new institute is being created */
     private Optional<ObjectId> exerciseSchemeId = Optional.empty();
 
-    @Autowired
-    public EditExerciseSchemeView(ExerciseSchemeService exerciseSchemeService, InstituteService instituteService) {
+    public EditExerciseSchemeView() {
         super("Übungsschema bearbeiten");
 
-        this.exerciseSchemeService = exerciseSchemeService;
+        this.exerciseSchemeService = Service.get(ExerciseSchemeService.class);
+        this.instituteService = Service.get(InstituteService.class);
 
         FormLayout form = new FormLayout();
         form.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
