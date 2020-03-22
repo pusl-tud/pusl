@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
-import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.institute.EditInstituteView;
 
 /**
@@ -32,16 +32,16 @@ public class EditInstituteViewIT extends BaseUITest {
 
         LOGGER.info("Testing access as ADMIN");
         login(UserType.ADMIN);
-        goToURLandWaitForRedirect(EditInstituteView.ROUTE + "/new", LecturesView.ROUTE);
+        goToURLandWaitForRedirect(EditInstituteView.ROUTE + "/new", PuslProperties.ROOT_ROUTE);
         logout();
 
         LOGGER.info("Testing access as WIWI");
         login(UserType.WIMI);
-        goToURLandWaitForRedirect(EditInstituteView.ROUTE + "/new", LecturesView.ROUTE);
+        goToURLandWaitForRedirect(EditInstituteView.ROUTE + "/new", PuslProperties.ROOT_ROUTE);
         logout();
 
         LOGGER.info("Testing access as HIWI");
         login(UserType.HIWI);
-        goToURLandWaitForRedirect(EditInstituteView.ROUTE + "/new", LecturesView.ROUTE);
+        goToURLandWaitForRedirect(EditInstituteView.ROUTE + "/new", PuslProperties.ROOT_ROUTE);
     }
 }

@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
-import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.lecture.ManageLecturesView;
 
 /**
@@ -37,11 +37,11 @@ public class ManageLecturesViewIT extends BaseUITest {
 
         LOGGER.info("Testing access as WIWI");
         login(UserType.WIMI);
-        goToURLandWaitForRedirect(ManageLecturesView.ROUTE, LecturesView.ROUTE);
+        goToURLandWaitForRedirect(ManageLecturesView.ROUTE, PuslProperties.ROOT_ROUTE);
         logout();
 
         LOGGER.info("Testing access as HIWI");
         login(UserType.HIWI);
-        goToURLandWaitForRedirect(ManageLecturesView.ROUTE, LecturesView.ROUTE);
+        goToURLandWaitForRedirect(ManageLecturesView.ROUTE, PuslProperties.ROOT_ROUTE);
     }
 }

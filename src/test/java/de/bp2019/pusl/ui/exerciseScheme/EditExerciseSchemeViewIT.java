@@ -12,13 +12,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.ui.LoginViewIT;
-import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.exercisescheme.EditExerciseSchemeView;
 import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
 
@@ -116,11 +116,11 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
 
         LOGGER.info("Testing access as WIWI");
         login(UserType.WIMI);        
-        goToURLandWaitForRedirect(EditExerciseSchemeView.ROUTE + "/new", LecturesView.ROUTE);
+        goToURLandWaitForRedirect(EditExerciseSchemeView.ROUTE + "/new", PuslProperties.ROOT_ROUTE);
         logout();
 
         LOGGER.info("Testing access as HIWI");
         login(UserType.HIWI);        
-        goToURLandWaitForRedirect(EditExerciseSchemeView.ROUTE + "/new", LecturesView.ROUTE);
+        goToURLandWaitForRedirect(EditExerciseSchemeView.ROUTE + "/new", PuslProperties.ROOT_ROUTE);
     }
 }

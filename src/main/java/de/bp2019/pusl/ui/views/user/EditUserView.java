@@ -40,7 +40,6 @@ import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.dialogs.SuccessDialog;
 import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
-import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
 import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
@@ -257,12 +256,12 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                                 userId = Optional.of(fetchedUser.getId());
                                 binder.readBean(fetchedUser);
                         } catch (UnauthorizedException e) {
-                                event.rerouteTo(LecturesView.ROUTE);
-                                UI.getCurrent().navigate(LecturesView.ROUTE);      
+                                event.rerouteTo(PuslProperties.ROOT_ROUTE);
+                                UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);      
                                 ErrorDialog.open("Nicht authorisiert um Nutzer zu bearbeiten!");
                         } catch (DataNotFoundException e) {                   
-                                event.rerouteTo(LecturesView.ROUTE);       
-                                UI.getCurrent().navigate(LecturesView.ROUTE); 
+                                event.rerouteTo(PuslProperties.ROOT_ROUTE);       
+                                UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE); 
                                 ErrorDialog.open("Nitzer nicht in Datenbank gefunden!");    
                         }
                 }

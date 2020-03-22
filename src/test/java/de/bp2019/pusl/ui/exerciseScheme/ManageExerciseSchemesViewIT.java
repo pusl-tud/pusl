@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Institute;
@@ -21,7 +22,6 @@ import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.ui.LoginViewIT;
 import de.bp2019.pusl.ui.dialogs.ConfirmDeletionDialog;
-import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.exercisescheme.EditExerciseSchemeView;
 import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
 
@@ -161,11 +161,11 @@ public class ManageExerciseSchemesViewIT extends BaseUITest {
 
         LOGGER.info("Testing access as WIWI");
         login(UserType.WIMI);
-        goToURLandWaitForRedirect(ManageExerciseSchemesView.ROUTE, LecturesView.ROUTE);
+        goToURLandWaitForRedirect(ManageExerciseSchemesView.ROUTE, PuslProperties.ROOT_ROUTE);
         logout();
 
         LOGGER.info("Testing access as HIWI");
         login(UserType.HIWI);
-        goToURLandWaitForRedirect(ManageExerciseSchemesView.ROUTE, LecturesView.ROUTE);
+        goToURLandWaitForRedirect(ManageExerciseSchemesView.ROUTE, PuslProperties.ROOT_ROUTE);
     }
 }

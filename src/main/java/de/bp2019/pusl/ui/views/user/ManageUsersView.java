@@ -17,7 +17,6 @@ import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.dialogs.SuccessDialog;
 import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
-import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
 import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
@@ -99,7 +98,7 @@ public class ManageUsersView extends BaseView implements AccessibleByAdmin {
                     userService.refreshAll();
                     SuccessDialog.open(user.getEmailAddress() + " erfolgreich gelöscht");
                 } catch (UnauthorizedException e) {
-                    UI.getCurrent().navigate(LecturesView.ROUTE);
+                    UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
                     ErrorDialog.open("Nicht authorisiert um Nutzer zu löschen!");
                 }
             });

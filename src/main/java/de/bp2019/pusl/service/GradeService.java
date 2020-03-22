@@ -4,6 +4,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,7 +16,6 @@ import com.vaadin.flow.data.provider.SortDirection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -31,6 +31,7 @@ import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.GradeRepository;
 import de.bp2019.pusl.service.dataproviders.GradeFilter;
 import de.bp2019.pusl.util.LimitOffsetPageRequest;
+import de.bp2019.pusl.util.exceptions.DataNotFoundException;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
@@ -39,7 +40,6 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
  * @author Leon Chemnitz
  */
 @Service
-@Scope("session")
 public class GradeService extends AbstractDataProvider<Grade, String> {
     private static final long serialVersionUID = -8681198334128727062L;
 
@@ -89,6 +89,39 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
         } else {
             LOGGER.error("user is not authorized to access Grade!");
             throw new UnauthorizedException();
+        }
+    }
+
+    /**
+     * Get a {@link Grade} based on its Id. Only returns Grades the active User is
+     * authenticated to see.
+     * 
+     * @param id Id to search for
+     * @return found Grade with matching Id, null if none is found
+     * @author Leon Chemnitz
+     * @throws DataNotFoundException
+     * @throws UnauthorizedException
+     */
+    public Grade getById(String id) throws DataNotFoundException, UnauthorizedException {
+        LOGGER.info("checking if grade with id " + id + " is present");
+        Optional<Grade> foundGrade = gradeRepository.findById(id);
+
+        if (foundGrade.isEmpty()) {
+            LOGGER.info("not found in database");
+            throw new DataNotFoundException();
+        } else {
+
+            LOGGER.info("found in database");
+            Grade grade = foundGrade.get();
+            LOGGER.debug(grade.toString());
+
+            if (userIsAuthorized(grade)) {
+                LOGGER.info("returned because user is authorized");
+                return grade;
+            } else {
+                LOGGER.error("user is not authorized to access User!");
+                throw new UnauthorizedException();
+            }
         }
     }
 

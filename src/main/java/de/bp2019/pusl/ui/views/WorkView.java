@@ -34,9 +34,9 @@ import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.service.dataproviders.FilteringGradeDataProvider;
 import de.bp2019.pusl.service.dataproviders.GradeFilter;
-import de.bp2019.pusl.ui.components.EditGradePopup;
 import de.bp2019.pusl.ui.components.GradeComposer;
 import de.bp2019.pusl.ui.components.VerticalTabs;
+import de.bp2019.pusl.ui.dialogs.EditGradeDialog;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.util.ExcelExporter;
 import de.bp2019.pusl.util.Service;
@@ -93,11 +93,10 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         createGrade.getStyle().set("marginLeft", "1em");
         createGrade.getStyle().set("marginTop", "-0.5em");
 
-        DatePicker creationDatePicker = new DatePicker();
-        creationDatePicker.setLabel("Abgabe-Datum");
-        creationDatePicker.setValue(LocalDate.now());
-        creationDatePicker.setVisible(true);
-        createGrade.add(creationDatePicker, 1);
+        DatePicker handInDatePicker = new DatePicker();
+        handInDatePicker.setLabel("Abgabe-Datum");
+        handInDatePicker.setValue(LocalDate.now());
+        createGrade.add(handInDatePicker, 1);
 
         Button createGradeButton = new Button();
         createGradeButton.setText("Note eintragen");
@@ -155,9 +154,10 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
                 .setHeader("Abgabedatum").setAutoWidth(true);
         grid.addColumn(item -> item.getValue()).setHeader("Note").setAutoWidth(true);
         grid.setSortableColumns("matrNumber");
+        
         grid.addItemClickListener(event -> {
             if (event.getClickCount() == 2) {
-                EditGradePopup.open(event.getItem());
+                EditGradeDialog.open(event.getItem(), () -> filteringGradeDataProvider.refreshAll());
             }
         });
 
@@ -246,7 +246,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             filteringGradeDataProvider.setFilter(filter);
             filteringGradeDataProvider.refreshAll();
         } catch (UnauthorizedException e) {
-            UI.getCurrent().navigate(LecturesView.ROUTE);
+            UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
             ErrorDialog.open("Nicht authorisiert um Noten zu bearbeiten!");
         }
 

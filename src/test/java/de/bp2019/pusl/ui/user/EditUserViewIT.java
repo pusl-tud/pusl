@@ -15,13 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.ui.LoginViewIT;
-import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.user.EditUserView;
 import de.bp2019.pusl.ui.views.user.ManageUsersView;
 
@@ -198,12 +198,12 @@ public class EditUserViewIT extends BaseUITest {
 
         LOGGER.info("Testing access as WIWI");
         login(UserType.WIMI);
-        goToURLandWaitForRedirect(EditUserView.ROUTE + "/new", LecturesView.ROUTE);
+        goToURLandWaitForRedirect(EditUserView.ROUTE + "/new", PuslProperties.ROOT_ROUTE);
         logout();
 
         LOGGER.info("Testing access as HIWI");
         login(UserType.HIWI);
-        goToURLandWaitForRedirect(EditUserView.ROUTE + "/new", LecturesView.ROUTE);
+        goToURLandWaitForRedirect(EditUserView.ROUTE + "/new", PuslProperties.ROOT_ROUTE);
     }
 
 }

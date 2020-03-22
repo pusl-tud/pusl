@@ -39,7 +39,6 @@ import de.bp2019.pusl.repository.GradeRepository;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.LectureRepository;
 import de.bp2019.pusl.repository.UserRepository;
-import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.LoginView;
 
 /**
@@ -280,7 +279,7 @@ public abstract class BaseUITest {
      * @throws InterruptedException
      */
     protected void logout() throws InterruptedException {
-        goToURL(LecturesView.ROUTE);
+        goToURL(PuslProperties.ROOT_ROUTE);
         findButtonContainingText("logout").click();
         waitForURL(LoginView.ROUTE);
     }

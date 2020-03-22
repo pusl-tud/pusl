@@ -74,7 +74,7 @@ public class MainAppView extends AppLayout {
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(false);
 
-        content.add(generateMenuButton("Startseite", new Icon(VaadinIcon.HOME), WorkView.ROUTE));
+        content.add(generateMenuButton("Startseite", new Icon(VaadinIcon.HOME), PuslProperties.ROOT_ROUTE));
 
         if(userService.currentUserType() != UserType.HIWI) {
             content.add(generateMenuButton("Noten Export", new Icon(VaadinIcon.DOWNLOAD), ExportView.ROUTE));

@@ -42,12 +42,8 @@ public class GradeComposer extends CustomField<GradeFilter> {
     private NumberField numeric;
     private ComboBox<Token> token;
 
-    private GradeFilter value;
-
     public GradeComposer() {
         lectureService = Service.get(LectureService.class);
-
-        value = new GradeFilter();
 
         FormLayout layout = new FormLayout();
         layout.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2),
@@ -58,7 +54,7 @@ public class GradeComposer extends CustomField<GradeFilter> {
         matrNumber.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         matrNumber.setLabel("Matrikelnummer");
         matrNumber.setPlaceholder("Matrikelnummer");
-        matrNumber.setValueChangeMode(ValueChangeMode.EAGER);
+        matrNumber.setValueChangeMode(ValueChangeMode.EAGER); 
         layout.add(matrNumber, 1);
 
         lecture = new ComboBox<>();
@@ -95,18 +91,22 @@ public class GradeComposer extends CustomField<GradeFilter> {
         add(layout);
 
         matrNumber.addValueChangeListener(event -> {
-            value.setMatrNumber(event.getValue().toString());
-            setValue(new GradeFilter(value));
+            LOGGER.debug("setting matrNumber");
+
+            GradeFilter value = generateModelValue();
+            Integer matrNumberValue = event.getValue();
+            if(matrNumberValue != null){
+                value.setMatrNumber(matrNumberValue.toString());
+            }else{
+                value.setMatrNumber(null);
+            }
+            setValue(value);
         });
 
         lecture.addValueChangeListener(event -> {
+            LOGGER.debug("setting lecture");
+
             Lecture lectureValue = event.getValue();
-
-            value.setLecture(lectureValue);  
-
-            if(exercise.getValue() == null){
-                setValue(new GradeFilter(value));
-            }   
 
             if (lectureValue == null) {
                 LOGGER.debug("lecture empty");
@@ -120,13 +120,9 @@ public class GradeComposer extends CustomField<GradeFilter> {
         });
 
         exercise.addValueChangeListener(event -> {
+            LOGGER.debug("setting exercise");
+
             Exercise exerciseValue = event.getValue();
-
-            value.setExercise(exerciseValue);
-
-            // if(numeric.getValue() == null){
-            //     setValue(new GradeFilter(value));
-            // }
 
             if (exerciseValue == null) {
                 LOGGER.debug("exercise empty");
@@ -165,48 +161,51 @@ public class GradeComposer extends CustomField<GradeFilter> {
 
         numeric.addValueChangeListener(event -> {
             LOGGER.debug("setting value numeric");
-            Double numericValue = event.getValue();
-            String gradeValue;
-
-            if (numericValue == null) {
-                LOGGER.debug("numeric empty");
-                gradeValue = "";
-            } else {
-                LOGGER.debug("numeric not empty");
-                gradeValue = numericValue.toString();
-            }
-
-            value.setGrade(gradeValue);
-            setValue(new GradeFilter(value));
+            setModelValue(generateModelValue(),true);
         });
 
         token.addValueChangeListener(event -> {
             LOGGER.debug("setting value token");
-            Token tokenValue = event.getValue();
-
-            String gradeValue;
-
-            if (tokenValue == null) {
-                LOGGER.debug("token empty");
-                gradeValue = "";
-            } else {
-                LOGGER.debug("token not empty");
-                gradeValue = tokenValue.getName();
-            }
-
-            value.setGrade(gradeValue);
-            setValue(new GradeFilter(value));
+            setModelValue(generateModelValue(),true);
         });
     }
 
     @Override
     protected GradeFilter generateModelValue() {
-        return value;
+        GradeFilter newModelValue = new GradeFilter();
+
+        
+        Integer matrNumberValue = matrNumber.getValue();
+        if(matrNumberValue != null){
+            newModelValue.setMatrNumber(matrNumberValue.toString());
+        }
+
+        Lecture lectureValue = lecture.getValue();
+        newModelValue.setLecture(lectureValue);
+        if(lectureValue != null){
+            Exercise exerciseValue = exercise.getValue();
+            newModelValue.setExercise(exerciseValue);
+
+            if(exerciseValue != null){
+                if(exerciseValue.getScheme().getIsNumeric()){
+                    Double numericValue = numeric.getValue();
+                    if(numericValue != null){
+                        newModelValue.setGrade(numericValue.toString());
+                    }
+                }else{
+                    Token tokenValue = token.getValue();
+                    if(tokenValue != null){
+                        newModelValue.setGrade(tokenValue.getName());
+                    }
+                }
+            }
+        }
+
+        return newModelValue;
     }
 
     @Override
-    protected void setPresentationValue(GradeFilter newPresentationValue) {
-        this.value = newPresentationValue;
+    protected void setPresentationValue(GradeFilter value) {
 
         if(value.getMatrNumber() != null){
             matrNumber.setValue(Integer.valueOf(value.getMatrNumber()));

@@ -38,7 +38,6 @@ import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.dialogs.SuccessDialog;
 import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.views.BaseView;
-import de.bp2019.pusl.ui.views.LecturesView;
 import de.bp2019.pusl.ui.views.MainAppView;
 import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
@@ -194,12 +193,12 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                                 lectureId = Optional.of(fetchedLecture.getId());
                                 binder.readBean(fetchedLecture);
                         } catch (UnauthorizedException e) {
-                                event.rerouteTo(LecturesView.ROUTE);
-                                UI.getCurrent().navigate(LecturesView.ROUTE);
+                                event.rerouteTo(PuslProperties.ROOT_ROUTE);
+                                UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
                                 ErrorDialog.open("Nicht authorisiert um Veranstaltung zu bearbeiten!");
                         } catch (DataNotFoundException e) {
-                                event.rerouteTo(LecturesView.ROUTE);
-                                UI.getCurrent().navigate(LecturesView.ROUTE);
+                                event.rerouteTo(PuslProperties.ROOT_ROUTE);
+                                UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
                                 ErrorDialog.open("Veranstaltung nicht in Datenbank gefunden!");
                         }
                 }

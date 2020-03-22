@@ -16,7 +16,6 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,7 +40,6 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
  * @author Leon Chemnitz
  */
 @Service
-@Scope("session")
 public class UserService extends AbstractDataProvider<User, String> {
     private static final long serialVersionUID = 1866448855648692985L;
 
@@ -49,8 +47,6 @@ public class UserService extends AbstractDataProvider<User, String> {
 
     @Autowired
     UserRepository userRepository;
-
-    private User currentUser;
 
     /**
      * Returns the currently logged in User as a {@link User} Object. If Current
@@ -63,28 +59,24 @@ public class UserService extends AbstractDataProvider<User, String> {
     public User currentUser() {
         LOGGER.debug("getting current user");
 
-        if (currentUser == null) {
-            LOGGER.debug("fetching currentUser from database");
+        LOGGER.debug("fetching currentUser from database");
 
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String email = authentication.getName();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
 
-            Optional<User> user = userRepository.findByEmailAddress(email);
+        Optional<User> user = userRepository.findByEmailAddress(email);
 
-            if (user.isEmpty()) {
-                LOGGER.info("currently logged in user with email: '" + email
-                        + "' was not found in Database. User is being logged out.");
-                SecurityContextHolder.clearContext();
-                UI.getCurrent().getSession().close();
-                UI.getCurrent().navigate(LoginView.ROUTE);
-                ErrorDialog.open("Angemeldeter Nutzer existiert nicht mehr in Datenbank!");
-                return new User();
-            }
-
-            currentUser = user.get();
+        if (user.isEmpty()) {
+            LOGGER.info("currently logged in user with email: '" + email
+                    + "' was not found in Database. User is being logged out.");
+            SecurityContextHolder.clearContext();
+            UI.getCurrent().getSession().close();
+            UI.getCurrent().navigate(LoginView.ROUTE);
+            ErrorDialog.open("Angemeldeter Nutzer existiert nicht mehr in Datenbank!");
+            return new User();
         }
 
-        return currentUser;
+        return user.get();
     }
 
     /**
@@ -124,11 +116,13 @@ public class UserService extends AbstractDataProvider<User, String> {
      */
     public static String getFullName(User user) {
         if (user != null) {
+            LOGGER.info(user.toString());
             /* initial admin has no name */
-            if (user.getFirstName() == null) {
+            if (user.getFirstName() == null || user.getFirstName().equals("")) {
                 return user.getEmailAddress();
+            } else {
+                return user.getFirstName() + " " + user.getLastName();
             }
-            return user.getFirstName() + " " + user.getLastName();
         } else {
             return "";
         }
