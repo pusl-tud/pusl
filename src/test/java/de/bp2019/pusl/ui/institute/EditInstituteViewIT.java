@@ -1,5 +1,10 @@
 package de.bp2019.pusl.ui.institute;
 
+import de.bp2019.pusl.model.Institute;
+import de.bp2019.pusl.repository.InstituteRepository;
+import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
+import de.bp2019.pusl.ui.views.institute.ManageInstitutesView;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,14 +13,19 @@ import de.bp2019.pusl.config.BaseUITest;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.ui.views.institute.EditInstituteView;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * UI test for {@link EditInstituteView}
- * 
+ *
  * @author Leon Chemnitz
  */
 public class EditInstituteViewIT extends BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(EditInstituteViewIT.class);
+
+    @Autowired
+    InstituteRepository instituteRepository;
+
 
     /**
      * @author Leon Chemnitz
@@ -43,5 +53,59 @@ public class EditInstituteViewIT extends BaseUITest {
         LOGGER.info("Testing access as HIWI");
         login(UserType.HIWI);
         goToURLandWaitForRedirect(EditInstituteView.ROUTE + "/new", PuslProperties.ROOT_ROUTE);
+    }
+
+    /**
+     * @throws Exception
+     * @author Luca Dinies
+     */
+    @Test
+    public void testCreateNewInstitute() throws Exception {
+        LOGGER.info("Testing create new Institute");
+
+        login(UserType.SUPERADMIN);
+        goToURL(EditInstituteView.ROUTE + "/new");
+
+        findElementById("name").sendKeys(RandomStringUtils.random(8, true, true));
+        findButtonContainingText("Speichern").click();
+
+        waitForURL(ManageInstitutesView.ROUTE);
+    }
+
+
+    /**
+     * @throws Exception
+     * @author Luca Dinies
+     */
+    @Test
+    public void testNoName() throws Exception {
+        LOGGER.info("Testing create new Institute");
+
+        login(UserType.SUPERADMIN);
+        goToURL(EditInstituteView.ROUTE + "/new");
+
+        findButtonContainingText("Speichern").click();
+
+        timeoutWrongURL(ManageInstitutesView.ROUTE);
+    }
+
+    /**
+     * @throws Exception
+     * @author Luca Dinies
+     */
+    @Test
+    public void testDuplicate() throws Exception {
+        LOGGER.info("Testing create new Institute");
+
+        Institute institute = new Institute(RandomStringUtils.random(8, true, true));
+        instituteRepository.save(institute);
+
+        login(UserType.SUPERADMIN);
+        goToURL(EditInstituteView.ROUTE + "/new");
+
+        findElementById("name").sendKeys(institute.getName());
+        findButtonContainingText("Speichern").click();
+
+        timeoutWrongURL(ManageInstitutesView.ROUTE);
     }
 }

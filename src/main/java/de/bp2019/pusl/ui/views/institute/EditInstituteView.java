@@ -74,7 +74,8 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                 name.setLabel("Name");
                 name.setPlaceholder("Name des Instituts");
                 name.setValueChangeMode(ValueChangeMode.EAGER);
-                form.add(name, 1);
+            name.setId("name");
+            form.add(name, 1);
 
                 Button save = new Button("Speichern");
                 save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

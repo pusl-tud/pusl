@@ -36,6 +36,7 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
     @Autowired
     InstituteRepository instituteRepository;
 
+
     /**
      * @author Luca Dinies
      * @throws Exception
@@ -59,7 +60,6 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
         findElementById("default-Value").sendKeys(exerciseScheme.getDefaultValue());
         findElementById("numeric").click();
         findElementById("flex-Handin").click();
-        assertFalse(findElementById("token").isDisplayed());
 
         findButtonContainingText("Speichern").click();
         timeoutWrongURL(ManageExerciseSchemesView.ROUTE);
