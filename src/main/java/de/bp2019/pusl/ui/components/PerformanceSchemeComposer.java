@@ -74,9 +74,9 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
         /* ######### Listeners ######## */
 
         createButton.addClickListener(event -> {
-            var performanceName = nameField.getValue();
+            String performanceName = nameField.getValue();
 
-            if (!performanceNames.contains(performanceName) && performanceName != "") {
+            if (!performanceNames.contains(performanceName) && !performanceName.equals("")) {
                 performanceNames.add(performanceName);
                 tabs.addTab(performanceName, createCalculationRuleField(defaultCalculationRule));
                 nameField.setValue("");
@@ -120,7 +120,7 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
         performanceNames = newPresentationValue.stream().map(PerformanceScheme::getName).collect(Collectors.toList());
 
         for (String name : performanceNames) {
-            if (newPresentationValue.stream().filter(scheme -> scheme.getName() == name).findFirst().isEmpty()) {
+            if (newPresentationValue.stream().filter(scheme -> scheme.getName().equals(name)).findFirst().isEmpty()) {
                 tabs.removeTab(name);
             }
         }

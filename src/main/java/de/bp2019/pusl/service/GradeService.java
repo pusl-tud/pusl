@@ -150,6 +150,7 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
             case ADMIN:
                 if (!currentUser.getInstitutes().containsAll(institutes))
                     break;
+                return true;
             case SUPERADMIN:
                 return true;
         }

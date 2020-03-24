@@ -48,6 +48,8 @@ public class AuthenticationService {
                 LOGGER.debug("getting user from database");
 
                 currentUser = userRepository.findByEmailAddress(email);
+
+                LOGGER.debug(currentUser.toString());
             }
         }
 

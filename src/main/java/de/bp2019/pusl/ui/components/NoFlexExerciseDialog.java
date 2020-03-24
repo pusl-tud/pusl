@@ -16,6 +16,8 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.validator.StringLengthValidator;
 
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.model.Exercise;
@@ -31,7 +33,8 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
  *
  * @author Luca Dinies
  */
-public class NoFlexExerciseDialog {
+public class NoFlexExerciseDialog {    
+    private static final Logger LOGGER = LoggerFactory.getLogger(NoFlexExerciseDialog.class);
 
     private ObjectId objectId;
 
@@ -168,10 +171,8 @@ public class NoFlexExerciseDialog {
                     gradeService.save(grade);
                     dialog.close();
                 } catch (UnauthorizedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    LOGGER.error(e.toString());
                 } finally {
-                    // TODO: implement ErrorHandling
                 }
             }
         });

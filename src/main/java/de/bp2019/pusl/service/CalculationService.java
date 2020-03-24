@@ -38,9 +38,7 @@ public class CalculationService {
         } catch (Exception e) {
             ErrorDialog.open("Es gab einen Fehler mit der Berechnungsregel");
 
-            matrNumbers.forEach(matrNumber -> {
-                result.add(new Performance(matrNumber, performanceScheme, " "));
-            });
+            matrNumbers.forEach(matrNumber -> result.add(new Performance(matrNumber, performanceScheme, " ")));
         }
 
         return result;

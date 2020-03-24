@@ -88,7 +88,7 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
         if (userIsAuthorized(lecture)) {
             lectureRepository.save(lecture);
         }else{
-            LOGGER.error("user is not authorized to delete lecture!");
+            LOGGER.error("user is not authorized to save lecture!");
             throw new UnauthorizedException();
         }
 
@@ -123,6 +123,7 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
      */
     private boolean userIsAuthorized(Lecture lecture) {
         User currentUser = authenticationService.currentUser();
+        LOGGER.info(currentUser.toString());
 
         switch (currentUser.getType()) {
             default:
@@ -132,6 +133,7 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
             case ADMIN:
                 if (!Utils.containsAny(currentUser.getInstitutes(), lecture.getInstitutes()))
                     break;
+                return true;
             case SUPERADMIN:
                 return true;
         }

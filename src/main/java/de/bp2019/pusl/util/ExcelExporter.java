@@ -18,6 +18,10 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 
 /**
  * 
@@ -25,6 +29,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  * @author Luca Dinies, Leon Chemnitz
  */
 public class ExcelExporter<T> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelExporter.class);
 
     private List<ValueProvider<T, String>> valueProviders;
     private List<String> headers;
@@ -93,8 +98,8 @@ public class ExcelExporter<T> {
             workbook.write(outputStream);
             workbook.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error(e.toString());
+            ErrorDialog.open("Fehler beim Erstellen der Datei");
         }
     }
 

@@ -58,7 +58,6 @@ public class Grade {
 
 	public void setLecture(Lecture lecture){
 		this.lecture = lecture;
-		lastModified = LocalDateTime.now();
 	}
 
 	public Lecture getLecture(){
@@ -71,7 +70,6 @@ public class Grade {
 
 	public void setMatrNumber(String matrNumber) {
 		this.matrNumber = matrNumber;
-		lastModified = LocalDateTime.now();
 	}
 
 	public String getValue() {
@@ -80,7 +78,6 @@ public class Grade {
 
 	public void setValue(String grade) {
 		this.value = grade;
-		lastModified = LocalDateTime.now();
 	}
 
 	public LocalDate getHandIn() {
@@ -89,7 +86,6 @@ public class Grade {
 
 	public void setHandIn(LocalDate handIn) {
 		this.handIn = handIn;
-		lastModified = LocalDateTime.now();
 	}
 
 	public ObjectId getId() {
@@ -98,7 +94,6 @@ public class Grade {
 
 	public void setId(ObjectId id) {
 		this.id = id;
-		lastModified = LocalDateTime.now();
 	}
 
 	public User getGradedBy() {
@@ -107,7 +102,6 @@ public class Grade {
 
 	public void setGradedBy(User gradedBy) {
 		this.gradedBy = gradedBy;
-		lastModified = LocalDateTime.now();
 	}
 
 	public Exercise getExercise() {
@@ -116,7 +110,6 @@ public class Grade {
 
 	public void setExercise(Exercise exercise) {
 		this.exercise = exercise;
-		lastModified = LocalDateTime.now();
 	}
 
 	public LocalDateTime getLastModified() {
@@ -125,7 +118,6 @@ public class Grade {
 
 	public void setLastModified(LocalDateTime lastModified) {
 		this.lastModified = lastModified;
-		lastModified = LocalDateTime.now();
 	}
 
 	@Override

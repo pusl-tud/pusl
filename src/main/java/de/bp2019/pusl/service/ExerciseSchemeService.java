@@ -129,6 +129,7 @@ public class ExerciseSchemeService extends AbstractDataProvider<ExerciseScheme, 
             case ADMIN:
                 if (!Utils.containsAny(currentUser.getInstitutes(), exerciseScheme.getInstitutes()))
                     break;
+                return true;
             case SUPERADMIN:
                 return true;
         }

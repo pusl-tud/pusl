@@ -55,18 +55,19 @@ public class Exercise {
 	}
 	
 	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-	}
-
-	@Override
 	public int hashCode() {
 		return new HashCodeBuilder().append(name).toHashCode();
 	}
-
+	
 	@Override
 	public boolean equals(Object o) {
 		return EqualsBuilder.reflectionEquals(this, o, Arrays.asList("scheme", "assignableByHIWI"));
 	}
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+	}
+
 
 }

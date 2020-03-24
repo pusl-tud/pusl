@@ -137,6 +137,7 @@ public class UserService extends AbstractDataProvider<User, String> {
             case ADMIN:
                 if (!Utils.containsAny(currentUser.getInstitutes(), user.getInstitutes()))
                     break;
+                return true;
             case SUPERADMIN:
                 return true;
         }
