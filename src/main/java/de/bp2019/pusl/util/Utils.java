@@ -43,7 +43,7 @@ public final class Utils {
     }
 
     public static boolean isMatrNumber(String m) {
-        if (!NumberUtils.isDigits(m)) {
+        if (m == null || !NumberUtils.isDigits(m)) {
                 return false;
         }
         if (m.length() == 6) {

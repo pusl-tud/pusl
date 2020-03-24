@@ -41,7 +41,7 @@ public class HiwiDataProvider extends AbstractDataProvider<User, String>
 
     @PostConstruct
     public void init() {
-        filter = new HashSet<Institute>();
+        filter = new HashSet<>();
     }
 
     @Override

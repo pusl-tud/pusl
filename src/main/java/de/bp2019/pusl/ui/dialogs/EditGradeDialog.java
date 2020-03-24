@@ -16,8 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.bp2019.pusl.model.Grade;
+import de.bp2019.pusl.service.AuthenticationService;
 import de.bp2019.pusl.service.GradeService;
-import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.service.dataproviders.GradeFilter;
 import de.bp2019.pusl.ui.components.GradeComposer;
 import de.bp2019.pusl.util.Service;
@@ -35,7 +35,8 @@ public final class EditGradeDialog {
         LOGGER.debug("opening EditGradeDialog");
         LOGGER.debug(grade.toString());
 
-        UserService userService = Service.get(UserService.class);
+        AuthenticationService authenticationService = Service.get(AuthenticationService.class);
+
         GradeService gradeService = Service.get(GradeService.class);
 
         Dialog dialog = new Dialog();
@@ -50,7 +51,7 @@ public final class EditGradeDialog {
                 + grade.getLastModified().format(DateTimeFormatter.ofPattern("dd. MM. uuuu | HH:mm")));
         lastModified.getStyle().set("margin-top", "0");
         info.add(lastModified);
-        String userName = UserService.getFullName(grade.getGradedBy());
+        String userName = grade.getGradedBy().getFullName();
         Label gradedBy = new Label("von: " + userName);
         gradedBy.getStyle().set("margin-top", "0");
         info.add(gradedBy);
@@ -66,7 +67,11 @@ public final class EditGradeDialog {
         gradeComposer.setValue(value);
         form.add(gradeComposer, 4);
 
-        form.add(new Label(""), 2);
+        Button delete = new Button("löschen");
+        delete.addThemeVariants(ButtonVariant.LUMO_SMALL);
+        form.add(delete, 1);
+
+        form.add(new Label(""), 1);
 
         DatePicker handIn = new DatePicker();
         handIn.getElement().setAttribute("theme", "small");
@@ -81,31 +86,64 @@ public final class EditGradeDialog {
         dialog.add(form);
         dialog.open();
 
+        delete.addClickListener(event -> {
+            ConfirmDeletionDialog.open(grade.getMatrNumber(), () -> {
+
+                try {
+                    Grade toDelete = gradeService.getById(grade.getId().toString());
+
+                    gradeService.delete(toDelete);
+                    SuccessDialog.open("Note erfolgreich gelöscht");
+                    callback.run();
+                } catch (DataNotFoundException e) {
+                    LOGGER.error("Grade not found in Database");
+                    ErrorDialog.open("zu bearbeitende Note wurde nicht in Datenbank gefunden");
+                } catch (UnauthorizedException e) {
+                    LOGGER.error("unauthorized to save Grade");
+                    ErrorDialog.open("Nicht authorisiert um Note zu bearbeiten!");
+                } finally {
+                    dialog.close();
+                }
+            });
+        });
+
         save.addClickListener(event -> {
+            GradeFilter composerValue = gradeComposer.getValue();
+
+            Grade modified;
             try {
-                GradeFilter composerValue = gradeComposer.getValue();
+                modified = gradeService.getById(grade.getId().toString());
+            } catch (DataNotFoundException e) {
+                LOGGER.error("Grade not found in Database");
+                ErrorDialog.open("zu bearbeitende Note wurde nicht in Datenbank gefunden");
+                return;
+            } catch (UnauthorizedException e) {
+                LOGGER.error("unauthorized to save Grade");
+                ErrorDialog.open("Nicht authorisiert um Note zu bearbeiten!");
+                return;
+            }
 
-                Grade modified = gradeService.getById(grade.getId().toString());
+            modified.setMatrNumber(composerValue.getMatrNumber());
+            modified.setLecture(composerValue.getLecture());
+            modified.setExercise(composerValue.getExercise());
+            modified.setValue(composerValue.getGrade());
 
-                modified.setMatrNumber(composerValue.getMatrNumber());
-                modified.setLecture(composerValue.getLecture());
-                modified.setExercise(composerValue.getExercise());
-                modified.setValue(composerValue.getGrade());
+            modified.setHandIn(handIn.getValue());
 
-                modified.setHandIn(handIn.getValue());
+            modified.setLastModified(LocalDateTime.now());
+            modified.setGradedBy(authenticationService.currentUser());
 
-                modified.setLastModified(LocalDateTime.now());
-                modified.setGradedBy(userService.currentUser());
+            if (!GradeService.gradeIsValid(modified)) {
+                return;
+            }
 
+            try {
                 gradeService.save(modified);
                 SuccessDialog.open("Note erfolgreich gespeichert");
                 callback.run();
             } catch (UnauthorizedException e) {
                 LOGGER.error("unauthorized to save Grade");
                 ErrorDialog.open("Nicht authorisiert um Note zu bearbeiten!");
-            } catch (DataNotFoundException e) {
-                LOGGER.error("Grade not found in Database");
-                ErrorDialog.open("zu bearbeitende Note wurde nicht in Datenbank gefunden");
             } finally {
                 dialog.close();
             }

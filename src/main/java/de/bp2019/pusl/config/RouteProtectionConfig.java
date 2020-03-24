@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import de.bp2019.pusl.enums.UserType;
-import de.bp2019.pusl.service.UserService;
+import de.bp2019.pusl.service.AuthenticationService;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.interfaces.AccessibleBySuperadmin;
@@ -32,7 +32,7 @@ public class RouteProtectionConfig implements VaadinServiceInitListener {
     private static final long serialVersionUID = 1L;
 
     @Autowired
-    UserService userService;
+    AuthenticationService authenticationService;
 
     @Override
     public void serviceInit(ServiceInitEvent event) {
@@ -49,22 +49,26 @@ public class RouteProtectionConfig implements VaadinServiceInitListener {
      * @author Leon Chemnitz
      */
     private void beforeEnter(BeforeEnterEvent event) {
-        if (!LoginView.class.equals(event.getNavigationTarget()) && !SecurityUtils.isUserLoggedIn()) {
+        UserType userType = authenticationService.currentUserType();
+
+        boolean userIsOnLoginView = LoginView.class.equals(event.getNavigationTarget());
+
+        if (!userIsOnLoginView && !SecurityUtils.isUserLoggedIn()) {
             /* User is not logged in and not on Login page -> reroute to login page */
             event.rerouteTo(PuslProperties.ROOT_ROUTE);
 
-        } else if (LoginView.class.equals(event.getNavigationTarget()) && SecurityUtils.isUserLoggedIn()) {
+        } else if (userIsOnLoginView && SecurityUtils.isUserLoggedIn()) {
             /* User is logged in tries to access Login page -> reroute to dashboard */
             UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
 
         } else if (Utils.implementsInterface(event.getNavigationTarget(), AccessibleByWimi.class)
-                && userService.currentUserType() == UserType.HIWI) {
+                && userType == UserType.HIWI) {
             /* User is hiwi and tries to access wimi pages */
             event.rerouteTo(PuslProperties.ROOT_ROUTE);
             UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
             ErrorDialog.open("Wimi-Berechtigungen sind nötig um auf URL zuzugreifen!");
         } else if (Utils.implementsInterface(event.getNavigationTarget(), AccessibleByAdmin.class)
-                && userService.currentUserType().ordinal() > UserType.ADMIN.ordinal()) {
+                && userType.ordinal() > UserType.ADMIN.ordinal()) {
             /*
              * User is not an admin and tries to access admin pages -> reroute to dashboard
              */
@@ -73,7 +77,7 @@ public class RouteProtectionConfig implements VaadinServiceInitListener {
             ErrorDialog.open("Admin-Berechtigungen sind nötig um auf URL zuzugreifen!");
 
         } else if (Utils.implementsInterface(event.getNavigationTarget(), AccessibleBySuperadmin.class)
-                && userService.currentUserType() != UserType.SUPERADMIN) {
+                && userType != UserType.SUPERADMIN) {
             /*
              * User is not an superadmin and tries to access superadmin pages -> reroute to
              * dashboard

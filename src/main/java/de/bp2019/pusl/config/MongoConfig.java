@@ -32,9 +32,8 @@ class MongoConfig extends AbstractMongoClientConfiguration {
   @Override
   public MongoClient mongoClient() {
     MongoClientSettings settings = MongoClientSettings.builder()
-        .applyToClusterSettings(builder -> builder
-            .hosts(Arrays.asList(
-              new ServerAddress(mongoProperties.getAddress(),Integer.valueOf(mongoProperties.getPort())))))
+        .applyToClusterSettings(builder -> builder.hosts(
+            Arrays.asList(new ServerAddress(mongoProperties.getAddress(), Integer.valueOf(mongoProperties.getPort())))))
         .build();
 
     return MongoClients.create(settings);
@@ -44,9 +43,5 @@ class MongoConfig extends AbstractMongoClientConfiguration {
   protected String getMappingBasePackage() {
     return PuslProperties.BASE_PACKAGE + ".model";
   }
-  
-  @Override
-  public boolean autoIndexCreation() {
-    return true;
-  }
+
 }

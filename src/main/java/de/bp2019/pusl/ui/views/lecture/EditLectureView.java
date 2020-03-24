@@ -29,7 +29,6 @@ import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.service.ExerciseSchemeService;
 import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.service.LectureService;
-import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.service.dataproviders.HiwiDataProvider;
 import de.bp2019.pusl.ui.components.ExerciseComposer;
 import de.bp2019.pusl.ui.components.PerformanceSchemeComposer;
@@ -112,7 +111,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 hasAccess.setHeight("10em");
                 hasAccess.setLabel("Zugriff");
                 hasAccess.setDataProvider(hiwiDataProvider);
-                hasAccess.setItemLabelGenerator(item -> UserService.getFullName(item));
+                hasAccess.setItemLabelGenerator(User::getFullName);
                 verticalTabs.addTab("Zugriff", hasAccess);
 
                 formLayout.add(verticalTabs, 2);

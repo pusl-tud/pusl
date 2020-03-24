@@ -1,6 +1,7 @@
 package de.bp2019.pusl.ui.views;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Location;
@@ -30,14 +30,16 @@ import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.Lecture;
+import de.bp2019.pusl.service.AuthenticationService;
+import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
-import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.service.dataproviders.FilteringGradeDataProvider;
 import de.bp2019.pusl.service.dataproviders.GradeFilter;
 import de.bp2019.pusl.ui.components.GradeComposer;
 import de.bp2019.pusl.ui.components.VerticalTabs;
 import de.bp2019.pusl.ui.dialogs.EditGradeDialog;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
+import de.bp2019.pusl.ui.dialogs.SuccessDialog;
 import de.bp2019.pusl.util.ExcelExporter;
 import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
@@ -59,10 +61,10 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
     private FilteringGradeDataProvider filteringGradeDataProvider;
     private LectureService lectureService;
+    private AuthenticationService authenticationService;
+    private GradeService gradeService;
 
     private Map<String, List<String>> parametersMap;
-
-    private Binder<Grade> binder;
 
     private Grid<Grade> grid;
 
@@ -73,6 +75,8 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         this.filteringGradeDataProvider = Service.get(FilteringGradeDataProvider.class);
         this.lectureService = Service.get(LectureService.class);
+        this.authenticationService = Service.get(AuthenticationService.class);
+        this.gradeService = Service.get(GradeService.class);
 
         filter = new GradeFilter();
 
@@ -116,10 +120,12 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         DatePicker startDateFilter = new DatePicker();
         startDateFilter.setLabel("Start");
+        startDateFilter.setClearButtonVisible(true);
         startDateFilter.getElement().setAttribute("theme", "small");
         showGradesHeader.add(startDateFilter, 1);
 
         DatePicker endDateFilter = new DatePicker();
+        endDateFilter.setClearButtonVisible(true);
         endDateFilter.setLabel("End");
         endDateFilter.getElement().setAttribute("theme", "small");
         showGradesHeader.add(endDateFilter, 1);
@@ -151,9 +157,9 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
                 .setAutoWidth(true);
         grid.addColumn(item -> item.getExercise().getName()).setKey("exercise").setHeader("Übung").setAutoWidth(true);
         grid.addColumn(item -> item.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM. uuuu")))
-                .setHeader("Abgabedatum").setAutoWidth(true);
-        grid.addColumn(item -> item.getValue()).setHeader("Note").setAutoWidth(true);
-        grid.setSortableColumns("matrNumber");
+                .setKey("handIn").setHeader("Abgabedatum").setAutoWidth(true);
+        grid.addColumn(Grade::getValue).setHeader("Note").setAutoWidth(true);
+        grid.setSortableColumns("matrNumber", "handIn");
         
         grid.addItemClickListener(event -> {
             if (event.getClickCount() == 2) {
@@ -166,6 +172,32 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         verticalTabs.addTab("Einsehen", showGrades);
 
         /* ############## CHANGE LISTENERS ############# */
+
+        createGradeButton.addClickListener( event -> {
+            Grade grade = new Grade();
+
+            grade.setMatrNumber(filter.getMatrNumber());
+            grade.setLecture(filter.getLecture());
+            grade.setExercise(filter.getExercise());
+            grade.setValue(filter.getGrade());
+            grade.setHandIn(handInDatePicker.getValue());
+
+            grade.setGradedBy(authenticationService.currentUser());
+            grade.setLastModified(LocalDateTime.now());
+
+            if(!GradeService.gradeIsValid(grade)){
+                return;
+            }
+
+            try {
+                gradeService.save(grade);
+                filteringGradeDataProvider.refreshAll();
+                SuccessDialog.open("Note erfolgreich gespeichert");
+            } catch (UnauthorizedException e) {
+                LOGGER.info("current User unauthorized to save Grade");
+                ErrorDialog.open("nicht authoriziert um Note zu speichern");
+            }
+        });     
 
         gradeComposer.addValueChangeListener(event -> {
             LOGGER.debug("GradeComposer value changed");
@@ -195,6 +227,11 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         startDateFilter.addValueChangeListener(event -> {
             LocalDate startDate = event.getValue();
 
+            LocalDate endDate = endDateFilter.getValue();
+            if(startDate != null && endDate != null && endDate.isBefore(startDate)){
+                endDateFilter.setValue(startDate);
+            }
+
             filter.setStartDate(startDate);
 
             filteringGradeDataProvider.setFilter(filter);
@@ -202,9 +239,14 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         });
 
         endDateFilter.addValueChangeListener(event -> {
-            LocalDate startDate = event.getValue();
+            LocalDate endDate = event.getValue();
 
-            filter.setStartDate(startDate);
+            LocalDate startDate = endDateFilter.getValue();
+            if(endDate != null && startDate != null && startDate.isAfter(endDate)){
+                startDateFilter.setValue(endDate);
+            }
+
+            filter.setEndDate(endDate);
 
             filteringGradeDataProvider.setFilter(filter);
             filteringGradeDataProvider.refreshAll();
@@ -264,7 +306,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         excelExporter.addColumn("Note", Grade::getValue);
         excelExporter.addColumn("Veranstaltung", grade -> grade.getLecture().getName());
         excelExporter.addColumn("Übung", grade -> grade.getExercise().getName());
-        excelExporter.addColumn("Eingetragen von", grade -> UserService.getFullName(grade.getGradedBy()));
+        excelExporter.addColumn("Eingetragen von", grade -> grade.getGradedBy().getFullName());
         excelExporter.addColumn("Abgegeben am",
                 grade -> grade.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM. uuuu")));
         excelExporter.addColumn("Zuletzt verändert",

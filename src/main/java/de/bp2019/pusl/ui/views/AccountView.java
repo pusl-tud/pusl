@@ -26,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.User;
+import de.bp2019.pusl.service.AuthenticationService;
 import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.dialogs.SuccessDialog;
@@ -35,7 +36,7 @@ import de.bp2019.pusl.util.exceptions.DataNotFoundException;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
- * @author Godot_Blend102
+ * @author Godot_Blend102, Leon Chemnitz
  *
  */
 @PageTitle(PuslProperties.NAME + " | Mein Account")
@@ -50,16 +51,18 @@ public class AccountView extends BaseView {
 
 	private User currentUser;
 
-	private UserService userService;       
+	private AuthenticationService authenticationService;
+	private UserService userService;
 	private PasswordEncoder passwordEncoder;
 
 	public AccountView() {
 		super("Account verwalten");
 
+		this.authenticationService = Service.get(AuthenticationService.class);
 		this.userService = Service.get(UserService.class);
 		this.passwordEncoder = Service.get(PasswordEncoder.class);
 
-		currentUser = userService.currentUser();
+		currentUser = authenticationService.currentUser();
 
 		LOGGER.debug("current user: " + currentUser.toString());
 
@@ -94,11 +97,11 @@ public class AccountView extends BaseView {
 		actions.setHorizontalComponentAlignment(Alignment.END, save);
 
 		form.add(actions, 2);
-		
+
 		add(form);
-		
+
 		/* ########### Data Binding and validation ########### */
-		
+
 		binder = new Binder<>();
 		binder.setBean(currentUser);
 

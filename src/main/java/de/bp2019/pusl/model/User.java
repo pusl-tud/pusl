@@ -67,9 +67,25 @@ public class User implements UserDetails {
 		return Arrays.asList(new SimpleGrantedAuthority(type.toString()));
 	}
 
+	/**
+	 * Get the full name of a user. Returns the users email address if no firstname
+	 * is set
+	 * 
+	 * @return Full name of the found User. Empty String if no user is found
+	 * @author Leon Chemnitz
+	 */
+	public String getFullName() {
+		/* initial admin has no name */
+		if (this.firstName == null || this.firstName.equals("")) {
+			return this.emailAddress;
+		} else {
+			return this.firstName + " " + this.lastName;
+		}
+	}
+
 	@Override
 	public String getUsername() {
-		return emailAddress;
+		return getEmailAddress();
 	}
 
 	@Override

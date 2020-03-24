@@ -16,6 +16,7 @@ import com.vaadin.flow.data.provider.SortDirection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -30,7 +31,10 @@ import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.GradeRepository;
 import de.bp2019.pusl.service.dataproviders.GradeFilter;
+import de.bp2019.pusl.ui.dialogs.ErrorDialog;
+import de.bp2019.pusl.ui.dialogs.SuccessDialog;
 import de.bp2019.pusl.util.LimitOffsetPageRequest;
+import de.bp2019.pusl.util.Utils;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
@@ -40,13 +44,14 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
  * @author Leon Chemnitz
  */
 @Service
+@Scope("session")
 public class GradeService extends AbstractDataProvider<Grade, String> {
     private static final long serialVersionUID = -8681198334128727062L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GradeService.class);
-
+    
     @Autowired
-    UserService userService;
+    AuthenticationService authenticationService;
 
     @Autowired
     GradeRepository gradeRepository;
@@ -134,15 +139,16 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
      */
     private boolean userIsAuthorized(Grade grade) {
         Set<Institute> institutes = grade.getLecture().getInstitutes();
+        User currentUser = authenticationService.currentUser();
 
-        switch (userService.currentUserType()) {
+        switch (currentUser.getType()) {
             default:
             case HIWI:
                 if (!grade.getExercise().isAssignableByHIWI())
                     break;
             case WIMI:
             case ADMIN:
-                if (!userService.currentUserInstitutes().containsAll(institutes))
+                if (!currentUser.getInstitutes().containsAll(institutes))
                     break;
             case SUPERADMIN:
                 return true;
@@ -203,13 +209,16 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
         Criteria criteria = new Criteria();
 
         LocalDate startDate = filter.getStartDate();
-        if (startDate != null) {
-            criteria = criteria.and("handIn").gte(startDate);
-        }
-
         LocalDate endDate = filter.getEndDate();
-        if (endDate != null) {
-            criteria = criteria.and("handIn").lte(endDate);
+        if (startDate != null || endDate != null) {
+            criteria = criteria.and("handIn");
+            if (startDate != null) {
+                criteria = criteria.gte(startDate);
+            }
+
+            if (endDate != null) {
+                criteria = criteria.lte(endDate);
+            }
         }
 
         String matrNumber = filter.getMatrNumber();
@@ -232,7 +241,7 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
             }
         }
 
-        User currentUser = userService.currentUser();
+        User currentUser = authenticationService.currentUser();
         switch (currentUser.getType()) {
             default:
             case HIWI:
@@ -244,5 +253,33 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
         }
 
         return criteria;
+    }
+
+    public static boolean gradeIsValid(Grade grade) {
+        if (!Utils.isMatrNumber(grade.getMatrNumber())) {
+            ErrorDialog.open("Matrikelnummer ist fehlerhaft");
+            return false;
+        }
+
+        Lecture lecture = grade.getLecture();
+        if (lecture == null) {
+            ErrorDialog.open("Bitte Veranstaltung angeben");
+            return false;
+        }
+
+        Exercise exercise = grade.getExercise();
+        if (exercise == null || !lecture.getExercises().contains(exercise)) {
+            ErrorDialog.open("Bitte Übung angeben");
+            return false;
+        }
+
+        String value = grade.getValue();
+        if (value == null || value.equals("")) {
+            SuccessDialog.open("Kein Notenwert angegeben, Standardwert wird gesetzt");
+            grade.setValue(exercise.getScheme().getDefaultValue());
+            return true;
+        }
+
+        return true;
     }
 }

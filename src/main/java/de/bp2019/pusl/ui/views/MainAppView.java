@@ -6,6 +6,7 @@ import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -19,7 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
-import de.bp2019.pusl.service.UserService;
+import de.bp2019.pusl.model.User;
+import de.bp2019.pusl.service.AuthenticationService;
 import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
 import de.bp2019.pusl.ui.views.institute.ManageInstitutesView;
 import de.bp2019.pusl.ui.views.lecture.ManageLecturesView;
@@ -40,21 +42,27 @@ public class MainAppView extends AppLayout {
     private static final long serialVersionUID = 5473180730294862712L;
 
     public MainAppView() {
-        UserService userService = Service.get(UserService.class);
+        AuthenticationService authenticationService = Service.get(AuthenticationService.class);
+        User currentUser = authenticationService.currentUser();
 
         HorizontalLayout titleLayout = new HorizontalLayout();
         Label title = new Label(PuslProperties.NAME);
         title.getStyle().set("font-size", "1.2em");
         titleLayout.add(title);
-        titleLayout.addClickListener(event -> UI.getCurrent().navigate(""));
+
+        Image logo = new Image("images/pusl_logo_small.png", "");
+        logo.getStyle().set("margin-left", "0.4em");
+        logo.getStyle().set("margin-top", "0.25em");
+        logo.setHeight("1.4em");
+        titleLayout.add(logo);
 
         VerticalLayout navbarRight = new VerticalLayout();
 
         HorizontalLayout userInfo = new HorizontalLayout();
         userInfo.setDefaultVerticalComponentAlignment(Alignment.END);
 
-        userInfo.add(generateUserTypeLabel(userService.currentUserType()));
-        userInfo.add(generateUserNameButton(userService.currentUserFullName()));
+        userInfo.add(generateUserTypeLabel(currentUser.getType()));
+        userInfo.add(generateUserNameButton(currentUser.getFullName()));
         userInfo.add(generateLogoutButton());
 
         navbarRight.getStyle().set("margin", "0");
@@ -76,12 +84,12 @@ public class MainAppView extends AppLayout {
 
         content.add(generateMenuButton("Startseite", new Icon(VaadinIcon.HOME), PuslProperties.ROOT_ROUTE));
 
-        if(userService.currentUserType() != UserType.HIWI) {
+        if (currentUser.getType() != UserType.HIWI) {
             content.add(generateMenuButton("Noten Export", new Icon(VaadinIcon.DOWNLOAD), ExportView.ROUTE));
         }
         content.add(generateMenuButton("Mein Account", new Icon(VaadinIcon.USER), AccountView.ROUTE));
 
-        if (userService.currentUserType().ordinal() <= UserType.ADMIN.ordinal()) {
+        if (currentUser.getType().ordinal() <= UserType.ADMIN.ordinal()) {
             content.add(generateSeperator());
             content.add(generateSectionLabel("Admin"));
             content.add(generateMenuButton("Nutzer", new Icon(VaadinIcon.USERS), ManageUsersView.ROUTE));
@@ -90,7 +98,7 @@ public class MainAppView extends AppLayout {
             content.add(generateMenuButton("Übungsschemas", new Icon(VaadinIcon.NOTEBOOK),
                     ManageExerciseSchemesView.ROUTE));
 
-            if (userService.currentUserType() == UserType.SUPERADMIN) {
+            if (currentUser.getType() == UserType.SUPERADMIN) {
                 content.add(generateSeperator());
                 content.add(generateSectionLabel("Global"));
                 content.add(

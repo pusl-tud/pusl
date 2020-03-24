@@ -187,9 +187,9 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
                                 new Exercise("Exkursion", exerciseSchemes.get(1), false),
                                 new Exercise("Klausur", exerciseSchemes.get(2), false));
 
-                String defaultValue = "function calcuate(results) { \n";
+                String defaultValue = "function calculate(results) { \n";
                 defaultValue += "     \n";
-                defaultValue += "    return ergebnis;\n";
+                defaultValue += "    return 'nicht definiert';\n";
                 defaultValue += "}";
 
                 PerformanceScheme pruefungsLeistung = new PerformanceScheme();

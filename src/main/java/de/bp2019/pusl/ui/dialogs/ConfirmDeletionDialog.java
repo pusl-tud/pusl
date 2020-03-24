@@ -36,7 +36,8 @@ public final class ConfirmDeletionDialog {
                     dialog.close();
                 }
             } else {
-                textField.setErrorMessage("stimmt nicht mit " + name + "überein");
+                textField.setErrorMessage("stimmt nicht mit " + name + " überein");
+                textField.setInvalid(true);
             }
         });
         layout.add(confirmButton);

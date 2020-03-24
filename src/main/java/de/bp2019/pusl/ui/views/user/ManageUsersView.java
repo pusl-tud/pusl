@@ -72,7 +72,7 @@ public class ManageUsersView extends BaseView implements AccessibleByAdmin {
      * @author Leon Chemnitz
      */
     private Button createNameButton(User user) {
-        var name = UserService.getFullName(user);
+        String name = user.getFullName();
 
         Button button = new Button(name, clickEvent -> {
             UI.getCurrent().navigate(EditUserView.ROUTE + "/" + user.getId());

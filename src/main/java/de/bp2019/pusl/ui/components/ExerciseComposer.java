@@ -55,10 +55,10 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
         gridItems = new ArrayList<>();
         grid.setItems(gridItems);
         grid.addColumn(item -> gridItems.indexOf(item) + 1).setAutoWidth(true);
-        grid.addComponentColumn(item -> createNameLabel(item)).setAutoWidth(true);
+        grid.addComponentColumn(this::createNameLabel).setAutoWidth(true);
         grid.addColumn(item -> item.getScheme().getName()).setAutoWidth(true);
-        grid.addComponentColumn(item -> createHiWiAccessCheckbox(item)).setAutoWidth(true);
-        grid.addComponentColumn(item -> createDeleteButton(item)).setAutoWidth(true);
+        grid.addComponentColumn(this::createHiWiAccessCheckbox).setAutoWidth(true);
+        grid.addComponentColumn(this::createDeleteButton).setAutoWidth(true);
         grid.setSelectionMode(SelectionMode.SINGLE);
         grid.setRowsDraggable(true);
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);

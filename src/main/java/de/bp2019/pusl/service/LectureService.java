@@ -10,11 +10,13 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Lecture;
+import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.LectureRepository;
 import de.bp2019.pusl.util.LimitOffsetPageRequest;
 import de.bp2019.pusl.util.Utils;
@@ -27,6 +29,7 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
  * @author Leon Chemnitz
  */
 @Service
+@Scope("session")
 public class LectureService extends AbstractDataProvider<Lecture, String> {
     private static final long serialVersionUID = -4325095502734352010L;
 
@@ -34,8 +37,9 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
 
     @Autowired
     LectureRepository lectureRepository;
+    
     @Autowired
-    UserService userService;
+    AuthenticationService authenticationService;
 
     /**
      * Get a {@link Lecture} based on its Id. Only return {@link Lecture}s the
@@ -60,8 +64,7 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
             Lecture lecture = foundLecture.get();
             LOGGER.debug(lecture.toString());
 
-            if (userService.currentUserType() == UserType.SUPERADMIN
-                    || Utils.containsAny(userService.currentUserInstitutes(), lecture.getInstitutes())) {
+            if (userIsAuthorized(lecture)) {
                 LOGGER.info("returned because user is authorized");
                 return lecture;
             } else {
@@ -119,14 +122,15 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
      * @author Leon Chemnitz
      */
     private boolean userIsAuthorized(Lecture lecture) {
+        User currentUser = authenticationService.currentUser();
 
-        switch (userService.currentUserType()) {
+        switch (currentUser.getType()) {
             default:
             case HIWI:
             case WIMI:
                 break;
             case ADMIN:
-                if (!Utils.containsAny(userService.currentUserInstitutes(), lecture.getInstitutes()))
+                if (!Utils.containsAny(currentUser.getInstitutes(), lecture.getInstitutes()))
                     break;
             case SUPERADMIN:
                 return true;
@@ -173,19 +177,22 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
 
     @Override
     public int size(Query<Lecture, String> query) {
-        if (userService.currentUserType() == UserType.SUPERADMIN) {
+        User currentUser = authenticationService.currentUser();
+
+        if (currentUser.getType() == UserType.SUPERADMIN) {
             return (int) lectureRepository.count();
         }
-        return lectureRepository.countByInstitutesIn(userService.currentUserInstitutes());
+        return lectureRepository.countByInstitutesIn(currentUser.getInstitutes());
     }
 
     @Override
     public Stream<Lecture> fetch(Query<Lecture, String> query) {
-        Pageable pageable = new LimitOffsetPageRequest(query.getLimit(), query.getOffset());
+        Pageable pageable = new LimitOffsetPageRequest(query.getLimit(), query.getOffset());        
+        User currentUser = authenticationService.currentUser();
 
-        if (userService.currentUserType() == UserType.SUPERADMIN) {
+        if (currentUser.getType() == UserType.SUPERADMIN) {
             return lectureRepository.findAll(pageable).stream();
         }
-        return lectureRepository.findByInstitutesIn(userService.currentUserInstitutes(), pageable);
+        return lectureRepository.findByInstitutesIn(currentUser.getInstitutes(), pageable);
     }
 }

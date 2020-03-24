@@ -11,11 +11,13 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Institute;
+import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.util.LimitOffsetPageRequest;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
@@ -27,6 +29,7 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
  * @author Leon Chemnitz
  */
 @Service
+@Scope("session")
 public class InstituteService extends AbstractDataProvider<Institute, String> {
     private static final long serialVersionUID = -1382092534461892569L;
 
@@ -34,9 +37,9 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
 
     @Autowired
     InstituteRepository instituteRepository;
-
+    
     @Autowired
-    UserService userService;
+    AuthenticationService authenticationService;
 
     /**
      * Get a {@link Institute} based on its Id. Only returns {@link Institute}s the
@@ -56,12 +59,13 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
             LOGGER.info("not found in database");
             throw new DataNotFoundException();
         } else {
-
             LOGGER.info("found in database");
+            
             Institute institute = foundInstitute.get();
-            LOGGER.debug(institute.toString());
+            LOGGER.debug(institute.toString());            
+            User currentUser = authenticationService.currentUser();
 
-            if (userIsAuthorized(institute)) {
+            if (currentUser.getType() == UserType.SUPERADMIN || (currentUser.getType() == UserType.ADMIN && currentUser.getInstitutes().contains(institute))) {
                 LOGGER.info("returned because user is authorized");
                 return institute;
             } else {
@@ -117,8 +121,9 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
      * @author Leon Chemnitz
      */
     private boolean userIsAuthorized(Institute institute) {
-        LOGGER.debug(userService.currentUserType().toString());
-        switch (userService.currentUserType()) {
+        UserType userType = authenticationService.currentUserType();
+        LOGGER.debug(userType.toString());
+        switch (userType) {
             default:
             case HIWI:
             case WIMI:
@@ -176,10 +181,12 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
      */
     @Override
     public int size(Query<Institute, String> query) {
-        if (userService.currentUserType() == UserType.SUPERADMIN) {
+        User currentUser = authenticationService.currentUser();
+
+        if (currentUser.getType() == UserType.SUPERADMIN) {
             return (int) instituteRepository.count();
         }
-        return userService.currentUserInstitutes().size();
+        return currentUser.getInstitutes().size();
     }
 
     /**
@@ -188,11 +195,13 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
     @Override
     public Stream<Institute> fetch(Query<Institute, String> query) {
         Pageable pageable = new LimitOffsetPageRequest(query.getLimit(), query.getOffset());
-        if (userService.currentUserType() == UserType.SUPERADMIN) {
+        User currentUser = authenticationService.currentUser();
+
+        if (currentUser.getType() == UserType.SUPERADMIN) {
             return instituteRepository.findAll(pageable).stream();
         }
         return instituteRepository.findByIdIn(
-                userService.currentUserInstitutes().stream().map(Institute::getId).collect(Collectors.toList()),
+                currentUser.getInstitutes().stream().map(Institute::getId).collect(Collectors.toList()),
                 pageable);
     }
 }
