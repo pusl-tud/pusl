@@ -86,7 +86,7 @@ public class ExportView extends BaseView implements AccessibleByWimi {
         performanceSchemeSelect.setItemLabelGenerator(PerformanceScheme::getName);
         performanceSchemeSelect.setLabel("Berechnungsregel");
         performanceSchemeSelect.setEnabled(false);
-        performanceSchemeSelect.setId(" ");
+        performanceSchemeSelect.setId("performanceScheme");
         selectLayout.add(performanceSchemeSelect);
 
         add(selectLayout);

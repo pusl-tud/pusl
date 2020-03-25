@@ -12,6 +12,8 @@ import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.ui.views.DatabaseView;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * UI test for {@link DatabaseView}
  *
@@ -56,33 +58,16 @@ public class DatabaseViewIT extends BaseUITest {
      * @author Luca Dinies
      */
     @Test
-    public void testDatabaseRefillButton() throws Exception {
-        LOGGER.info("Testing Database Refill button");
-        login(UserType.SUPERADMIN);
-
-        goToURL(DatabaseView.ROUTE);
-
-        findButtonContainingText("Datenbank neu befüllen").click();
-
-        goToURL(WorkView.ROUTE);
-
-    }
-
-    /**
-     * @throws Exception
-     * @author Luca Dinies
-     */
-    @Test
     public void testGradesRefillButton() throws Exception {
         LOGGER.info("Testing Grade Refill button");
         login(UserType.SUPERADMIN);
 
         goToURL(DatabaseView.ROUTE);
 
+        findButtonContainingText("Datenbank neu befüllen").click();
         findElementById("numGrades").sendKeys("500");
         findButtonContainingText("Noten generieren").click();
 
         goToURL(WorkView.ROUTE);
-
     }
 }
