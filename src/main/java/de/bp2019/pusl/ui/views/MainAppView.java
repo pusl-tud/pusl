@@ -36,7 +36,7 @@ import de.bp2019.pusl.util.Service;
  */
 @CssImport("./styles/global.css")
 @Viewport("width=device-width, minimum-scale=0.5, initial-scale=1, user-scalable=yes, viewport-fit=cover")
-@PWA(name = PuslProperties.NAME, shortName = PuslProperties.NAME)
+@PWA(name = PuslProperties.NAME, shortName = PuslProperties.NAME, iconPath = "icons/icon-192.png")
 public class MainAppView extends AppLayout {
 
     private static final long serialVersionUID = 5473180730294862712L;
@@ -46,7 +46,6 @@ public class MainAppView extends AppLayout {
         User currentUser = authenticationService.currentUser();
 
         HorizontalLayout titleLayout = new HorizontalLayout();
-
 
         Image logo = new Image("images/pusl_logo_small.png", "");
         logo.getStyle().set("margin-top", "0.25em");

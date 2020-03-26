@@ -42,6 +42,7 @@ import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.dialogs.SuccessDialog;
 import de.bp2019.pusl.util.ExcelExporter;
 import de.bp2019.pusl.util.Service;
+import de.bp2019.pusl.util.Utils;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
@@ -230,7 +231,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
                 endDateFilter.setValue(startDate);
             }
 
-            filter.setStartDate(startDate);
+            filter.setStartDate(Utils.localDateToDate(startDate));
 
             filteringGradeDataProvider.setFilter(filter);
             filteringGradeDataProvider.refreshAll();
@@ -244,7 +245,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
                 startDateFilter.setValue(endDate);
             }
 
-            filter.setEndDate(endDate);
+            filter.setEndDate(Utils.localDateToDate(endDate));
 
             filteringGradeDataProvider.setFilter(filter);
             filteringGradeDataProvider.refreshAll();

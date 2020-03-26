@@ -22,7 +22,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document
 @CompoundIndexes({
-    @CompoundIndex(name = "filter_asc", def = "{'matrNumber' : 1, 'lecture._id': 1, 'exercise.name': 1, 'handIn': 1}")
+    @CompoundIndex(name = "grade_lecture", def = "{'lecture._id' : 1}"),
+    @CompoundIndex(name = "lecture_exercise", def = "{'lecture._id' : 1, 'exercise.name': 1}"),
+    @CompoundIndex(name = "matr_lecture", def = "{'matrNumber' : 1, 'lecture._id': 1}"),
+    @CompoundIndex(name = "matr_lecture_exercise_handin", def = "{'matrNumber' : 1, 'lecture._id': 1, 'exercise.name': 1, 'handIn': 1}"),
 })
 public class Grade {
 	@Id
@@ -38,7 +41,7 @@ public class Grade {
 	private User gradedBy;
 
 	private String value;
-
+	
 	private LocalDate handIn;
 
 	private LocalDateTime lastModified;

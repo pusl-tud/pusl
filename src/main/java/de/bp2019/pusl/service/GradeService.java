@@ -2,7 +2,7 @@ package de.bp2019.pusl.service;
 
 import static org.springframework.data.mongodb.core.query.Query.query;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -193,7 +193,10 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
         }).collect(Collectors.toList());
         Sort sort = Sort.by(order);
 
-        return mongoTemplate.find(query(buildCriteria(filter)).with(sort).with(pageable), Grade.class).stream();
+        var mongoQuery = query(buildCriteria(filter)).with(sort).with(pageable);
+        LOGGER.debug(mongoQuery.getQueryObject().toJson());
+
+        return mongoTemplate.find(mongoQuery, Grade.class).stream();
     }
 
     /**
@@ -210,8 +213,8 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
 
         Criteria criteria = new Criteria();
 
-        LocalDate startDate = filter.getStartDate();
-        LocalDate endDate = filter.getEndDate();
+        Date startDate = filter.getStartDate();
+        Date endDate = filter.getEndDate();
         if (startDate != null || endDate != null) {
             criteria = criteria.and("handIn");
             if (startDate != null) {

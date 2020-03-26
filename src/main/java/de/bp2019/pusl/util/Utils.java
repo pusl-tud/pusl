@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
+import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -40,6 +41,14 @@ public final class Utils {
               .nextLong(startSeconds, endSeconds);
          
             return LocalDate.ofInstant(Instant.ofEpochSecond(random), ZoneId.systemDefault());
+    }
+
+    public static Date localDateToDate(LocalDate localDate){
+        if(localDate == null){
+            return null;
+        }
+        Instant instant = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        return Date.from(instant);
     }
 
     public static boolean isMatrNumber(String m) {

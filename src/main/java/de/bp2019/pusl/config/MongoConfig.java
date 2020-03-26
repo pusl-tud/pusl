@@ -1,6 +1,9 @@
 package de.bp2019.pusl.config;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
@@ -40,8 +43,14 @@ class MongoConfig extends AbstractMongoClientConfiguration {
   }
 
   @Override
-  protected String getMappingBasePackage() {
-    return PuslProperties.BASE_PACKAGE + ".model";
+  protected Collection<String> getMappingBasePackages() {
+    List<String> packages = new ArrayList<>();
+    packages.add(PuslProperties.BASE_PACKAGE + ".model");
+    return packages;
   }
 
+  @Override
+  public boolean autoIndexCreation(){
+    return false;
+  }
 }
