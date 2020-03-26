@@ -30,7 +30,6 @@ import de.bp2019.pusl.service.AuthenticationService;
 import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.dialogs.SuccessDialog;
-import de.bp2019.pusl.ui.views.user.ManageUsersView;
 import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
@@ -165,12 +164,12 @@ public class AccountView extends BaseView {
 					}
 
 					userService.save(currentUser);
-					UI.getCurrent().navigate(ManageUsersView.ROUTE);
+					UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
 					SuccessDialog.open("Nutzer erfolgreich gespeichert");
 				} catch (UnauthorizedException e) {
 					ErrorDialog.open("nicht authorisiert um Nutzer zu speichern!");
 				} catch (DataNotFoundException e1) {
-					UI.getCurrent().navigate(ManageUsersView.ROUTE);
+					UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
 					ErrorDialog.open("Nutzer wurde nicht in Datenbank gefunden!");
 				}
 			} else {

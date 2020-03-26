@@ -131,9 +131,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         showGradesHeader.add(endDateFilter, 1);
 
         ExcelExporter<Grade> excelExporter = createExcelExporter();
-        Anchor download = new Anchor(
-                new StreamResource("noten.xlsx", (stream, session) -> excelExporter.createResource(stream, session)),
-                "");
+        Anchor download = new Anchor(new StreamResource("noten.xlsx", excelExporter::createResource), "");
         download.getElement().setAttribute("download", true);
         Button downloadButton = new Button("Download Excel");
         downloadButton.setWidthFull();
@@ -156,11 +154,11 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         grid.addColumn(item -> item.getLecture().getName()).setKey("lecture").setHeader("Veranstaltung")
                 .setAutoWidth(true);
         grid.addColumn(item -> item.getExercise().getName()).setKey("exercise").setHeader("Übung").setAutoWidth(true);
-        grid.addColumn(item -> item.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM. uuuu")))
-                .setKey("handIn").setHeader("Abgabedatum").setAutoWidth(true);
+        grid.addColumn(item -> item.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM. uuuu"))).setKey("handIn")
+                .setHeader("Abgabedatum").setAutoWidth(true);
         grid.addColumn(Grade::getValue).setHeader("Note").setAutoWidth(true);
         grid.setSortableColumns("matrNumber", "handIn");
-        
+
         grid.addItemClickListener(event -> {
             if (event.getClickCount() == 2) {
                 EditGradeDialog.open(event.getItem(), () -> filteringGradeDataProvider.refreshAll());
@@ -173,7 +171,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         /* ############## CHANGE LISTENERS ############# */
 
-        createGradeButton.addClickListener( event -> {
+        createGradeButton.addClickListener(event -> {
             Grade grade = new Grade();
 
             grade.setMatrNumber(filter.getMatrNumber());
@@ -185,7 +183,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             grade.setGradedBy(authenticationService.currentUser());
             grade.setLastModified(LocalDateTime.now());
 
-            if(!GradeService.gradeIsValid(grade)){
+            if (!GradeService.gradeIsValid(grade)) {
                 return;
             }
 
@@ -197,7 +195,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
                 LOGGER.info("current User unauthorized to save Grade");
                 ErrorDialog.open("nicht authoriziert um Note zu speichern");
             }
-        });     
+        });
 
         gradeComposer.addValueChangeListener(event -> {
             LOGGER.debug("GradeComposer value changed");
@@ -228,7 +226,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             LocalDate startDate = event.getValue();
 
             LocalDate endDate = endDateFilter.getValue();
-            if(startDate != null && endDate != null && endDate.isBefore(startDate)){
+            if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
                 endDateFilter.setValue(startDate);
             }
 
@@ -242,7 +240,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             LocalDate endDate = event.getValue();
 
             LocalDate startDate = endDateFilter.getValue();
-            if(endDate != null && startDate != null && startDate.isAfter(endDate)){
+            if (endDate != null && startDate != null && startDate.isAfter(endDate)) {
                 startDateFilter.setValue(endDate);
             }
 

@@ -22,22 +22,22 @@ public class ExerciseScheme {
 	@Id
 	private ObjectId id;
 	private String name;
-	private boolean flexHandin;
 	private boolean isNumeric;
-	private String defaultValue;
+	private double defaultValueNumeric;
+	private Token defaultValueToken;
 	private Set<Token> tokens;
 	private Set<Institute> institutes;
 	private Set<User> hasAccess;
 
 	public ExerciseScheme() {
+		this.defaultValueNumeric = 5.0;
 	}
 
-	public ExerciseScheme(String name, boolean flexHandin, boolean isNumeric, String defaultValue, Set<Token> tokens,
+	public ExerciseScheme(String name, boolean isNumeric, double defaultValueNumeric, Token defaultValueToken, Set<Token> tokens,
 			Set<Institute> institutes, Set<User> hasAccess) {
 		this.name = name;
-		this.flexHandin = flexHandin;
 		this.isNumeric = isNumeric;
-		this.defaultValue = defaultValue;
+		this.defaultValueNumeric = defaultValueNumeric;
 		this.tokens = tokens;
 		this.institutes = institutes;
 		this.hasAccess = hasAccess;
@@ -59,7 +59,7 @@ public class ExerciseScheme {
 		this.name = name;
 	}
 
-	public boolean getIsNumeric() {
+	public boolean isNumeric() {
 		return isNumeric;
 	}
 
@@ -91,20 +91,20 @@ public class ExerciseScheme {
 		this.hasAccess = hasAccess;
 	}
 
-	public boolean isFlexHandin() {
-		return flexHandin;
+	public double getDefaultValueNumeric() {
+		return defaultValueNumeric;
 	}
 
-	public void setFlexHandin(boolean flexHandin) {
-		this.flexHandin = flexHandin;
+	public void setDefaultValueNumeric(double defaultValueNumeric) {
+		this.defaultValueNumeric = defaultValueNumeric;
 	}
 
-	public String getDefaultValue() {
-		return defaultValue;
+	public Token getDefaultValueToken() {
+		return defaultValueToken;
 	}
 
-	public void setDefaultValue(String defaultValue) {
-		this.defaultValue = defaultValue;
+	public void setDefaultValueToken(Token defaultValueToken) {
+		this.defaultValueToken = defaultValueToken;
 	}
 
 	@Override

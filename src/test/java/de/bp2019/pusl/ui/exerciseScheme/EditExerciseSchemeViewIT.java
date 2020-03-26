@@ -52,18 +52,17 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
 
         ExerciseScheme exerciseScheme = new ExerciseScheme();
         exerciseScheme.setName(RandomStringUtils.random(8, true, true));
-        exerciseScheme.setDefaultValue(RandomStringUtils.random(8, true, true));
+        // exerciseScheme.setDefaultValue(RandomStringUtils.random(8, true, true));
         LOGGER.info("creating exerciseScheme: " + exerciseScheme.toString());
 
         findElementById("name").sendKeys(exerciseScheme.getName());
-        findElementById("default-Value").sendKeys(exerciseScheme.getDefaultValue());
+        // findElementById("default-Value").sendKeys(exerciseScheme.getDefaultValue());
         findElementById("numeric").click();
-        findElementById("flex-Handin").click();
 
+        assertFalse(findElementById("token").isDisplayed());
+        
         findButtonContainingText("Speichern").click();
         timeoutWrongURL(ManageExerciseSchemesView.ROUTE);
-
-
     }
 
      /**
@@ -82,12 +81,12 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
 
         ExerciseScheme exerciseScheme = new ExerciseScheme();
         exerciseScheme.setName(RandomStringUtils.random(8, true, true));
-        exerciseScheme.setDefaultValue(RandomStringUtils.random(8, true, true));
+        // exerciseScheme.setDefaultValue(RandomStringUtils.random(8, true, true));
         LOGGER.info("creating exerciseScheme: " + exerciseScheme.toString());
 
         findElementById("name").sendKeys(exerciseScheme.getName());
         findMSCBByIdAndSelectByTexts("institutes", Arrays.asList(institute.getName()));
-        findElementById("default-Value").sendKeys(exerciseScheme.getDefaultValue());
+        // findElementById("default-Value").sendKeys(exerciseScheme.getDefaultValue());
         findElementById("flex-Handin").click();
         assertTrue(findElementById("token").isDisplayed());
 

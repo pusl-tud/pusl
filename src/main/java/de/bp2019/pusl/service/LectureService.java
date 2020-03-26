@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.LectureRepository;
@@ -37,7 +36,7 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
 
     @Autowired
     LectureRepository lectureRepository;
-    
+
     @Autowired
     AuthenticationService authenticationService;
 
@@ -87,7 +86,7 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
 
         if (userIsAuthorized(lecture)) {
             lectureRepository.save(lecture);
-        }else{
+        } else {
             LOGGER.error("user is not authorized to save lecture!");
             throw new UnauthorizedException();
         }
@@ -107,7 +106,7 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
 
         if (userIsAuthorized(lecture)) {
             lectureRepository.delete(lecture);
-        }else{
+        } else {
             LOGGER.error("user is not authorized to delete lecture!");
             throw new UnauthorizedException();
         }
@@ -181,20 +180,32 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
     public int size(Query<Lecture, String> query) {
         User currentUser = authenticationService.currentUser();
 
-        if (currentUser.getType() == UserType.SUPERADMIN) {
-            return (int) lectureRepository.count();
+        switch (currentUser.getType()) {
+            case SUPERADMIN:
+                return (int) lectureRepository.count();
+            case ADMIN:
+            case WIMI:
+                return lectureRepository.countByInstitutesIn(currentUser.getInstitutes());
+            case HIWI:
+            default:
+                return lectureRepository.countByInstitutesInAndHasAccessIn(currentUser.getInstitutes(), currentUser.getId());
         }
-        return lectureRepository.countByInstitutesIn(currentUser.getInstitutes());
     }
 
     @Override
     public Stream<Lecture> fetch(Query<Lecture, String> query) {
-        Pageable pageable = new LimitOffsetPageRequest(query.getLimit(), query.getOffset());        
+        Pageable pageable = new LimitOffsetPageRequest(query.getLimit(), query.getOffset());
         User currentUser = authenticationService.currentUser();
 
-        if (currentUser.getType() == UserType.SUPERADMIN) {
-            return lectureRepository.findAll(pageable).stream();
+        switch (currentUser.getType()) {
+            case SUPERADMIN:
+                return lectureRepository.findAll(pageable).stream();
+            case ADMIN:
+            case WIMI:
+                return lectureRepository.findByInstitutesIn(currentUser.getInstitutes(), pageable);
+            case HIWI:
+            default:
+                return lectureRepository.findByInstitutesInAndHasAccessIn(currentUser.getInstitutes(), currentUser.getId(), pageable);
         }
-        return lectureRepository.findByInstitutesIn(currentUser.getInstitutes(), pageable);
     }
 }

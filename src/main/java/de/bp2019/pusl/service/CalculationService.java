@@ -3,6 +3,9 @@ package de.bp2019.pusl.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import com.vaadin.flow.data.provider.Query;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -14,10 +17,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.model.Exercise;
+import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.model.Performance;
 import de.bp2019.pusl.model.PerformanceScheme;
+import de.bp2019.pusl.service.dataproviders.GradeFilter;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.util.exceptions.JSException;
 
@@ -46,11 +51,11 @@ public class CalculationService {
 
     public Performance calculatePerformance(String matrNumber, Lecture lecture, PerformanceScheme performanceScheme) {
 
-        Grade filter = new Grade();
+        GradeFilter filter = new GradeFilter();
         filter.setMatrNumber(matrNumber);
-        filter.setLecture(lecture);
-        //////////////////////////////////////
-        List<Grade> grades = new ArrayList<>();
+        filter.setLecture(lecture);        
+
+        List<Grade> grades = gradeService.fetch(new Query<>(), filter).collect(Collectors.toList());
         LOGGER.info(grades.toString());
 
         List<Object> gradeValues = new ArrayList<>();
@@ -59,14 +64,19 @@ public class CalculationService {
             Optional<Grade> grade = grades.stream()
                     .filter(g -> g.getExercise().equals(exercise) && g.getMatrNumber().equals(matrNumber)).findFirst();
 
+            ExerciseScheme exerciseScheme = exercise.getScheme();
             if (grade.isPresent()) {
-                if (exercise.getScheme().getIsNumeric()) {
+                if (exerciseScheme.isNumeric()) {
                     gradeValues.add(Float.valueOf(grade.get().getValue()));
                 } else {
                     gradeValues.add(grade.get().getValue());
                 }
             } else {
-                gradeValues.add(exercise.getScheme().getDefaultValue());
+                if(exerciseScheme.isNumeric()){                    
+                    gradeValues.add(exerciseScheme.getDefaultValueNumeric());
+                }else{
+                    gradeValues.add(exerciseScheme.getDefaultValueToken().getName());
+                }
             }
         }
 

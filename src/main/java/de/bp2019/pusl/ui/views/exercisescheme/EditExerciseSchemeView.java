@@ -7,10 +7,10 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
@@ -28,6 +28,7 @@ import org.vaadin.gatanaso.MultiselectComboBox;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Institute;
+import de.bp2019.pusl.model.Token;
 import de.bp2019.pusl.service.ExerciseSchemeService;
 import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.ui.components.TokenEditor;
@@ -42,7 +43,7 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
  *
- * @author Luca Dinies
+ * @author Luca Dinies, Leon Chemnitz
  *
  **/
 
@@ -70,7 +71,7 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
 
         FormLayout form = new FormLayout();
         form.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
-        form.setWidth("100%");
+        form.setWidth("calc(100% - 1em)");
         form.getStyle().set("marginLeft", "1em");
         form.getStyle().set("marginTop", "-0.5em");
 
@@ -87,44 +88,40 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         institutes.setItemLabelGenerator(Institute::getName);
         institutes.setId("institutes");
 
+        NumberField defaultValueNumeric = new NumberField();
+        defaultValueNumeric.setLabel("Standard Note");
+        defaultValueNumeric.setValue(5.0);
+        defaultValueNumeric.setId("default-value-numeric");
+
+        ComboBox<Token> defaultValueToken = new ComboBox<>();
+        defaultValueToken.setLabel("Standard Token");
+        defaultValueToken.setId("default-value-token");
+        defaultValueToken.setItemLabelGenerator(Token::getName);
+        defaultValueToken.setClearButtonVisible(false);
+        defaultValueToken.setVisible(false);
+
+        Checkbox tokenBased = new Checkbox("Token basiert");
+        tokenBased.setId("numeric");
+
         TokenEditor tokens = new TokenEditor(exerciseSchemeService);
         tokens.setId("token");
-
-        Checkbox isNumeric = new Checkbox("Mit Note");
-        isNumeric.addValueChangeListener(evt -> {
-            if (isNumeric.getValue()) {
-                tokens.setVisible(false);
-            } else {
-                tokens.setVisible(true);
-            }
-        });
-        isNumeric.setId("numeric");
-
-        Checkbox flexHandin = new Checkbox("Einzel-Ausgabe");
-        flexHandin.setId("flex-Handin");
-
-        TextField defaultValue = new TextField();
-        defaultValue.setLabel("Standart Wert");
-        defaultValue.setId("default-Value");
+        tokens.setVisible(false);
 
         form.add(name, 1);
         form.add(institutes, 1);
-        form.add(isNumeric);
-        form.add(flexHandin);
-        form.add(defaultValue);
+        form.add(defaultValueNumeric, 1);
+        form.add(defaultValueToken, 1);
+        form.add(tokenBased, 1);
         form.add(tokens, 2);
+
+        add(form);
 
         Button save = new Button("Speichern");
         save.setId("save");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        /* Button Bar */
-        VerticalLayout actions = new VerticalLayout();
-        actions.add(save);
-        actions.setHorizontalComponentAlignment(FlexComponent.Alignment.END, save);
-        form.add(actions);
-        
-        add(form);
+        add(save);
+        setHorizontalComponentAlignment(Alignment.END, save);
 
         binder.forField(name).withValidator(new StringLengthValidator("Bitte Namen der Übung eingeben", 1, null))
                 .bind(ExerciseScheme::getName, ExerciseScheme::setName);
@@ -133,17 +130,30 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
                 .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(), "Bitte mind. ein Institut angeben")
                 .bind(ExerciseScheme::getInstitutes, ExerciseScheme::setInstitutes);
 
+        binder.forField(defaultValueNumeric).bind(ExerciseScheme::getDefaultValueNumeric, ExerciseScheme::setDefaultValueNumeric);
+
+        binder.forField(defaultValueToken).bind(ExerciseScheme::getDefaultValueToken, ExerciseScheme::setDefaultValueToken);
+        
+        binder.bind(tokenBased, es -> !es.isNumeric(), (es, value) -> es.setIsNumeric(!value));
+        
         binder.bind(tokens, ExerciseScheme::getTokens, ExerciseScheme::setTokens);
 
-        binder.bind(isNumeric, ExerciseScheme::getIsNumeric, ExerciseScheme::setIsNumeric);
 
-        binder.bind(flexHandin, ExerciseScheme::isFlexHandin, ExerciseScheme::setFlexHandin);
+        /* ########### Listeners ########## */
+        tokenBased.addValueChangeListener(evt -> {
+            if (tokenBased.getValue()) {
+                defaultValueNumeric.setVisible(false);
+                defaultValueToken.setVisible(true);
+                tokens.setVisible(true);
+            } else {
+                defaultValueNumeric.setVisible(true);
+                defaultValueToken.setVisible(false);
+                tokens.setVisible(false);
+            }
+        });
 
-        binder.forField(defaultValue)
-                .withValidator(new StringLengthValidator("Bitte Standart-Bewertung eingeben!", 1, null))
-                .bind(ExerciseScheme::getDefaultValue, ExerciseScheme::setDefaultValue);
+        tokens.addValueChangeListener(event -> defaultValueToken.setItems(event.getValue()));
 
-        /* Click-Listeners */
         save.addClickListener(event -> {
 
             if (!exerciseSchemeService.checkNameAvailable(name.getValue(), exerciseSchemeId)) {
@@ -162,6 +172,7 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
                     UI.getCurrent().navigate(ManageExerciseSchemesView.ROUTE);
                     SuccessDialog.open("Übungsschema erfolgreich gespeichert");
                 } catch (UnauthorizedException e) {
+                    LOGGER.error("unauthorized to edit ExerciseScheme");
                     ErrorDialog.open("nicht authorisiert um Übungsschema zu speichern!");
                 }
             } else {
@@ -169,7 +180,8 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
                 String errorText = validate.getFieldValidationStatuses().stream()
                         .filter(BindingValidationStatus::isError).map(BindingValidationStatus::getMessage)
                         .map(Optional::get).distinct().collect(Collectors.joining(", "));
-                LOGGER.info("ExerciseScheme could not be saved because of validation errors. Errors were: " + errorText);
+                LOGGER.info(
+                        "ExerciseScheme could not be saved because of validation errors. Errors were: " + errorText);
             }
         });
     }

@@ -2,9 +2,16 @@ package de.bp2019.pusl.service;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.vaadin.flow.data.provider.Query;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.slf4j.Logger;
@@ -34,6 +41,42 @@ public class UserServiceIT {
 
     @Autowired
     UserService userService;
+
+    @Test
+    public void testGetByIds(){
+        LOGGER.info("Testing getByIds");
+        List<User> users = new ArrayList<>();
+
+        User user1 = new User();
+        user1.setEmailAddress(RandomStringUtils.randomAlphanumeric(10));
+        userRepository.save(user1);
+        users.add(user1);
+
+        User user2 = new User();
+        user2.setEmailAddress(RandomStringUtils.randomAlphanumeric(10));
+        userRepository.save(user2);
+        users.add(user2);
+
+        User user3 = new User();
+        user3.setEmailAddress(RandomStringUtils.randomAlphanumeric(10));
+        userRepository.save(user3);
+
+        LOGGER.info("Testing all Ids in DB");
+        LOGGER.info("Users to get: " + users.toString());
+
+        Set<ObjectId> ids = users.stream().map(User::getId).collect(Collectors.toSet());
+        Set<User> fetchedUsers = userService.getByIds(ids);
+
+        LOGGER.info("Users gotten: " + fetchedUsers.toString());
+        TestUtils.assertCollectionsAreEqual(users, fetchedUsers);
+
+        LOGGER.info("Testing not all Ids in DB");
+        userRepository.delete(user2);
+        fetchedUsers = userService.getByIds(ids);
+        LOGGER.info("Users gotten: " + fetchedUsers.toString());
+
+        TestUtils.assertCollectionsAreEqual(Arrays.asList(user1), fetchedUsers);
+    }
 
     @Test
     public void testSize() throws Exception {

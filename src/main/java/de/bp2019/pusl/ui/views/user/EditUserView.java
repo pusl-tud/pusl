@@ -195,11 +195,11 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                                                 user.setPassword(passwordEncoder.encode(pwd));
                                         }
                                 });
-                password.addValueChangeListener(e -> passwordBinder.validate());
 
-                /* ########### Click Listeners for Buttons ########### */
+                /* ########### Listeners ########### */
 
                 save.addClickListener(event -> {
+                        passwordBinder.validate();
 
                         if (!userService.checkEmailAvailable(emailAddress.getValue(), userId)) {
                                 ErrorDialog.open("Email Adresse bereits vergeben");

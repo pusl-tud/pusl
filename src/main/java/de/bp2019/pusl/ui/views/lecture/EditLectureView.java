@@ -29,6 +29,7 @@ import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.service.ExerciseSchemeService;
 import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.service.LectureService;
+import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.service.dataproviders.HiwiDataProvider;
 import de.bp2019.pusl.ui.components.ExerciseComposer;
 import de.bp2019.pusl.ui.components.PerformanceSchemeComposer;
@@ -57,6 +58,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
         private InstituteService instituteService;
         private LectureService lectureService;
+        private UserService userService;
         private ExerciseSchemeService exerciseSchemeService;
         private HiwiDataProvider hiwiDataProvider;
 
@@ -71,6 +73,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
                 this.instituteService = Service.get(InstituteService.class);
                 this.lectureService = Service.get(LectureService.class);
+                this.userService = Service.get(UserService.class);
                 this.exerciseSchemeService = Service.get(ExerciseSchemeService.class);
                 this.hiwiDataProvider = Service.get(HiwiDataProvider.class);
 
@@ -134,7 +137,9 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                                                 "Bitte mind. ein Institut angeben")
                                 .bind(Lecture::getInstitutes, Lecture::setInstitutes);
 
-                binder.bind(hasAccess, Lecture::getHasAccess, Lecture::setHasAccess);
+                binder.bind(hasAccess, lecture -> userService.getByIds(lecture.getHasAccess()), (lecture, items) -> {
+                        lecture.setHasAccess(items.stream().map(u -> u.getId()).collect(Collectors.toSet()));
+                });
 
                 binder.bind(exercises, Lecture::getExercises, Lecture::setExercises);
 

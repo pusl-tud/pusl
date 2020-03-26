@@ -2,9 +2,11 @@ package de.bp2019.pusl.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.collect.Sets;
@@ -119,6 +121,23 @@ public class UserService extends AbstractDataProvider<User, String> {
         }
     }
 
+    public Set<User> getByIds(Set<ObjectId> ids){
+        if(ids == null) {
+            LOGGER.debug("getting Users by ID but parameter was null");
+            return new HashSet<>();
+        }       
+        LOGGER.debug("getting Users with IDs: " + ids.toString());
+
+        Iterable<String> idsString = ids.stream().map(ObjectId::toString).collect(Collectors.toList());
+        Iterable<User> users = userRepository.findAllById(idsString);
+
+        Set<User> userSet = new HashSet<>();
+
+        users.forEach(u -> userSet.add(u));
+
+        return userSet;
+    }
+
     /**
      * Check if current user is authorized to access the {@link User}
      * 
@@ -133,6 +152,8 @@ public class UserService extends AbstractDataProvider<User, String> {
             default:
             case HIWI:
             case WIMI:
+                if(user.getId().equals(currentUser.getId()))
+                    return true;
                 break;
             case ADMIN:
                 if (!Utils.containsAny(currentUser.getInstitutes(), user.getInstitutes()))

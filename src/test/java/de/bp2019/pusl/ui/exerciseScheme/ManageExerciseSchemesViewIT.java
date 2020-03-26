@@ -27,7 +27,7 @@ import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
 
 /**
  * UI test for
- * {@link de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView}
+ * {@link ManageExerciseSchemesView}
  *
  * @author Luca Dinies
  */
@@ -57,13 +57,14 @@ public class ManageExerciseSchemesViewIT extends BaseUITest {
         instituteSet.add(instituteRepository.findAll().get(0));
 
         Set<Token> tokenSet = new HashSet<>();
-        tokenSet.add(new Token(RandomStringUtils.random(8, true, true), false));
+        Token defaultToken = new Token(RandomStringUtils.random(8, true, true), false);
+        tokenSet.add(defaultToken);
 
         Set<User> userSet = new HashSet<>();
         userSet.add(userRepository.findByEmailAddress(testProperties.getAdminUsername()).get());
 
-        exerciseScheme = new ExerciseScheme(RandomStringUtils.random(8, true, false), false, false,
-                RandomStringUtils.random(8, true, true), tokenSet, instituteSet, userSet);
+        exerciseScheme = new ExerciseScheme(RandomStringUtils.random(8, true, false), false, 0, defaultToken, tokenSet,
+                instituteSet, userSet);
 
         exerciseSchemeRepository.save(exerciseScheme);
 
@@ -105,11 +106,6 @@ public class ManageExerciseSchemesViewIT extends BaseUITest {
         findButtonContainingText(exerciseSchemeName).click();
 
         waitForURL(EditExerciseSchemeView.ROUTE + "/" + id.toString());
-
-        findElementById("numeric").click();
-
-        findButtonContainingText("Speichern").click();
-        waitForURL(ManageExerciseSchemesView.ROUTE);
     }
 
     /**
@@ -137,7 +133,7 @@ public class ManageExerciseSchemesViewIT extends BaseUITest {
 
         // TODO: jajaja
 
-        //assertTrue(exerciseSchemeRepository.findById(id.toString()).isEmpty());
+        // assertTrue(exerciseSchemeRepository.findById(id.toString()).isEmpty());
     }
 
     /**

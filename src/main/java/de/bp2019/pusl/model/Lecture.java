@@ -28,7 +28,7 @@ public class Lecture {
 
     private Set<Institute> institutes;
 
-    private Set<User> hasAccess;
+    private Set<ObjectId> hasAccess;
 
     private List<Exercise> exercises;
 
@@ -36,7 +36,7 @@ public class Lecture {
 
     private Instant lastModified;
 
-    public Lecture(String name, Set<Institute> institutes, Set<User> hasAccess, List<Exercise> exercises,
+    public Lecture(String name, Set<Institute> institutes, Set<ObjectId> hasAccess, List<Exercise> exercises,
             List<PerformanceScheme> performanceSchemes) {
         this.name = name;
         this.institutes = institutes;
@@ -74,11 +74,11 @@ public class Lecture {
         this.institutes = institutes;
     }
 
-    public Set<User> getHasAccess() {
+    public Set<ObjectId> getHasAccess() {
         return hasAccess;
     }
 
-    public void setHasAccess(Set<User> hasAccess) {
+    public void setHasAccess(Set<ObjectId> hasAccess) {
         this.hasAccess = hasAccess;
     }
 

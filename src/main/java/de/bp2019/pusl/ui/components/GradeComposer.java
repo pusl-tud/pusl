@@ -1,7 +1,9 @@
 package de.bp2019.pusl.ui.components;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -17,10 +19,12 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.model.Token;
+import de.bp2019.pusl.service.AuthenticationService;
 import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.service.dataproviders.GradeFilter;
 import de.bp2019.pusl.util.Service;
@@ -35,6 +39,7 @@ public class GradeComposer extends CustomField<GradeFilter> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GradeComposer.class);
 
     private LectureService lectureService;
+    private AuthenticationService authenticationService;
 
     private ComboBox<Lecture> lecture;
     private ComboBox<Exercise> exercise;
@@ -44,6 +49,7 @@ public class GradeComposer extends CustomField<GradeFilter> {
 
     public GradeComposer() {
         lectureService = Service.get(LectureService.class);
+        authenticationService = Service.get(AuthenticationService.class);
 
         FormLayout layout = new FormLayout();
         layout.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2),
@@ -54,7 +60,7 @@ public class GradeComposer extends CustomField<GradeFilter> {
         matrNumber.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         matrNumber.setLabel("Matrikelnummer");
         matrNumber.setPlaceholder("Matrikelnummer");
-        matrNumber.setValueChangeMode(ValueChangeMode.EAGER); 
+        matrNumber.setValueChangeMode(ValueChangeMode.EAGER);
         layout.add(matrNumber, 1);
 
         lecture = new ComboBox<>();
@@ -95,9 +101,9 @@ public class GradeComposer extends CustomField<GradeFilter> {
 
             GradeFilter value = generateModelValue();
             Integer matrNumberValue = event.getValue();
-            if(matrNumberValue != null){
+            if (matrNumberValue != null) {
                 value.setMatrNumber(matrNumberValue.toString());
-            }else{
+            } else {
                 value.setMatrNumber(null);
             }
             setValue(value);
@@ -116,7 +122,7 @@ public class GradeComposer extends CustomField<GradeFilter> {
                 LOGGER.debug("lecture not empty");
                 exercise.setItems(lectureValue.getExercises());
                 exercise.setEnabled(true);
-            }       
+            }
         });
 
         exercise.addValueChangeListener(event -> {
@@ -137,7 +143,7 @@ public class GradeComposer extends CustomField<GradeFilter> {
                 LOGGER.debug("exercise not empty");
                 ExerciseScheme exerciseSchemeValue = exerciseValue.getScheme();
 
-                if (exerciseSchemeValue.getIsNumeric()) {
+                if (exerciseSchemeValue.isNumeric()) {
                     LOGGER.debug("exercise numeric");
                     token.setVisible(false);
                     token.setEnabled(false);
@@ -161,12 +167,12 @@ public class GradeComposer extends CustomField<GradeFilter> {
 
         numeric.addValueChangeListener(event -> {
             LOGGER.debug("setting value numeric");
-            setModelValue(generateModelValue(),true);
+            setModelValue(generateModelValue(), true);
         });
 
         token.addValueChangeListener(event -> {
             LOGGER.debug("setting value token");
-            setModelValue(generateModelValue(),true);
+            setModelValue(generateModelValue(), true);
         });
     }
 
@@ -174,27 +180,26 @@ public class GradeComposer extends CustomField<GradeFilter> {
     protected GradeFilter generateModelValue() {
         GradeFilter newModelValue = new GradeFilter();
 
-        
         Integer matrNumberValue = matrNumber.getValue();
-        if(matrNumberValue != null){
+        if (matrNumberValue != null) {
             newModelValue.setMatrNumber(matrNumberValue.toString());
         }
 
         Lecture lectureValue = lecture.getValue();
         newModelValue.setLecture(lectureValue);
-        if(lectureValue != null){
+        if (lectureValue != null) {
             Exercise exerciseValue = exercise.getValue();
             newModelValue.setExercise(exerciseValue);
 
-            if(exerciseValue != null){
-                if(exerciseValue.getScheme().getIsNumeric()){
+            if (exerciseValue != null) {
+                if (exerciseValue.getScheme().isNumeric()) {
                     Double numericValue = numeric.getValue();
-                    if(numericValue != null){
+                    if (numericValue != null) {
                         newModelValue.setGrade(numericValue.toString());
                     }
-                }else{
+                } else {
                     Token tokenValue = token.getValue();
-                    if(tokenValue != null){
+                    if (tokenValue != null) {
                         newModelValue.setGrade(tokenValue.getName());
                     }
                 }
@@ -207,9 +212,9 @@ public class GradeComposer extends CustomField<GradeFilter> {
     @Override
     protected void setPresentationValue(GradeFilter value) {
 
-        if(value.getMatrNumber() != null){
+        if (value.getMatrNumber() != null) {
             matrNumber.setValue(Integer.valueOf(value.getMatrNumber()));
-        }else {
+        } else {
             matrNumber.setValue(null);
         }
 
@@ -217,9 +222,15 @@ public class GradeComposer extends CustomField<GradeFilter> {
         Exercise exerciseValue = value.getExercise();
 
         lecture.setValue(lectureValue);
-        
-        if(lectureValue != null){
-            exercise.setItems(lectureValue.getExercises());
+
+        if (lectureValue != null) {
+            if (authenticationService.currentUserType() == UserType.HIWI) {
+                List<Exercise> exercises = lectureValue.getExercises().stream().filter(e -> e.isAssignableByHIWI())
+                        .collect(Collectors.toList());
+                exercise.setItems(exercises);
+            } else {
+                exercise.setItems(lectureValue.getExercises());
+            }
         }
 
         exercise.setValue(exerciseValue);
@@ -230,24 +241,31 @@ public class GradeComposer extends CustomField<GradeFilter> {
             ExerciseScheme exerciseScheme = exerciseValue.getScheme();
             LOGGER.debug("Grade value: " + gradeValue);
 
-            if (exerciseScheme.getIsNumeric()) {
-                if(gradeValue != null && NumberUtils.isParsable(gradeValue)) {
+            if (exerciseScheme.isNumeric()) {
+                if (gradeValue != null && NumberUtils.isParsable(gradeValue)) {
                     numeric.setValue(Double.valueOf(gradeValue));
-                }else{
+                } else {
                     numeric.setValue(null);
                 }
             } else {
-                token.setItems(exerciseScheme.getTokens());
+
+                if(authenticationService.currentUserType() == UserType.HIWI){
+                    List<Token> tokens = exerciseScheme.getTokens().stream().filter(t-> t.getAssignableByHIWI()).collect(Collectors.toList());
+                    token.setItems(tokens);
+                }else{
+                    token.setItems(exerciseScheme.getTokens());
+                }
+                
 
                 Set<Token> tokens = value.getExercise().getScheme().getTokens();
                 LOGGER.debug(tokens.toString());
 
                 Optional<Token> tokenValue = tokens.stream().filter(t -> t.getName().equals(gradeValue)).findFirst();
 
-                if(tokenValue.isPresent()){
+                if (tokenValue.isPresent()) {
                     LOGGER.debug("token found");
                     token.setValue(tokenValue.get());
-                }else{
+                } else {
                     LOGGER.debug("token not found");
                     token.setValue(null);
                 }

@@ -146,14 +146,15 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
                 Lecture lecture;
 
                 tokenSet1 = new HashSet<>();
-                tokenSet1.add(new Token("O", true));
+                Token defaultToken = new Token("O", true);
+                tokenSet1.add(defaultToken);
                 tokenSet1.add(new Token("T", true));
                 tokenSet1.add(new Token("J", true));
                 tokenSet1.add(new Token("N", true));
 
                 exerciseScheme = new ExerciseScheme();
                 exerciseScheme.setName("Hausübung");
-                exerciseScheme.setDefaultValue("O");
+                exerciseScheme.setDefaultValueToken(defaultToken);
                 exerciseScheme.setIsNumeric(false);
                 exerciseScheme.setTokens(tokenSet1);
                 exerciseScheme.setInstitutes(Set.of(institutes.get(0), institutes.get(1)));
@@ -165,7 +166,7 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
 
                 exerciseScheme = new ExerciseScheme();
                 exerciseScheme.setName("Exkursion");
-                exerciseScheme.setDefaultValue("O");
+                exerciseScheme.setDefaultValueToken(defaultToken);
                 exerciseScheme.setIsNumeric(false);
                 exerciseScheme.setTokens(tokenSet1);
                 exerciseScheme.setInstitutes(Set.of(institutes.get(0)));
@@ -173,7 +174,7 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
 
                 exerciseScheme = new ExerciseScheme();
                 exerciseScheme.setName("Klausur");
-                exerciseScheme.setDefaultValue("5.0");
+                exerciseScheme.setDefaultValueNumeric(5.0);
                 exerciseScheme.setIsNumeric(true);
                 exerciseScheme.setInstitutes(Set.of(institutes.get(0)));
                 exerciseSchemeRepository.save(exerciseScheme);
@@ -264,7 +265,7 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
                                         }
 
                                         String value;
-                                        if (exercise.getScheme().getIsNumeric()) {
+                                        if (exercise.getScheme().isNumeric()) {
                                                 int generatedInt = new RandomDataGenerator().nextInt(10, 50);
                                                 value = Float.toString(generatedInt / 10.0F);
                                         } else {

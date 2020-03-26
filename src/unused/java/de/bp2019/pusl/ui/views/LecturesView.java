@@ -1,4 +1,4 @@
-package de.bp2019.pusl.ui.views;
+// package de.bp2019.pusl.ui.views;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,11 +23,14 @@ import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.service.LectureService;
+import de.bp2019.pusl.ui.views.BaseView;
+import de.bp2019.pusl.ui.views.MainAppView;
+import de.bp2019.pusl.ui.views.WorkView;
 import de.bp2019.pusl.util.Service;
 
 /**
  * View displaying a list of all {@link Lecture}s
- * 
+ *
  * @author Leon Chemnitz
  */
 @PageTitle(PuslProperties.NAME + " | Meine Veranstaltungen")

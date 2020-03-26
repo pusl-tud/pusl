@@ -25,6 +25,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.model.Exercise;
+import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.Lecture;
@@ -247,6 +248,7 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
             default:
             case HIWI:
                 criteria = criteria.and("exercise.assignableByHIWI").is(true);
+                criteria = criteria.and("lecture.hasAccess").in(currentUser.getId());
             case WIMI:
             case ADMIN:
                 criteria = criteria.and("lecture.institutes").in(currentUser.getInstitutes());
@@ -277,7 +279,15 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
         String value = grade.getValue();
         if (value == null || value.equals("")) {
             SuccessDialog.open("Kein Notenwert angegeben, Standardwert wird gesetzt");
-            grade.setValue(exercise.getScheme().getDefaultValue());
+
+            ExerciseScheme exerciseScheme = exercise.getScheme();
+            
+            if(exerciseScheme.isNumeric()){
+                grade.setValue(Double.toString(exerciseScheme.getDefaultValueNumeric()));
+            }else{
+                grade.setValue(exerciseScheme.getDefaultValueToken().getName());
+            }
+
             return true;
         }
 

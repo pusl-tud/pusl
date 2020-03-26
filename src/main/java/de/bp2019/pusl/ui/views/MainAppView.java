@@ -46,15 +46,17 @@ public class MainAppView extends AppLayout {
         User currentUser = authenticationService.currentUser();
 
         HorizontalLayout titleLayout = new HorizontalLayout();
-        Label title = new Label(PuslProperties.NAME);
-        title.getStyle().set("font-size", "1.2em");
-        titleLayout.add(title);
+
 
         Image logo = new Image("images/pusl_logo_small.png", "");
-        logo.getStyle().set("margin-left", "0.4em");
         logo.getStyle().set("margin-top", "0.25em");
         logo.setHeight("1.4em");
         titleLayout.add(logo);
+
+        Label title = new Label(PuslProperties.NAME);
+        title.getStyle().set("font-size", "1.2em");
+        title.getStyle().set("margin-left", "0.2em");
+        titleLayout.add(title);
 
         VerticalLayout navbarRight = new VerticalLayout();
 
@@ -82,10 +84,10 @@ public class MainAppView extends AppLayout {
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(false);
 
-        content.add(generateMenuButton("Startseite", new Icon(VaadinIcon.HOME), PuslProperties.ROOT_ROUTE));
+        content.add(generateMenuButton("Noten", new Icon(VaadinIcon.HOME), PuslProperties.ROOT_ROUTE));
 
         if (currentUser.getType() != UserType.HIWI) {
-            content.add(generateMenuButton("Noten Export", new Icon(VaadinIcon.DOWNLOAD), ExportView.ROUTE));
+            content.add(generateMenuButton("Export", new Icon(VaadinIcon.DOWNLOAD), ExportView.ROUTE));
         }
         content.add(generateMenuButton("Mein Account", new Icon(VaadinIcon.USER), AccountView.ROUTE));
 

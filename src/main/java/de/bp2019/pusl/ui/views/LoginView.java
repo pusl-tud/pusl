@@ -44,15 +44,15 @@ public class LoginView extends VerticalLayout {
 
 		/* configures login dialog and adds it to the main view */
 		HorizontalLayout titleLayout = new HorizontalLayout();
-		Label title = new Label(PuslProperties.NAME);
-		title.getStyle().set("font-size", "2.6em");
-		titleLayout.add(title);
-
-        Image logo = new Image("images/pusl_logo_large.png", "");
-        logo.getStyle().set("margin-left", "0.6em");
+		Image logo = new Image("images/pusl_logo_large.png", "");
         logo.getStyle().set("margin-top", "0.4em");
         logo.setHeight("3.3em");
-        titleLayout.add(logo);
+		titleLayout.add(logo);
+		
+		Label title = new Label(PuslProperties.NAME);
+		title.getStyle().set("font-size", "2.6em");
+		title.getStyle().set("margin-left", "0.2em");
+		titleLayout.add(title);
 
 		login.setTitle(titleLayout);
 		login.setDescription("System für Prüfungen und studentische Leistungen");
