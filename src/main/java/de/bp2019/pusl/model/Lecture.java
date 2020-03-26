@@ -1,7 +1,9 @@
 package de.bp2019.pusl.model;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -36,6 +38,14 @@ public class Lecture {
 
     private Instant lastModified;
 
+    public Lecture() {
+        this.lastModified = Instant.now();
+		this.institutes = new HashSet<>();
+		this.hasAccess = new HashSet<>();
+		this.exercises = new ArrayList<>();
+		this.performanceSchemes = new ArrayList<>();
+    }
+
     public Lecture(String name, Set<Institute> institutes, Set<ObjectId> hasAccess, List<Exercise> exercises,
             List<PerformanceScheme> performanceSchemes) {
         this.name = name;
@@ -43,10 +53,6 @@ public class Lecture {
         this.exercises = exercises;
         this.hasAccess = hasAccess;
         this.performanceSchemes = performanceSchemes;
-        this.lastModified = Instant.now();
-    }
-
-    public Lecture() {
         this.lastModified = Instant.now();
     }
 

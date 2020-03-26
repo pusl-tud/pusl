@@ -1,17 +1,16 @@
 package de.bp2019.pusl.ui.user;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.config.BaseUITest;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
-import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.ui.LoginViewIT;
-import de.bp2019.pusl.ui.dialogs.ConfirmDeletionDialog;
 import de.bp2019.pusl.ui.views.user.EditUserView;
 import de.bp2019.pusl.ui.views.user.ManageUsersView;
 
@@ -22,9 +21,6 @@ import de.bp2019.pusl.ui.views.user.ManageUsersView;
  */
 public class ManageUsersViewIT extends BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewIT.class);
-
-    @Autowired
-    UserRepository userRepository;
 
     /**
      * @author Leon Chemnitz
@@ -51,13 +47,14 @@ public class ManageUsersViewIT extends BaseUITest {
         LOGGER.info("Testing User name button");
         login(UserType.SUPERADMIN);
 
+        User user = testUtils.createUser(UserType.ADMIN);
+        String id = user.getId().toString();
+        String name = user.getFullName();
+        
         goToURL(ManageUsersView.ROUTE);
 
-        User user = userRepository.findByEmailAddress(testProperties.getAdminUsername()).get();
-        String id = user.getId().toString();
-
-        /* click delete button */
-        findElementById("create-" + id).click();
+        /* click name button */
+        findButtonContainingText(name).click();
 
         waitForURL(EditUserView.ROUTE + "/" + id);
     }
@@ -71,20 +68,18 @@ public class ManageUsersViewIT extends BaseUITest {
         LOGGER.info("Testing Delete User Button");
         login(UserType.SUPERADMIN);
 
-        goToURL(ManageUsersView.ROUTE);
-
-        User user = userRepository.findByEmailAddress(testProperties.getAdminUsername()).get();
+        User user = testUtils.createUser(UserType.ADMIN);
         String id = user.getId().toString();
+        String email = user.getEmailAddress();
+
+        goToURL(ManageUsersView.ROUTE);
 
         /* click delete button */
         findElementById("delete-" + id).click();
-        /* confirm delete button */
-        findButtonContainingText("Löschen").click();
 
-        findElementById(ConfirmDeletionDialog.ID);
+        acceptConfirmDeletionDialog(email);
 
-        // TODO: jajaja
-        //assertTrue(userRepository.findByEmailAddress(testProperties.getAdminUsername()).isEmpty());
+        assertTrue(userRepository.findByEmailAddress(user.getEmailAddress()).isEmpty());
     }
 
     /**

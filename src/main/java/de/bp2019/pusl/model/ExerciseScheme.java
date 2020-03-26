@@ -1,6 +1,7 @@
 package de.bp2019.pusl.model;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -31,6 +32,9 @@ public class ExerciseScheme {
 
 	public ExerciseScheme() {
 		this.defaultValueNumeric = 5.0;
+		this.tokens = new HashSet<>();
+		this.institutes = new HashSet<>();
+		this.hasAccess = new HashSet<>();
 	}
 
 	public ExerciseScheme(String name, boolean isNumeric, double defaultValueNumeric, Token defaultValueToken, Set<Token> tokens,

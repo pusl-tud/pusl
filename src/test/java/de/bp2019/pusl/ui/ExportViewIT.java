@@ -112,7 +112,7 @@ public class ExportViewIT extends BaseUITest {
         findSelectByIdAndSelectByText("lecture", lecture.getName());
         findSelectByIdAndSelectByText("performanceScheme", lecture.getPerformanceSchemes().get(1).getName());
 
-        findButtonContainingText("Download Excel").click();
+        // findButtonContainingText("Download Excel").click();
 
     }
 }

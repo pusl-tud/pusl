@@ -11,6 +11,7 @@ import com.vaadin.flow.component.html.Label;
 public final class SuccessDialog {
     public static void open(String msg){
         Dialog dialog = new Dialog();
+        dialog.setId("success-dialog");
         Label label = new Label(msg);
         dialog.add(label);
         dialog.open();

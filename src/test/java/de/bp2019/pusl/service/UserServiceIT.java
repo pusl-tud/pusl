@@ -90,7 +90,7 @@ public class UserServiceIT {
         instituteRepository.save(institute2);
         institute2 = instituteRepository.findByName(institute2.getName()).get();
 
-        User admin = testUtils.getUser(UserType.ADMIN);
+        User admin = testUtils.createUser(UserType.ADMIN);
         admin.setInstitutes(Sets.newSet(institute1));
         userRepository.save(admin);
 
@@ -109,7 +109,7 @@ public class UserServiceIT {
         user3.setType(UserType.HIWI);
         userRepository.save(user3);
 
-        testUtils.authenticateAs(UserType.ADMIN);
+        testUtils.authenticateAs(admin);
 
         assertEquals(2, userService.sizeHiwis(new Query<>(), Sets.newSet(institute1)));
         assertEquals(3, userService.size(new Query<>()));

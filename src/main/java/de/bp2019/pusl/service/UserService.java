@@ -148,12 +148,15 @@ public class UserService extends AbstractDataProvider<User, String> {
     private boolean userIsAuthorized(User user) {
         User currentUser = authenticationService.currentUser();
 
+        /* everybody is allowed to edit themselves */
+        if(user.getId() != null && user.getId().equals(currentUser.getId())){
+            return true;
+        }
+
         switch (currentUser.getType()) {
             default:
             case HIWI:
             case WIMI:
-                if(user.getId().equals(currentUser.getId()))
-                    return true;
                 break;
             case ADMIN:
                 if (!Utils.containsAny(currentUser.getInstitutes(), user.getInstitutes()))

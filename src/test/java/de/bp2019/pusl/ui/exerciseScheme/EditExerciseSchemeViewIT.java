@@ -1,7 +1,5 @@
 package de.bp2019.pusl.ui.exercisescheme;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -44,22 +42,14 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
     public void testNoInstitutes() throws Exception {
         LOGGER.info("Testing create new ExerciseScheme");
 
-        Institute institute = new Institute(RandomStringUtils.random(8, true, true));
-        instituteRepository.save(institute);
-
         login(UserType.SUPERADMIN);
         goToURL(EditExerciseSchemeView.ROUTE + "/new");
 
         ExerciseScheme exerciseScheme = new ExerciseScheme();
         exerciseScheme.setName(RandomStringUtils.random(8, true, true));
-        // exerciseScheme.setDefaultValue(RandomStringUtils.random(8, true, true));
         LOGGER.info("creating exerciseScheme: " + exerciseScheme.toString());
 
         findElementById("name").sendKeys(exerciseScheme.getName());
-        // findElementById("default-Value").sendKeys(exerciseScheme.getDefaultValue());
-        findElementById("numeric").click();
-
-        assertFalse(findElementById("token").isDisplayed());
         
         findButtonContainingText("Speichern").click();
         timeoutWrongURL(ManageExerciseSchemesView.ROUTE);
@@ -69,30 +59,26 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
      * @author Luca Dinies
      * @throws Exception
      */
-    @Test
-    public void testCreateNewExerciseScheme() throws Exception {
-        LOGGER.info("Testing create new ExerciseScheme");
+    // @Test
+    // public void testCreateNewExerciseScheme() throws Exception {
+    //     LOGGER.info("Testing create new ExerciseScheme");
 
-        Institute institute = new Institute(RandomStringUtils.random(8, true, true));
-        instituteRepository.save(institute);
+    //     Institute institute = new Institute(RandomStringUtils.random(8, true, true));
+    //     instituteRepository.save(institute);
 
-        login(UserType.SUPERADMIN);
-        goToURL(EditExerciseSchemeView.ROUTE + "/new");
+    //     login(UserType.SUPERADMIN);
+    //     goToURL(EditExerciseSchemeView.ROUTE + "/new");
 
-        ExerciseScheme exerciseScheme = new ExerciseScheme();
-        exerciseScheme.setName(RandomStringUtils.random(8, true, true));
-        // exerciseScheme.setDefaultValue(RandomStringUtils.random(8, true, true));
-        LOGGER.info("creating exerciseScheme: " + exerciseScheme.toString());
+    //     ExerciseScheme exerciseScheme = new ExerciseScheme();
+    //     exerciseScheme.setName(RandomStringUtils.random(8, true, true));
+    //     LOGGER.info("creating exerciseScheme: " + exerciseScheme.toString());
 
-        findElementById("name").sendKeys(exerciseScheme.getName());
-        findMSCBByIdAndSelectByTexts("institutes", Arrays.asList(institute.getName()));
-        // findElementById("default-Value").sendKeys(exerciseScheme.getDefaultValue());
-        findElementById("flex-Handin").click();
-        assertTrue(findElementById("token").isDisplayed());
+    //     findElementById("name").sendKeys(exerciseScheme.getName());
+    //     findMSCBByIdAndSelectByTexts("institutes", Arrays.asList(institute.getName()));
 
-        findElementById("save").click();
-        waitForURL(ManageExerciseSchemesView.ROUTE);
-    }
+    //     findElementById("save").click();
+    //     waitForURL(ManageExerciseSchemesView.ROUTE);
+    // }
 
     /**
      * @author Leon Chemnitz

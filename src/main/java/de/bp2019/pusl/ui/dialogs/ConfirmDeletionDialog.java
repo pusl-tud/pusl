@@ -25,6 +25,7 @@ public final class ConfirmDeletionDialog {
         VerticalLayout layout = new VerticalLayout();
         layout.add(new Text("Möchten sie " + name + " wirklich Löschen?"));
         TextField textField = new TextField();
+        textField.setId("confirm-deletion-text-field");
         layout.add(textField);
         Button confirmButton = new Button("Löschen", event -> {
             if (textField.getValue().equals(name)) {

@@ -62,7 +62,7 @@ public class InstituteServiceIT {
         Institute institute1 = instituteRepository.save(new Institute(RandomStringUtils.randomAlphanumeric(8)));
         Institute institute2 = instituteRepository.save(new Institute(RandomStringUtils.randomAlphanumeric(8)));
 
-        User admin = testUtils.getUser(UserType.ADMIN);
+        User admin = testUtils.createUser(UserType.ADMIN);
         Set<Institute> instituteSet = new HashSet<Institute>();
         instituteSet.add(institute2);
         admin.setInstitutes(instituteSet);
@@ -75,7 +75,7 @@ public class InstituteServiceIT {
         LOGGER.info("testing SUPERADMIN authorized correct id");
         assertEquals(institute1, instituteService.getById(institute1.getId().toString()));
 
-        testUtils.authenticateAs(UserType.ADMIN);
+        testUtils.authenticateAs(admin);
         LOGGER.info("testing ADMIN unauthorized");
         assertThrows(UnauthorizedException.class, () -> instituteService.getById(institute1.getId().toString()));
         LOGGER.info("testing ADMIN authorized correct id");

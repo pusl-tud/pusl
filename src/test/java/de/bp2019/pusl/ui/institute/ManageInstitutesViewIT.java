@@ -1,5 +1,7 @@
 package de.bp2019.pusl.ui.institute;
 
+import static org.junit.Assert.assertTrue;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
@@ -108,7 +110,7 @@ public class ManageInstitutesViewIT extends BaseUITest {
 
     /**
      * @throws Exception
-     * @author Luca Dinies
+     * @author Luca Dinies, Leon Chemnitz
      */
     @Test
     public void testDeleteButton() throws Exception {
@@ -124,13 +126,11 @@ public class ManageInstitutesViewIT extends BaseUITest {
 
         /* click delete button */
         findElementById("delete-" + id.toString()).click();
-        /* confirm delete button */
-        findButtonContainingText("Löschen").click();
 
         findElementById(ConfirmDeletionDialog.ID);
 
-        // TODO: prüfen ob gelöscht
+        acceptConfirmDeletionDialog(instituteName);
 
-        //assertTrue(instituteRepository.findById(id.toString()).isEmpty());
+        assertTrue(instituteRepository.findById(id.toString()).isEmpty());
     }
 }

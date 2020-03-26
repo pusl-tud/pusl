@@ -55,10 +55,14 @@ public class RouteProtectionConfig implements VaadinServiceInitListener {
 
         if (!userIsOnLoginView && !SecurityUtils.isUserLoggedIn()) {
             /* User is not logged in and not on Login page -> reroute to login page */
-            event.rerouteTo(PuslProperties.ROOT_ROUTE);
+
+            event.rerouteTo(LoginView.class);
+            UI.getCurrent().navigate(LoginView.class);
 
         } else if (userIsOnLoginView && SecurityUtils.isUserLoggedIn()) {
             /* User is logged in tries to access Login page -> reroute to dashboard */
+            
+            event.rerouteTo(PuslProperties.ROOT_ROUTE);
             UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
 
         } else if (Utils.implementsInterface(event.getNavigationTarget(), AccessibleByWimi.class)

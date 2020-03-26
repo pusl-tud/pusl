@@ -78,8 +78,6 @@ public class ManageUsersView extends BaseView implements AccessibleByAdmin {
             UI.getCurrent().navigate(EditUserView.ROUTE + "/" + user.getId());
         });
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        /** makes testing a lot easier */
-        button.setId("create-" + user.getId().toString());
         return button;
     }
 

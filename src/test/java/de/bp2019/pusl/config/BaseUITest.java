@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,25 +61,28 @@ public abstract class BaseUITest {
     int port;
 
     @Autowired
+    protected TestUtils testUtils;
+
+    @Autowired
     protected TestProperties testProperties;
 
     @Autowired
-    UserRepository userRepository;
+    protected UserRepository userRepository;
 
     @Autowired
-    InstituteRepository instituteRepository;
+    protected InstituteRepository instituteRepository;
 
     @Autowired
-    LectureRepository lectureRepository;
+    protected LectureRepository lectureRepository;
 
     @Autowired
-    ExerciseSchemeRepository exerciseSchemeRepository;
+    protected ExerciseSchemeRepository exerciseSchemeRepository;
 
     @Autowired
-    GradeRepository gradeRepository;
+    protected GradeRepository gradeRepository;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    protected PasswordEncoder passwordEncoder;
 
     protected String baseUrl;
     protected WebDriverWait wait;
@@ -91,31 +95,6 @@ public abstract class BaseUITest {
      */
     @BeforeEach
     public void setUp() throws Exception {
-
-        User mockUser = new User();
-        mockUser.setEmailAddress(testProperties.getSuperadminUsername());
-        mockUser.setPassword(passwordEncoder.encode(testProperties.getSuperadminPassword()));
-        mockUser.setType(UserType.SUPERADMIN);
-        userRepository.save(mockUser);
-
-        mockUser = new User();
-        mockUser.setEmailAddress(testProperties.getAdminUsername());
-        mockUser.setPassword(passwordEncoder.encode(testProperties.getAdminPassword()));
-        mockUser.setType(UserType.ADMIN);
-        userRepository.save(mockUser);
-
-        mockUser = new User();
-        mockUser.setEmailAddress(testProperties.getWimiUsername());
-        mockUser.setPassword(passwordEncoder.encode(testProperties.getWimiPassword()));
-        mockUser.setType(UserType.WIMI);
-        userRepository.save(mockUser);
-
-        mockUser = new User();
-        mockUser.setEmailAddress(testProperties.getHiwiUsername());
-        mockUser.setPassword(passwordEncoder.encode(testProperties.getHiwiPassword()));
-        mockUser.setType(UserType.HIWI);
-        userRepository.save(mockUser);
-
         baseUrl = testProperties.getBaseUrl() + port + "/";
 
         String driverFile = findFile();
@@ -204,6 +183,7 @@ public abstract class BaseUITest {
      * @author Leon Chemnitz
      */
     protected void goToURL(String url) {
+        LOGGER.info("going to URL " + baseUrl + url);
         try {
             driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
             driver.navigate().to(baseUrl + url);
@@ -246,32 +226,22 @@ public abstract class BaseUITest {
      * @throws Exception
      * @author Leon Chemnitz
      */
-    protected void login(UserType userType) throws Exception {
+    protected User login(UserType userType) throws Exception {
+        LOGGER.info("Logging in as " + userType.toString());
+
+        String password = RandomStringUtils.randomAlphanumeric(14);
+        User user = testUtils.createUser(userType, password);
+
         waitForLoginRedirect();
 
-        LOGGER.info("Logging in as " + userType.toString());
-        switch (userType) {
-            case SUPERADMIN:
-                findElementByName("username").sendKeys(testProperties.getSuperadminUsername());
-                findElementByName("password").sendKeys(testProperties.getSuperadminPassword());
-                break;
-            case ADMIN:
-                findElementByName("username").sendKeys(testProperties.getAdminUsername());
-                findElementByName("password").sendKeys(testProperties.getAdminPassword());
-                break;
-            case WIMI:
-                findElementByName("username").sendKeys(testProperties.getWimiUsername());
-                findElementByName("password").sendKeys(testProperties.getWimiPassword());
-                break;
-            case HIWI:
-                findElementByName("username").sendKeys(testProperties.getHiwiUsername());
-                findElementByName("password").sendKeys(testProperties.getHiwiPassword());
-                break;
-        }
+        findElementByName("username").sendKeys(user.getEmailAddress());
+        findElementByName("password").sendKeys(password);
 
         findButtonContainingText("Log in").click();
+        
+        waitForURL(PuslProperties.ROOT_ROUTE);
 
-        waitForURL("");
+        return user;
     }
 
     /**
@@ -279,6 +249,7 @@ public abstract class BaseUITest {
      * @throws InterruptedException
      */
     protected void logout() throws InterruptedException {
+        LOGGER.info("logging out");
         goToURL(PuslProperties.ROOT_ROUTE);
         findButtonContainingText("logout").click();
         waitForURL(LoginView.ROUTE);
@@ -389,6 +360,21 @@ public abstract class BaseUITest {
     protected void waitUntilDialogVisible(String dialogText) {
         wait.until(ExpectedConditions
                 .visibilityOfElementLocated(By.xpath("//div[contains(text(),'" + dialogText + "')]")));
+    }
+
+    /**
+     * Accept {@link ConfirmDeletionDialog} with given confirmationString
+     * 
+     * @param confirmationString
+     * @author Leon Chemnitz
+     */
+    protected void acceptConfirmDeletionDialog(String confirmationString) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//vaadin-dialog-overlay")));
+
+        findElementById("confirm-deletion-text-field").sendKeys(confirmationString);
+        findButtonContainingText("Löschen").click();
+        
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("confirm-deletion-dialog")));
     }
 
     /**

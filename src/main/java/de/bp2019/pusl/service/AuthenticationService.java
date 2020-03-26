@@ -45,7 +45,7 @@ public class AuthenticationService {
             String email = authentication.getName();
 
             if(currentUser.isEmpty() || !currentUser.get().getEmailAddress().equals(email)){
-                LOGGER.debug("getting user from database");
+                LOGGER.debug("getting user from database. Email is: " + email);
 
                 currentUser = userRepository.findByEmailAddress(email);
 

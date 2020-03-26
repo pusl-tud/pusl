@@ -11,7 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import de.bp2019.pusl.ui.views.LoginView;
-import de.bp2019.pusl.util.CustomRequestCache;
 import de.bp2019.pusl.util.SecurityUtils;
 
 /**
@@ -29,10 +28,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		return super.authenticationManagerBean();
 	}
 
-	@Bean
-	public CustomRequestCache requestCache() {
-		return new CustomRequestCache();
-	}
 
 	@Bean
 	PasswordEncoder passwordEncoder() {
@@ -49,14 +44,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		/* Not using Spring CSRF here to be able to use plain HTML for the login page */
 		http.csrf().disable()
 
-				/*
-				 * Register our CustomRequestCache, that saves unauthorized access attempts, so
-				 * the user is redirected after login.
-				 */
-				.requestCache().requestCache(requestCache())
-
 				/* Restrict access to our application. */
-				.and().authorizeRequests()
+				.authorizeRequests()
 
 				/* Allow all flow internal requests. */
 				.requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()

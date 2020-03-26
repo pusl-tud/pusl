@@ -76,7 +76,7 @@ public class GradeServiceIT {
         instituteRepository.save(institute2);
         institute2 = instituteRepository.findByName(institute2.getName()).get();
 
-        User admin = testUtils.getUser(UserType.ADMIN);
+        User admin = testUtils.createUser(UserType.ADMIN);
         admin.setInstitutes(Sets.newSet(institute1));
         userRepository.save(admin);
 
@@ -103,7 +103,7 @@ public class GradeServiceIT {
         lecture2 = lectureRepository.findByName(lecture2.getName()).get();
 
 
-        testUtils.authenticateAs(UserType.ADMIN);
+        testUtils.authenticateAs(admin);
 
         Grade grade1, grade2, grade3, grade4;
 

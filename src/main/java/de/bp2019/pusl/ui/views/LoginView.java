@@ -16,7 +16,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import de.bp2019.pusl.config.PuslProperties;
-import de.bp2019.pusl.util.CustomRequestCache;
 import de.bp2019.pusl.util.Service;
 
 /**
@@ -35,12 +34,9 @@ public class LoginView extends VerticalLayout {
 	private LoginOverlay login = new LoginOverlay();
 
 	private AuthenticationManager authenticationManager;
-    private CustomRequestCache requestCache;
-
 	public LoginView() {
 
 		this.authenticationManager = Service.get(AuthenticationManager.class);
-		this.requestCache = Service.get(CustomRequestCache.class);
 
 		/* configures login dialog and adds it to the main view */
 		HorizontalLayout titleLayout = new HorizontalLayout();
@@ -76,7 +72,7 @@ public class LoginView extends VerticalLayout {
 				if (authentication != null) {
 					login.close();
 					SecurityContextHolder.getContext().setAuthentication(authentication);
-					UI.getCurrent().navigate(requestCache.resolveRedirectUrl());
+					UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
 				}
 
 			} catch (AuthenticationException ex) {

@@ -68,11 +68,10 @@ public class LectureServiceIT {
         lectureRepository.deleteAll();
 
         LOGGER.info("saving as ADMIN unauthorized");
-        testUtils.authenticateAs(UserType.ADMIN);
+        User admin = testUtils.authenticateAs(UserType.ADMIN);
         assertThrows(UnauthorizedException.class, () -> lectureService.save(lecture));
         assertFalse(lectureRepository.findByName(lecture.getName()).isPresent());
 
-        User admin = testUtils.getUser(UserType.ADMIN);
         admin.setInstitutes(Sets.newSet(institute1));
         userRepository.save(admin);
 
@@ -83,7 +82,7 @@ public class LectureServiceIT {
         assertFalse(lectureRepository.findByName(lecture.getName()).isPresent());
 
         LOGGER.info("saving as ADMIN authorized");
-        testUtils.authenticateAs(UserType.ADMIN);
+        testUtils.authenticateAs(admin);
         lectureService.save(lecture);
         assertTrue(lectureRepository.findByName(lecture.getName()).isPresent());
         lectureRepository.deleteAll();

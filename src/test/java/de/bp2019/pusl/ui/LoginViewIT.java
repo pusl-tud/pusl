@@ -1,10 +1,14 @@
 package de.bp2019.pusl.ui;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.PuslProperties;
+import de.bp2019.pusl.enums.UserType;
+import de.bp2019.pusl.model.User;
 
 public class LoginViewIT extends BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewIT.class);
@@ -13,27 +17,35 @@ public class LoginViewIT extends BaseUITest {
     public void testLoginCorrectCredentials() throws Exception {
         LOGGER.info("Testing login with correct Credetials");
 
-        waitForLoginRedirect();
+        for (UserType userType : UserType.values()) {
+            String password = RandomStringUtils.randomAlphanumeric(14);
+            User user = testUtils.createUser(userType, password);
 
-        findElementByName("username").sendKeys(testProperties.getSuperadminUsername());
-        findElementByName("password").sendKeys(testProperties.getSuperadminPassword());
+            waitForLoginRedirect();
 
-        findButtonContainingText("Log in").click();
+            findElementByName("username").sendKeys(user.getEmailAddress());
+            findElementByName("password").sendKeys(password);
 
-        waitForURL("");
+            findButtonContainingText("Log in").click();
+            waitForURL("");
+
+            logout();
+        }
     }
 
     @Test
     public void testLoginWrongCredentials() throws Exception {
         LOGGER.info("Testing login with wrong Credetials");
 
+        String password = RandomStringUtils.randomAlphanumeric(14);
+        User user = testUtils.createUser(UserType.ADMIN, password);
+
         waitForLoginRedirect();
 
-        findElementByName("username").sendKeys(testProperties.getSuperadminUsername());
+        findElementByName("username").sendKeys(user.getEmailAddress());
         findElementByName("password").sendKeys("wrong-password");
 
         findButtonContainingText("Log in").click();
-
-        timeoutWrongURL("");
+        timeoutWrongURL(PuslProperties.ROOT_ROUTE);
     }
 }
