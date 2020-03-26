@@ -1,25 +1,25 @@
 package de.bp2019.pusl.ui;
 
-import de.bp2019.pusl.config.PuslProperties;
-import de.bp2019.pusl.model.*;
-import de.bp2019.pusl.repository.InstituteRepository;
-import de.bp2019.pusl.repository.LectureRepository;
-import de.bp2019.pusl.ui.views.ExportView;
-import elemental.html.Performance;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.bp2019.pusl.config.BaseUITest;
-import de.bp2019.pusl.enums.UserType;
-import de.bp2019.pusl.ui.views.AccountView;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.PuslProperties;
+import de.bp2019.pusl.enums.UserType;
+import de.bp2019.pusl.model.Institute;
+import de.bp2019.pusl.model.Lecture;
+import de.bp2019.pusl.model.PerformanceScheme;
+import de.bp2019.pusl.repository.InstituteRepository;
+import de.bp2019.pusl.repository.LectureRepository;
+import de.bp2019.pusl.ui.views.ExportView;
 
 /**
  * UI test for {@link de.bp2019.pusl.ui.views.ExportView}

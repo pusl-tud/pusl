@@ -1,6 +1,5 @@
-package de.bp2019.pusl.ui.exerciseScheme;
+package de.bp2019.pusl.ui.exercisescheme;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;

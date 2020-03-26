@@ -1,18 +1,16 @@
 package de.bp2019.pusl.ui;
 
-import de.bp2019.pusl.repository.GradeRepository;
-import de.bp2019.pusl.ui.views.WorkView;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import de.bp2019.pusl.config.BaseUITest;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
+import de.bp2019.pusl.repository.GradeRepository;
 import de.bp2019.pusl.ui.views.DatabaseView;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.junit.Assert.assertEquals;
+import de.bp2019.pusl.ui.views.WorkView;
 
 /**
  * UI test for {@link DatabaseView}

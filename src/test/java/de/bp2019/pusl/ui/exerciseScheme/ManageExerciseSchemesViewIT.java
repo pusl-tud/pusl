@@ -1,4 +1,4 @@
-package de.bp2019.pusl.ui.exerciseScheme;
+package de.bp2019.pusl.ui.exercisescheme;
 
 import java.util.HashSet;
 import java.util.Set;
