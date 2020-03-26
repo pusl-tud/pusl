@@ -1,5 +1,16 @@
 package de.bp2019.pusl.ui.institute;
 
+import de.bp2019.pusl.model.ExerciseScheme;
+import de.bp2019.pusl.model.Institute;
+import de.bp2019.pusl.model.Token;
+import de.bp2019.pusl.model.User;
+import de.bp2019.pusl.repository.InstituteRepository;
+import de.bp2019.pusl.ui.dialogs.ConfirmDeletionDialog;
+import de.bp2019.pusl.ui.views.exercisescheme.EditExerciseSchemeView;
+import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
+import de.bp2019.pusl.ui.views.institute.EditInstituteView;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,14 +19,33 @@ import de.bp2019.pusl.config.BaseUITest;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.ui.views.institute.ManageInstitutesView;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * UI test for {@link ManageInstitutesView}
- * 
+ *
  * @author Leon Chemnitz
  */
 public class ManageInstitutesViewIT extends BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageInstitutesViewIT.class);
+
+    Institute institute;
+
+    @Autowired
+    InstituteRepository instituteRepository;
+
+    /**
+     * @author Luca Dinies
+     */
+    private String addInstitute() {
+        institute = new Institute(RandomStringUtils.random(8, true, true));
+        instituteRepository.save(institute);
+
+        return institute.getName();
+    }
 
     /**
      * @author Leon Chemnitz
@@ -43,5 +73,72 @@ public class ManageInstitutesViewIT extends BaseUITest {
         LOGGER.info("Testing access as HIWI");
         login(UserType.HIWI);
         goToURLandWaitForRedirect(ManageInstitutesView.ROUTE, PuslProperties.ROOT_ROUTE);
+    }
+
+    /**
+     * @throws Exception
+     * @author Luca Dinies
+     */
+    @Test
+    public void testNewExerciseSchemeButton() throws Exception {
+        LOGGER.info("Testing new Institute button");
+        login(UserType.SUPERADMIN);
+
+        goToURL(ManageInstitutesView.ROUTE);
+
+        findButtonContainingText("Neues Institut").click();
+
+        waitForURL(EditInstituteView.ROUTE + "/new");
+    }
+
+    /**
+     * @throws Exception
+     * @author Luca Dinies
+     */
+    @Test
+    public void testNameButton() throws Exception {
+        LOGGER.info("Testing Institute name button");
+        login(UserType.SUPERADMIN);
+
+        String instituteName = addInstitute();
+
+        goToURL(ManageInstitutesView.ROUTE);
+
+        Institute institute = instituteRepository.findByName(instituteName).get();
+        ObjectId id = institute.getId();
+
+        findButtonContainingText(instituteName).click();
+        waitForURL(EditInstituteView.ROUTE + "/" + id.toString());
+
+        findButtonContainingText("Speichern").click();
+        waitForURL(ManageInstitutesView.ROUTE);
+    }
+
+    /**
+     * @throws Exception
+     * @author Luca Dinies
+     */
+    @Test
+    public void testDeleteButton() throws Exception {
+        LOGGER.info("Testing Delete Institute Button");
+        login(UserType.SUPERADMIN);
+
+        String instituteName = addInstitute();
+
+        goToURL(ManageInstitutesView.ROUTE);
+
+        Institute institute = instituteRepository.findByName(instituteName).get();
+        ObjectId id = institute.getId();
+
+        /* click delete button */
+        findElementById("delete-" + id.toString()).click();
+        /* confirm delete button */
+        findButtonContainingText("Löschen").click();
+
+        findElementById(ConfirmDeletionDialog.ID);
+
+        // TODO: prüfen ob gelöscht
+
+        //assertTrue(instituteRepository.findById(id.toString()).isEmpty());
     }
 }

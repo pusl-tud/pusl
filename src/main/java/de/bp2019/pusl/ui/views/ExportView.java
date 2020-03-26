@@ -79,12 +79,14 @@ public class ExportView extends BaseView implements AccessibleByWimi {
         lectureSelect.setItemLabelGenerator(Lecture::getName);
         lectureSelect.setDataProvider(lectureService);
         lectureSelect.setLabel("Veranstaltung");
+        lectureSelect.setId("lecture");
         selectLayout.add(lectureSelect);
 
         performanceSchemeSelect = new Select<>();
         performanceSchemeSelect.setItemLabelGenerator(PerformanceScheme::getName);
         performanceSchemeSelect.setLabel("Berechnungsregel");
         performanceSchemeSelect.setEnabled(false);
+        performanceSchemeSelect.setId("performanceScheme");
         selectLayout.add(performanceSchemeSelect);
 
         add(selectLayout);

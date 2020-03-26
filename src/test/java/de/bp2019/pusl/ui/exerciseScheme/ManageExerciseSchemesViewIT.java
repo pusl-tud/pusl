@@ -49,7 +49,6 @@ public class ManageExerciseSchemesViewIT extends BaseUITest {
 
     /**
      * @author Luca Dinies
-     * @throws Exception
      */
     private String addExerciseScheme() {
         institute = new Institute(RandomStringUtils.random(8, true, true));

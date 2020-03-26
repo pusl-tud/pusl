@@ -67,7 +67,8 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
                 add(refillDatabaseButton);
 
                 numGradesField = new IntegerField();
-                add(numGradesField);
+            numGradesField.setId("numGrades");
+            add(numGradesField);
 
                 Button refillGradesButton = new Button("Noten generieren");
                 add(refillGradesButton);

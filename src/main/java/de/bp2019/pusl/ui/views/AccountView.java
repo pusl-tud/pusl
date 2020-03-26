@@ -69,18 +69,23 @@ public class AccountView extends BaseView {
 		FormLayout form = new FormLayout();
 
 		TextField firstName = new TextField("Vorname", "Vornamen eingeben");
+		firstName.setId("firstName");
 		firstName.setValueChangeMode(ValueChangeMode.EAGER);
 
 		TextField lastName = new TextField("Nachname", "Nachnamen eingeben");
+		lastName.setId("lastName");
 		lastName.setValueChangeMode(ValueChangeMode.EAGER);
 
 		TextField emailAddress = new TextField("Email-Adresse", "Mail-Adresse eingeben");
+		emailAddress.setId("email");
 		emailAddress.setValueChangeMode(ValueChangeMode.EAGER);
 
 		PasswordField password = new PasswordField("Passwort", "Passwort eingeben");
+		password.setId("password");
 		password.setValueChangeMode(ValueChangeMode.EAGER);
 
 		PasswordField confirmPassword = new PasswordField("Passwort wiederholen", "Passwort wiederholen");
+		confirmPassword.setId("confirmPassword");
 		confirmPassword.setValueChangeMode(ValueChangeMode.EAGER);
 
 		form.add(firstName, 1);
