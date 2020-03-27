@@ -12,22 +12,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties("pusl.test")
 public class TestProperties {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestProperties.class);
-
     private boolean headlessUiTests;
     private String baseUrl;
 
-    public static String chromedriverWin;
-    private static String chromedriverLinux;
-    private static String chromedriverMac;
-
-
-    @Value("${pusl.test.chromedriver-win}")
-    public void setChromedriverWin(String db) {
-        LOGGER.info("setting chromedriver win " + db);
-        this.chromedriverWin = db;
-    }
-
+    public static String chromedriverWin = "chromedriver_win.exe";
+    public static String chromedriverLinux = "/usr/local/bin/chromedriver";
+    public static String chromedriverMac = "chromedriver_mac";
 
     public String getBaseUrl() {
         return this.baseUrl;
@@ -35,26 +25,6 @@ public class TestProperties {
 
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
-    }
-
-    public String getChromedriverLinux() {
-        return this.chromedriverLinux;
-    }
-
-    public void setChromedriverLinux(String chromedriverLinux) {
-        this.chromedriverLinux = chromedriverLinux;
-    }
-
-    public String getChromedriverMac() {
-        return this.chromedriverMac;
-    }
-
-    public void setChromedriverMac(String chromedriverMac) {
-        this.chromedriverMac = chromedriverMac;
-    }
-
-    public String getChromedriverWin() {
-        return this.chromedriverWin;
     }
 
     public boolean isHeadlessUiTests() {
