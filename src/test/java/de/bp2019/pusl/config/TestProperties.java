@@ -1,5 +1,8 @@
 package de.bp2019.pusl.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -12,10 +15,9 @@ public class TestProperties {
     private boolean headlessUiTests;
     private String baseUrl;
 
-    private String chromedriverWin;
-    private String chromedriverLinux;
-    private String chromedriverMac;
-
+    public static String chromedriverWin = "chromedriver_win.exe";
+    public static String chromedriverLinux = "/usr/local/bin/chromedriver";
+    public static String chromedriverMac = "chromedriver_mac";
 
     public String getBaseUrl() {
         return this.baseUrl;
@@ -23,30 +25,6 @@ public class TestProperties {
 
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
-    }
-
-    public String getChromedriverLinux() {
-        return this.chromedriverLinux;
-    }
-
-    public void setChromedriverLinux(String chromedriverLinux) {
-        this.chromedriverLinux = chromedriverLinux;
-    }
-
-    public String getChromedriverMac() {
-        return this.chromedriverMac;
-    }
-
-    public void setChromedriverMac(String chromedriverMac) {
-        this.chromedriverMac = chromedriverMac;
-    }
-
-    public String getChromedriverWin() {
-        return this.chromedriverWin;
-    }
-
-    public void setChromedriverWin(String chromedriverWin) {
-        this.chromedriverWin = chromedriverWin;
     }
 
     public boolean isHeadlessUiTests() {

@@ -1,5 +1,7 @@
 package de.bp2019.pusl.ui;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +12,6 @@ import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.repository.GradeRepository;
 import de.bp2019.pusl.ui.views.DatabaseView;
-import de.bp2019.pusl.ui.views.WorkView;
 
 /**
  * UI test for {@link DatabaseView}
@@ -53,10 +54,10 @@ public class DatabaseViewIT extends BaseUITest {
 
     /**
      * @throws Exception
-     * @author Luca Dinies
+     * @author Luca Dinies, Leon Chemnitz
      */
     @Test
-    public void testGradesRefillButton() throws Exception {
+    public void testRefill() throws Exception {
         LOGGER.info("Testing Grade Refill button");
         login(UserType.SUPERADMIN);
 
@@ -66,6 +67,10 @@ public class DatabaseViewIT extends BaseUITest {
         findElementById("numGrades").sendKeys("500");
         findButtonContainingText("Noten generieren").click();
 
-        goToURL(WorkView.ROUTE);
+        waitSeconds(10);
+        goToURL(PuslProperties.ROOT_ROUTE);
+
+        assertEquals(50, gradeRepository.count());
     }
+
 }

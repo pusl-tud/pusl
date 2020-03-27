@@ -5,13 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -19,9 +20,9 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -31,6 +32,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import de.bp2019.pusl.enums.UserType;
@@ -40,6 +44,7 @@ import de.bp2019.pusl.repository.GradeRepository;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.LectureRepository;
 import de.bp2019.pusl.repository.UserRepository;
+import de.bp2019.pusl.ui.dialogs.ConfirmDeletionDialog;
 import de.bp2019.pusl.ui.views.LoginView;
 
 /**
@@ -52,9 +57,11 @@ import de.bp2019.pusl.ui.views.LoginView;
  * @author Leon Chemnitz
  */
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@DependsOn({ "testProperties" })
 public abstract class BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseUITest.class);
 
+    private static ChromeDriverService service;
     protected WebDriver driver;
 
     @LocalServerPort
@@ -87,6 +94,21 @@ public abstract class BaseUITest {
     protected String baseUrl;
     protected WebDriverWait wait;
 
+    @BeforeAll
+    public static void startService() throws Exception {
+        LOGGER.info("Starting Chromedriver service");
+
+        service = new ChromeDriverService.Builder().usingDriverExecutable(findFile()).usingAnyFreePort().build();
+        service.start();
+    }
+
+    @AfterAll
+    public static void stopService() {
+        LOGGER.info("Stopping Chromedriver service");
+
+        service.stop();
+    }
+
     /**
      * Initializes TestDatabase and starts Webdriver
      * 
@@ -95,12 +117,10 @@ public abstract class BaseUITest {
      */
     @BeforeEach
     public void setUp() throws Exception {
+        LOGGER.info("Starting Chromedriver");
+
         baseUrl = testProperties.getBaseUrl() + port + "/";
 
-        String driverFile = findFile();
-
-        ChromeDriverService service = new ChromeDriverService.Builder().usingDriverExecutable(new File(driverFile))
-                .build();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--no-sandbox");
         options.addArguments("--window-size=1920,1080");
@@ -114,7 +134,8 @@ public abstract class BaseUITest {
         options.addArguments("--disable-gpu");
         options.addArguments("--disable-dev-shm-usage");
 
-        driver = new ChromeDriver(service, options);
+        // driver = new ChromeDriver(service, options);
+        driver = new RemoteWebDriver(service.getUrl(), options);
 
         driver.get(baseUrl);
 
@@ -136,8 +157,30 @@ public abstract class BaseUITest {
         exerciseSchemeRepository.deleteAll();
         lectureRepository.deleteAll();
         gradeRepository.deleteAll();
+
         if (driver != null) {
+            LOGGER.info("Stopping Chromedriver");
             driver.quit();
+        }
+    }
+
+    private static File findFile() throws IOException {
+
+        if (SystemUtils.IS_OS_WINDOWS) {
+            LOGGER.info("Platform Windows detected");
+            Resource resource = new ClassPathResource(TestProperties.chromedriverWin);
+            LOGGER.info(resource.getURL().toExternalForm());
+            return resource.getFile();
+        } else if (SystemUtils.IS_OS_LINUX) {
+            LOGGER.info("Platform Linux detected");
+            return new File(TestProperties.chromedriverLinux);
+        } else if (SystemUtils.IS_OS_MAC) {
+            LOGGER.info("Platform Mac detected");
+            Resource resource = new ClassPathResource(TestProperties.chromedriverMac);
+            LOGGER.info(resource.getURL().toExternalForm());
+            return resource.getFile();
+        } else {
+            throw new IOException("No supported plattform detected");
         }
     }
 
@@ -238,7 +281,7 @@ public abstract class BaseUITest {
         findElementByName("password").sendKeys(password);
 
         findButtonContainingText("Log in").click();
-        
+
         waitForURL(PuslProperties.ROOT_ROUTE);
 
         return user;
@@ -373,7 +416,7 @@ public abstract class BaseUITest {
 
         findElementById("confirm-deletion-text-field").sendKeys(confirmationString);
         findButtonContainingText("Löschen").click();
-        
+
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("confirm-deletion-dialog")));
     }
 
@@ -388,22 +431,13 @@ public abstract class BaseUITest {
         return (WebElement) ((JavascriptExecutor) driver).executeScript("return arguments[0].shadowRoot", element);
     }
 
-    private String findFile() throws IOException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        URL url;
-        if (SystemUtils.IS_OS_WINDOWS) {
-            LOGGER.info("Platform Windows detected");
-            url = classLoader.getResource(testProperties.getChromedriverWin());
-        } else if (SystemUtils.IS_OS_LINUX) {
-            LOGGER.info("Platform Linux detected");
-            return testProperties.getChromedriverLinux();
-        } else if (SystemUtils.IS_OS_MAC) {
-            LOGGER.info("Platform Mac detected");
-            url = classLoader.getResource(testProperties.getChromedriverMac());
-        } else {
-            throw new IOException("No supported plattform detected");
-        }
-
-        return url.getFile();
+    /**
+     * Force the driver to wait
+     * 
+     * @param seconds
+     * @author Leon Chemnitz
+     */
+    public void waitSeconds(int seconds) {
+        driver.manage().timeouts().implicitlyWait(seconds, TimeUnit.SECONDS);
     }
 }

@@ -242,7 +242,7 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
         }
 
         private void refillGrades() {
-                int numGrades = numGradesField.getValue();
+                Integer numGrades = numGradesField.getValue();
                 gradeRepository.deleteAll();
 
                 List<User> users = userRepository.findAll();
@@ -250,6 +250,11 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
 
                 int currentGrade = 0;
                 int matrInt = 1524750;
+
+                if(lectures.size() == 0 || numGrades == null){
+                        return;
+                }
+
                 while (currentGrade < numGrades) {
 
                         while (!Utils.isMatrNumber(matrInt)) {
