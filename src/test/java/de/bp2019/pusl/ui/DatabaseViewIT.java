@@ -64,13 +64,13 @@ public class DatabaseViewIT extends BaseUITest {
         goToURL(DatabaseView.ROUTE);
 
         findButtonContainingText("Datenbank neu befüllen").click();
-        findElementById("numGrades").sendKeys("500");
+        findElementById("numGrades").sendKeys("50");
         findButtonContainingText("Noten generieren").click();
 
         waitSeconds(10);
         goToURL(PuslProperties.ROOT_ROUTE);
 
-        assertEquals(500, gradeRepository.count());
+        assertEquals(50, gradeRepository.count());
     }
 
 }
