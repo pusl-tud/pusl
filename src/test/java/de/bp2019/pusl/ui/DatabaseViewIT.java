@@ -70,7 +70,7 @@ public class DatabaseViewIT extends BaseUITest {
         waitSeconds(10);
         goToURL(PuslProperties.ROOT_ROUTE);
 
-        assertEquals(50, gradeRepository.count());
+        assertEquals(500, gradeRepository.count());
     }
 
 }
