@@ -11,7 +11,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -31,6 +35,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import de.bp2019.pusl.enums.UserType;
@@ -40,6 +47,7 @@ import de.bp2019.pusl.repository.GradeRepository;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.LectureRepository;
 import de.bp2019.pusl.repository.UserRepository;
+import de.bp2019.pusl.ui.dialogs.ConfirmDeletionDialog;
 import de.bp2019.pusl.ui.views.LoginView;
 
 /**
@@ -52,9 +60,11 @@ import de.bp2019.pusl.ui.views.LoginView;
  * @author Leon Chemnitz
  */
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public abstract class BaseUITest {
+@DependsOn({"testProperties"})
+public abstract class BaseUITest{
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseUITest.class);
 
+    private static ChromeDriverService service;
     protected WebDriver driver;
 
     @LocalServerPort
@@ -87,6 +97,24 @@ public abstract class BaseUITest {
     protected String baseUrl;
     protected WebDriverWait wait;
 
+
+
+    @BeforeAll
+    public static void startService() throws Exception {
+        LOGGER.info("Starting Chromedriver service");
+
+        // String driverFile = ;
+        service = new ChromeDriverService.Builder().usingDriverExecutable(findFile()).build();
+        service.start();
+    }
+
+    @AfterAll
+    public static void stopService() {
+        LOGGER.info("Stopping Chromedriver service");
+
+        service.stop();
+    }
+
     /**
      * Initializes TestDatabase and starts Webdriver
      * 
@@ -95,12 +123,10 @@ public abstract class BaseUITest {
      */
     @BeforeEach
     public void setUp() throws Exception {
+        LOGGER.info("Starting Chromedriver");
+
         baseUrl = testProperties.getBaseUrl() + port + "/";
 
-        String driverFile = findFile();
-
-        ChromeDriverService service = new ChromeDriverService.Builder().usingDriverExecutable(new File(driverFile))
-                .build();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--no-sandbox");
         options.addArguments("--window-size=1920,1080");
@@ -136,9 +162,34 @@ public abstract class BaseUITest {
         exerciseSchemeRepository.deleteAll();
         lectureRepository.deleteAll();
         gradeRepository.deleteAll();
+
         if (driver != null) {
+            LOGGER.info("Stopping Chromedriver");
             driver.quit();
         }
+    }
+
+    private static File findFile() throws IOException {
+        //ClassLoader classLoader = getClass().getClassLoader();
+        URL url;
+        // if (SystemUtils.IS_OS_WINDOWS) {
+            LOGGER.info("Platform Windows detected");
+            Resource resource = new ClassPathResource(TestProperties.chromedriverWin);
+            LOGGER.info(resource.getURL().toExternalForm());
+            return resource.getFile();// = classLoader.getResource(testProperties.getChromedriverWin());
+        // }
+        //  else if (SystemUtils.IS_OS_LINUX) {
+        //     LOGGER.info("Platform Linux detected");
+        //     return testProperties.getChromedriverLinux();
+        // } else if (SystemUtils.IS_OS_MAC) {
+        //     LOGGER.info("Platform Mac detected");
+        //     url = classLoader.getResource(testProperties.getChromedriverMac());
+        // } else {
+        //     throw new IOException("No supported plattform detected");
+        // }
+
+        // return "";
+        // return url.getFile();
     }
 
     /**
@@ -238,7 +289,7 @@ public abstract class BaseUITest {
         findElementByName("password").sendKeys(password);
 
         findButtonContainingText("Log in").click();
-        
+
         waitForURL(PuslProperties.ROOT_ROUTE);
 
         return user;
@@ -373,7 +424,7 @@ public abstract class BaseUITest {
 
         findElementById("confirm-deletion-text-field").sendKeys(confirmationString);
         findButtonContainingText("Löschen").click();
-        
+
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("confirm-deletion-dialog")));
     }
 
@@ -388,22 +439,13 @@ public abstract class BaseUITest {
         return (WebElement) ((JavascriptExecutor) driver).executeScript("return arguments[0].shadowRoot", element);
     }
 
-    private String findFile() throws IOException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        URL url;
-        if (SystemUtils.IS_OS_WINDOWS) {
-            LOGGER.info("Platform Windows detected");
-            url = classLoader.getResource(testProperties.getChromedriverWin());
-        } else if (SystemUtils.IS_OS_LINUX) {
-            LOGGER.info("Platform Linux detected");
-            return testProperties.getChromedriverLinux();
-        } else if (SystemUtils.IS_OS_MAC) {
-            LOGGER.info("Platform Mac detected");
-            url = classLoader.getResource(testProperties.getChromedriverMac());
-        } else {
-            throw new IOException("No supported plattform detected");
-        }
-
-        return url.getFile();
+    /**
+     * Force the driver to wait
+     * 
+     * @param seconds
+     * @author Leon Chemnitz
+     */
+    public void waitSeconds(int seconds) {
+        driver.manage().timeouts().implicitlyWait(seconds, TimeUnit.SECONDS);
     }
 }

@@ -120,7 +120,7 @@ public class AccountViewIT extends BaseUITest {
 
     /**
      * @throws Exception
-     * @author Luca Dinies
+     * @author Luca Dinies, Leon Chemnitz
      */
     @Test
     public void testPasswordToShort() throws Exception {
@@ -129,15 +129,10 @@ public class AccountViewIT extends BaseUITest {
         login(UserType.SUPERADMIN);
         goToURL(AccountView.ROUTE);
 
-        findElementById("firstName").sendKeys(RandomStringUtils.random(8, true, false));
-        findElementById("lastName").sendKeys(RandomStringUtils.random(8, true, false));
-        findElementById("email").sendKeys(
-                RandomStringUtils.random(8, true, false) + "@" + RandomStringUtils.random(8, true, false) + ".de");
+        String password = RandomStringUtils.random(6, true, true);
 
-        String random = RandomStringUtils.random(6, true, true);
-
-        findPasswordFieldById("password").sendKeys(random);
-        findPasswordFieldById("confirmPassword").sendKeys(random);
+        findPasswordFieldById("password").sendKeys(password);
+        findPasswordFieldById("confirmPassword").sendKeys(password);
 
         findButtonContainingText("Änderungen speichern").click();
 

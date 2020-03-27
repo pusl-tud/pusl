@@ -1,5 +1,8 @@
 package de.bp2019.pusl.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -9,12 +12,21 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties("pusl.test")
 public class TestProperties {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestProperties.class);
+
     private boolean headlessUiTests;
     private String baseUrl;
 
-    private String chromedriverWin;
-    private String chromedriverLinux;
-    private String chromedriverMac;
+    public static String chromedriverWin;
+    private static String chromedriverLinux;
+    private static String chromedriverMac;
+
+
+    @Value("${pusl.test.chromedriver-win}")
+    public void setChromedriverWin(String db) {
+        LOGGER.info("setting chromedriver win " + db);
+        this.chromedriverWin = db;
+    }
 
 
     public String getBaseUrl() {
@@ -43,10 +55,6 @@ public class TestProperties {
 
     public String getChromedriverWin() {
         return this.chromedriverWin;
-    }
-
-    public void setChromedriverWin(String chromedriverWin) {
-        this.chromedriverWin = chromedriverWin;
     }
 
     public boolean isHeadlessUiTests() {
