@@ -1,6 +1,7 @@
 package de.bp2019.pusl.ui.views.exercisescheme;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.UI;
@@ -63,6 +64,8 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
     /** empty if new institute is being created */
     private Optional<ObjectId> exerciseSchemeId = Optional.empty();
 
+    private ComboBox<Token> defaultValueToken;
+
     public EditExerciseSchemeView() {
         super("Übungsschema bearbeiten");
 
@@ -93,7 +96,7 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         defaultValueNumeric.setValue(5.0);
         defaultValueNumeric.setId("default-value-numeric");
 
-        ComboBox<Token> defaultValueToken = new ComboBox<>();
+        defaultValueToken = new ComboBox<>();
         defaultValueToken.setLabel("Standard Token");
         defaultValueToken.setId("default-value-token");
         defaultValueToken.setItemLabelGenerator(Token::getName);
@@ -130,14 +133,29 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
                 .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(), "Bitte mind. ein Institut angeben")
                 .bind(ExerciseScheme::getInstitutes, ExerciseScheme::setInstitutes);
 
-        binder.forField(defaultValueNumeric).bind(ExerciseScheme::getDefaultValueNumeric, ExerciseScheme::setDefaultValueNumeric);
+        binder.forField(defaultValueNumeric)
+        .withValidator(value ->{
+            if(!tokenBased.getValue()){
+                return value != null;
+            }
+            return true;
+        }, "Bitte Standard Note auswählen")
+        .bind(ExerciseScheme::getDefaultValueNumeric,
+                ExerciseScheme::setDefaultValueNumeric);
 
-        binder.forField(defaultValueToken).bind(ExerciseScheme::getDefaultValueToken, ExerciseScheme::setDefaultValueToken);
-        
+        binder.forField(defaultValueToken)
+                .withValidator(token -> {
+                    if(tokenBased.getValue()){
+                        return token != null;
+                    }
+                    return true;
+                }, "Bitte Standard Token auswählen")
+                .bind(ExerciseScheme::getDefaultValueToken,
+                ExerciseScheme::setDefaultValueToken);
+
         binder.bind(tokenBased, es -> !es.isNumeric(), (es, value) -> es.setIsNumeric(!value));
-        
-        binder.bind(tokens, ExerciseScheme::getTokens, ExerciseScheme::setTokens);
 
+        binder.bind(tokens, ExerciseScheme::getTokens, ExerciseScheme::setTokens);
 
         /* ########### Listeners ########## */
         tokenBased.addValueChangeListener(evt -> {
@@ -152,7 +170,17 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
             }
         });
 
-        tokens.addValueChangeListener(event -> defaultValueToken.setItems(event.getValue()));
+        tokens.addValueChangeListener(event -> {
+            LOGGER.debug("TokenEditor changed");
+
+            Set<Token> tokenSet = event.getValue();
+            Token defaultToken = defaultValueToken.getValue();
+
+            defaultValueToken.setItems(tokenSet);
+            if (tokenSet.contains(defaultToken)) {
+                defaultValueToken.setValue(defaultToken);
+            }
+        });
 
         save.addClickListener(event -> {
 
@@ -194,10 +222,12 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
             binder.readBean(null);
         } else {
             try {
-                ExerciseScheme fetchedInstitute;
-                fetchedInstitute = exerciseSchemeService.getById(idParameter);
-                exerciseSchemeId = Optional.of(fetchedInstitute.getId());
-                binder.readBean(fetchedInstitute);
+                ExerciseScheme fetchedExerciseScheme;
+                fetchedExerciseScheme = exerciseSchemeService.getById(idParameter);
+                exerciseSchemeId = Optional.of(fetchedExerciseScheme.getId());
+                defaultValueToken.setItems(fetchedExerciseScheme.getTokens());
+
+                binder.readBean(fetchedExerciseScheme);
             } catch (UnauthorizedException e) {
                 event.rerouteTo(PuslProperties.ROOT_ROUTE);
                 UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);

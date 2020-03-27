@@ -47,6 +47,17 @@ public class GradeComposer extends CustomField<GradeFilter> {
     private NumberField numeric;
     private ComboBox<Token> token;
 
+    @Override
+    public void setId(String id){
+        super.setId(id);
+
+        lecture.setId(id + "-lecture");
+        exercise.setId(id + "-exercise");
+        matrNumber.setId(id + "-matrNumber");
+        numeric.setId(id + "-numeric");
+        token.setId(id + "-token");
+    }
+
     public GradeComposer() {
         lectureService = Service.get(LectureService.class);
         authenticationService = Service.get(AuthenticationService.class);

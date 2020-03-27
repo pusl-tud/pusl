@@ -77,7 +77,10 @@ public class TokenEditor extends CustomField<Set<Token>> {
 
     @Override
     protected Set<Token> generateModelValue() {
-        return gridItems;
+        Set<Token> modelValue = new HashSet<>();
+
+        modelValue.addAll(gridItems);
+        return modelValue;
     }
 
     @Override

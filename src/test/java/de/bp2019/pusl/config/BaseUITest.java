@@ -263,7 +263,7 @@ public abstract class BaseUITest {
     }
 
     /**
-     * Login to the application with a user of the given Type
+     * Create User of given type and login to the application
      * 
      * @param userType
      * @throws Exception
@@ -276,6 +276,29 @@ public abstract class BaseUITest {
         User user = testUtils.createUser(userType, password);
 
         waitForLoginRedirect();
+
+        findElementByName("username").sendKeys(user.getEmailAddress());
+        findElementByName("password").sendKeys(password);
+
+        findButtonContainingText("Log in").click();
+
+        waitForURL(PuslProperties.ROOT_ROUTE);
+
+        return user;
+    }
+
+    /**
+     * Login to application with given user. user must have been created with {@link TestUtils::createUser}
+     * 
+     * @param user
+     * @return
+     * @throws InterruptedException
+     */
+    protected User login(User user) throws InterruptedException {
+        LOGGER.info("Logging in as " + user.toString());
+        waitForLoginRedirect();
+
+        String password = testUtils.getPasswordOfUser(user);
 
         findElementByName("username").sendKeys(user.getEmailAddress());
         findElementByName("password").sendKeys(password);
@@ -371,6 +394,7 @@ public abstract class BaseUITest {
         driver.findElement(By.xpath("//multiselect-combo-box[@id='" + id + "']")).sendKeys(Keys.ENTER);
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//vaadin-combo-box-overlay")));
     }
+
 
     /**
      * Find vaadin Password Field based on its CSS id

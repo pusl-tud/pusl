@@ -42,6 +42,7 @@ public class ExerciseScheme {
 		this.name = name;
 		this.isNumeric = isNumeric;
 		this.defaultValueNumeric = defaultValueNumeric;
+		this.defaultValueToken = defaultValueToken;
 		this.tokens = tokens;
 		this.institutes = institutes;
 		this.hasAccess = hasAccess;

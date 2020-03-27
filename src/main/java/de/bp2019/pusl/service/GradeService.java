@@ -194,7 +194,7 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
         Sort sort = Sort.by(order);
 
         var mongoQuery = query(buildCriteria(filter)).with(sort).with(pageable);
-        LOGGER.debug(mongoQuery.getQueryObject().toJson());
+        // LOGGER.debug(mongoQuery.getQueryObject().toJson());
 
         return mongoTemplate.find(mongoQuery, Grade.class).stream();
     }

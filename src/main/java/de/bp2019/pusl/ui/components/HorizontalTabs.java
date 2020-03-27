@@ -44,7 +44,7 @@ public class HorizontalTabs<T extends Component> extends VerticalLayout {
      * @author Leon Chemnitz
      */
     public void addTab(String title, T component) {
-        if (pages.size() > 0) {
+        if (pages.isEmpty()) {
             component.setVisible(false);
         }
         Tab tab = new Tab(title);

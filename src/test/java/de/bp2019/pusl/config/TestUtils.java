@@ -69,6 +69,10 @@ public class TestUtils {
         return createUser(userType, RandomStringUtils.randomAlphanumeric(14));
     }
 
+    public String getPasswordOfUser(User user){
+        return idToPassword.get(user.getId());
+    }
+
     /**
      * Create a User and save it to the database
      * 

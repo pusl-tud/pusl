@@ -65,6 +65,15 @@ public class VerticalTabs extends HorizontalLayout {
         }
         Tab tab = new Tab(title);
 
+        String id = "";
+
+        if(getId().isPresent()){
+            id += getId().get() + "-";
+        }
+        id += title.toLowerCase();
+
+        tab.setId(id);
+
         tabsComponent.add(tab);
         pages.add(component);
         titleToPages.put(title, component);

@@ -63,6 +63,7 @@ public final class EditGradeDialog {
         form.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2),
                 new ResponsiveStep("5em", 3), new ResponsiveStep("5em", 4));
         GradeComposer gradeComposer = new GradeComposer();
+        gradeComposer.setId("dialog-gc");
         GradeFilter value = new GradeFilter(grade);
         gradeComposer.setValue(value);
         form.add(gradeComposer, 4);

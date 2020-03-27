@@ -47,6 +47,7 @@ public class Grade {
 	private LocalDateTime lastModified;
 
 	public Grade() {
+		lastModified = LocalDateTime.now();
 	}
 
 	public Grade(Lecture lecture, Exercise exercise, String matrNumber, String value, LocalDate handIn) {

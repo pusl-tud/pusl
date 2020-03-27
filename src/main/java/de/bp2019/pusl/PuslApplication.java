@@ -15,7 +15,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 public class PuslApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(PuslApplication.class, args);
+		SpringApplication.run(PuslApplication.class);
 	}
 
 }

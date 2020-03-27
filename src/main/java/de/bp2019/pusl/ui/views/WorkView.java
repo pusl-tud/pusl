@@ -82,10 +82,12 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         filter = new GradeFilter();
 
         GradeComposer gradeComposer = new GradeComposer();
+        gradeComposer.setId("work-view-gc");
         gradeComposer.setWidthFull();
         add(gradeComposer);
 
         VerticalTabs verticalTabs = new VerticalTabs();
+        verticalTabs.setId("vtabs");
         verticalTabs.setHeight("30em");
         verticalTabs.setWidthFull();
         add(verticalTabs);
