@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * @author Leon Chemnitz
  */
 @SpringBootTest
-class PuslApplicationTest {
+class PuslApplicationIT {
 
 	/**
 	 * @author Leon Chemnitz

@@ -140,7 +140,6 @@ public abstract class BaseUITest {
         lectureRepository.deleteAll();
         gradeRepository.deleteAll();
 
-        // driver = new ChromeDriver(service, options);
         driver = new RemoteWebDriver(service.getUrl(), options);
 
         driver.get(baseUrl);

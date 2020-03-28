@@ -21,6 +21,8 @@ import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 public final class ExcelUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelUtil.class);
 
+    private ExcelUtil(){}
+
     public static List<String> readColumnToList(InputStream inputStream, int column){
         List<String> result = new ArrayList<String>();
         try {

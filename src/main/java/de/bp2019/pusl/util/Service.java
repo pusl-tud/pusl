@@ -9,7 +9,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @author Leon Chemnitz
  */
-public class Service {
+public final class Service {
+
+  private Service(){}
+
   public static <T> T get(Class<T> serviceType) {
     return WebApplicationContextUtils.getWebApplicationContext(VaadinServlet.getCurrent().getServletContext())
         .getBean(serviceType);
