@@ -127,12 +127,6 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>3.0.0-M4</version>
         <configuration>
-          <excludes>
-            <exclude>**/*IT.java</exclude>
-          </excludes>
-          <includes>
-            <include>**/*IP.java</include>
-          </includes>
           <!-- <skipTests>true</skipTests> -->
         </configuration>
         <executions>
