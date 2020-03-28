@@ -133,6 +133,12 @@ public abstract class BaseUITest {
         options.addArguments("--disable-extensions");
         options.addArguments("--disable-gpu");
         options.addArguments("--disable-dev-shm-usage");
+        
+        userRepository.deleteAll();
+        instituteRepository.deleteAll();
+        exerciseSchemeRepository.deleteAll();
+        lectureRepository.deleteAll();
+        gradeRepository.deleteAll();
 
         // driver = new ChromeDriver(service, options);
         driver = new RemoteWebDriver(service.getUrl(), options);
