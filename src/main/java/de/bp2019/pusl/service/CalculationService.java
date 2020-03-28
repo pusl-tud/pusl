@@ -25,6 +25,12 @@ import de.bp2019.pusl.model.Performance;
 import de.bp2019.pusl.model.PerformanceScheme;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 
+/**
+ * Service providing functionality to execute JavaScript functions defined in
+ * {@link PerformanceScheme}s
+ * 
+ * @author Leon Chemnitz
+ */
 @Service
 @Scope("session")
 public class CalculationService {
@@ -33,6 +39,16 @@ public class CalculationService {
     @Autowired
     GradeService gradeService;
 
+    /**
+     * Calulates the performances of students with matrNumbers given as argument.
+     * Looks up all relevant {@link Grade}s from Database.
+     * 
+     * @param matrNumbers
+     * @param lecture
+     * @param performanceScheme
+     * @return
+     * @author Leon Chemnitz
+     */
     public List<Performance> calculatePerformances(List<String> matrNumbers, Lecture lecture,
             PerformanceScheme performanceScheme) {
         List<Performance> result = new ArrayList<>();
@@ -49,11 +65,21 @@ public class CalculationService {
         return result;
     }
 
+    /**
+     * Calculate a single perfomance. Looks up all relevant {@link Grade}s from
+     * Database.
+     * 
+     * @param matrNumber
+     * @param lecture
+     * @param performanceScheme
+     * @return
+     * @author Leon Chemnitz
+     */
     public Performance calculatePerformance(String matrNumber, Lecture lecture, PerformanceScheme performanceScheme) {
 
         GradeFilter filter = new GradeFilter();
         filter.setMatrNumber(matrNumber);
-        filter.setLecture(lecture);        
+        filter.setLecture(lecture);
 
         List<Grade> grades = gradeService.fetch(new Query<>(), filter).collect(Collectors.toList());
         LOGGER.debug("fetched grades for matr Number " + matrNumber + " : " + grades.toString());
@@ -72,9 +98,9 @@ public class CalculationService {
                     gradeValues.add(grade.get().getValue());
                 }
             } else {
-                if(exerciseScheme.isNumeric()){                    
+                if (exerciseScheme.isNumeric()) {
                     gradeValues.add(exerciseScheme.getDefaultValueNumeric());
-                }else{
+                } else {
                     gradeValues.add(exerciseScheme.getDefaultValueToken().getName());
                 }
             }
@@ -85,7 +111,14 @@ public class CalculationService {
         return new Performance(matrNumber, performanceScheme, calculationResult);
     }
 
-    public String calculate(String script, Object[] grades) {
+    /**
+     * 
+     * @param script
+     * @param grades
+     * @return
+     * @author Leon Chemnitz
+     */
+    private String calculate(String script, Object[] grades) {
         Context cx = Context.enter();
         Scriptable scope = cx.initStandardObjects();
 
@@ -104,16 +137,18 @@ public class CalculationService {
         return report;
     }
 
-    // public void checkPerformanceScheme(PerformanceScheme performanceScheme) throws JSException {
-    //     Context cx = Context.enter();
-    //     Scriptable scope = cx.initStandardObjects();
+    // public void checkPerformanceScheme(PerformanceScheme performanceScheme)
+    // throws JSException {
+    // Context cx = Context.enter();
+    // Scriptable scope = cx.initStandardObjects();
 
-    //     cx.evaluateString(scope, performanceScheme.getCalculationRule(), "pusl", 1, null);
+    // cx.evaluateString(scope, performanceScheme.getCalculationRule(), "pusl", 1,
+    // null);
 
-    //     Object fObj = scope.get("calculate", scope);
+    // Object fObj = scope.get("calculate", scope);
 
-    //     if (!(fObj instanceof Function)) {
-    //         throw new JSException();
-    //     }
+    // if (!(fObj instanceof Function)) {
+    // throw new JSException();
+    // }
     // }
 }

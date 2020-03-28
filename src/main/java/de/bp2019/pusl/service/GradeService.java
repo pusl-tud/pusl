@@ -194,7 +194,6 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
         Sort sort = Sort.by(order);
 
         var mongoQuery = query(buildCriteria(filter)).with(sort).with(pageable);
-        // LOGGER.debug(mongoQuery.getQueryObject().toJson());
 
         return mongoTemplate.find(mongoQuery, Grade.class).stream();
     }
@@ -261,6 +260,13 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
         return criteria;
     }
 
+    /**
+     * Check if MatrNumber is valid with the validation algorithm of TU Darmstadt
+     * 
+     * @param grade
+     * @return
+     * @author Leon Chemnitz
+     */
     public static boolean gradeIsValid(Grade grade) {
         if (!Utils.isMatrNumber(grade.getMatrNumber())) {
             ErrorDialog.open("Matrikelnummer ist fehlerhaft");

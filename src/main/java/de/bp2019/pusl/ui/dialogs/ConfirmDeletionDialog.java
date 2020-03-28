@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Simple Dialog displaying an Error Message
+ * Dialog used to conifrm a action by retyping a String
  * 
  * @author Leon Chemnitz
  */

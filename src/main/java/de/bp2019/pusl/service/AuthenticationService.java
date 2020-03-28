@@ -17,7 +17,10 @@ import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
 
 /**
- * Service providing current authentication details. Bean is stateful t
+ * Service providing current authentication details. Bean is stateful to improve
+ * performance. The authenticated {@link User} Object is kept in session memory
+ * so that it doesnt have to be looked up from the database every time
+ * authentication details are requested
  * 
  * @author Leon Chemnitz
  */
@@ -48,7 +51,7 @@ public class AuthenticationService {
         } else {
             String email = authentication.getName();
 
-            if(currentUser.isEmpty() || !currentUser.get().getEmailAddress().equals(email)){
+            if (currentUser.isEmpty() || !currentUser.get().getEmailAddress().equals(email)) {
                 LOGGER.debug("getting user from database. Email is: " + email);
 
                 currentUser = userRepository.findByEmailAddress(email);
@@ -57,9 +60,9 @@ public class AuthenticationService {
             }
         }
 
-        if(currentUser.isPresent()){
+        if (currentUser.isPresent()) {
             return currentUser.get();
-        }else{
+        } else {
             return new User();
         }
     }

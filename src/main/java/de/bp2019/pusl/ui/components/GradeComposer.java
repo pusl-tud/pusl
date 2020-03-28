@@ -30,6 +30,8 @@ import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.util.Service;
 
 /**
+ * Component to configure a {@link Grade} in a dynamic way
+ * 
  * @author Leon Chemnitz
  */
 public class GradeComposer extends CustomField<GradeFilter> {
@@ -48,7 +50,7 @@ public class GradeComposer extends CustomField<GradeFilter> {
     private ComboBox<Token> token;
 
     @Override
-    public void setId(String id){
+    public void setId(String id) {
         super.setId(id);
 
         lecture.setId(id + "-lecture");
@@ -260,13 +262,13 @@ public class GradeComposer extends CustomField<GradeFilter> {
                 }
             } else {
 
-                if(authenticationService.currentUserType() == UserType.HIWI){
-                    List<Token> tokens = exerciseScheme.getTokens().stream().filter(t-> t.getAssignableByHIWI()).collect(Collectors.toList());
+                if (authenticationService.currentUserType() == UserType.HIWI) {
+                    List<Token> tokens = exerciseScheme.getTokens().stream().filter(t -> t.getAssignableByHIWI())
+                            .collect(Collectors.toList());
                     token.setItems(tokens);
-                }else{
+                } else {
                     token.setItems(exerciseScheme.getTokens());
                 }
-                
 
                 Set<Token> tokens = value.getExercise().getScheme().getTokens();
                 LOGGER.debug(tokens.toString());

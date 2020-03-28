@@ -24,7 +24,7 @@ import de.bp2019.pusl.util.exceptions.DataNotFoundException;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
- * Service providing relevant Institutes
+ * Service providing relevant {@link Institute}s
  * 
  * @author Leon Chemnitz
  */
