@@ -24,7 +24,7 @@ import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
  * @author Luca Dinies
  */
 public class EditExerciseSchemeViewIT extends BaseUITest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EditExerciseSchemeViewIP.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditExerciseSchemeViewIT.class);
 
 
     /**
