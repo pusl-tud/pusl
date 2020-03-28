@@ -98,7 +98,7 @@
       <groupId>org.mozilla</groupId>
       <artifactId>rhino</artifactId>
       <version>1.7.12</version>
-  </dependency>  
+    </dependency>
   </dependencies>
   <repositories>
     <repository>
@@ -127,6 +127,12 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>3.0.0-M4</version>
         <configuration>
+          <excludes>
+            <exclude>**/*IT.java</exclude>
+          </excludes>
+          <includes>
+            <include>**/*IP.java</include>
+          </includes>
           <!-- <skipTests>true</skipTests> -->
         </configuration>
         <executions>

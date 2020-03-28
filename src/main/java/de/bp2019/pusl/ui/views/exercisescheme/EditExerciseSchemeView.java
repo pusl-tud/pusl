@@ -216,8 +216,8 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
             exerciseSchemeId = Optional.empty();
             
             
-            // binder.readBean(new ExerciseScheme());
-            binder.readBean(null);
+            binder.readBean(new ExerciseScheme());
+            //binder.readBean(null);
         } else {
             try {
                 ExerciseScheme fetchedExerciseScheme;
