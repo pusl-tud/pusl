@@ -65,6 +65,7 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
     private Optional<ObjectId> exerciseSchemeId = Optional.empty();
 
     private ComboBox<Token> defaultValueToken;
+    private NumberField defaultValueNumeric;
 
     public EditExerciseSchemeView() {
         super("Übungsschema bearbeiten");
@@ -91,9 +92,8 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         institutes.setItemLabelGenerator(Institute::getName);
         institutes.setId("institutes");
 
-        NumberField defaultValueNumeric = new NumberField();
+        defaultValueNumeric = new NumberField();
         defaultValueNumeric.setLabel("Standard Note");
-        defaultValueNumeric.setValue(5.0);
         defaultValueNumeric.setId("default-value-numeric");
 
         defaultValueToken = new ComboBox<>();
@@ -104,7 +104,7 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         defaultValueToken.setVisible(false);
 
         Checkbox tokenBased = new Checkbox("Token basiert");
-        tokenBased.setId("numeric");
+        tokenBased.setId("token-based");
 
         TokenEditor tokens = new TokenEditor(exerciseSchemeService);
         tokens.setId("token");
@@ -133,24 +133,20 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
                 .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(), "Bitte mind. ein Institut angeben")
                 .bind(ExerciseScheme::getInstitutes, ExerciseScheme::setInstitutes);
 
-        binder.forField(defaultValueNumeric)
-        .withValidator(value ->{
-            if(!tokenBased.getValue()){
+        binder.forField(defaultValueNumeric).withValidator(value -> {
+            if (!tokenBased.getValue()) {
                 return value != null;
             }
             return true;
-        }, "Bitte Standard Note auswählen")
-        .bind(ExerciseScheme::getDefaultValueNumeric,
+        }, "Bitte Standard Note auswählen").bind(ExerciseScheme::getDefaultValueNumeric,
                 ExerciseScheme::setDefaultValueNumeric);
 
-        binder.forField(defaultValueToken)
-                .withValidator(token -> {
-                    if(tokenBased.getValue()){
-                        return token != null;
-                    }
-                    return true;
-                }, "Bitte Standard Token auswählen")
-                .bind(ExerciseScheme::getDefaultValueToken,
+        binder.forField(defaultValueToken).withValidator(token -> {
+            if (tokenBased.getValue()) {
+                return token != null;
+            }
+            return true;
+        }, "Bitte Standard Token auswählen").bind(ExerciseScheme::getDefaultValueToken,
                 ExerciseScheme::setDefaultValueToken);
 
         binder.bind(tokenBased, es -> !es.isNumeric(), (es, value) -> es.setIsNumeric(!value));
@@ -218,8 +214,8 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
     public void setParameter(BeforeEvent event, String idParameter) {
         if (idParameter.equals("new")) {
             exerciseSchemeId = Optional.empty();
-            /* clear fields by setting null */
-            binder.readBean(null);
+            
+            binder.readBean(new ExerciseScheme());
         } else {
             try {
                 ExerciseScheme fetchedExerciseScheme;

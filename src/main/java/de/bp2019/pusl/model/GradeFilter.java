@@ -1,14 +1,16 @@
-package de.bp2019.pusl.service.dataproviders;
+package de.bp2019.pusl.model;
 
 import java.util.Date;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import de.bp2019.pusl.model.Exercise;
-import de.bp2019.pusl.model.Grade;
-import de.bp2019.pusl.model.Lecture;
-
+/**
+ * A Filter used to query {@link Grade}s. Used in {@link GradeComposer}. Not a
+ * Database Entity
+ * 
+ * @author Leon Chemnitz
+ */
 public class GradeFilter {
     private Lecture lecture;
     private Exercise exercise;
@@ -28,7 +30,7 @@ public class GradeFilter {
         this.grade = grade.getValue();
     }
 
-    public GradeFilter(GradeFilter o){
+    public GradeFilter(GradeFilter o) {
         this.lecture = o.getLecture();
         this.exercise = o.getExercise();
         this.matrNumber = o.getMatrNumber();
@@ -86,9 +88,8 @@ public class GradeFilter {
     }
 
     @Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
-    
 
 }

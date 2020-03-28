@@ -89,17 +89,20 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
 
                 TextField name = new TextField();
                 name.setLabel("Name");
+                name.setId("lecture-name");
                 name.setPlaceholder("Name der Veranstaltung");
                 name.setValueChangeMode(ValueChangeMode.EAGER);
                 formLayout.add(name, 1);
 
                 MultiselectComboBox<Institute> institutes = new MultiselectComboBox<>();
                 institutes.setLabel("Institute");
+                institutes.setId("lecture-institutes");
                 institutes.setDataProvider(instituteService);
                 institutes.setItemLabelGenerator(Institute::getName);
                 formLayout.add(institutes, 1);
 
                 VerticalTabs verticalTabs = new VerticalTabs();
+                verticalTabs.setId("vtabs");
                 verticalTabs.setHeight("25em");
                 verticalTabs.setWidth("100%");
 
@@ -146,6 +149,9 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 binder.bind(performanceSchemes, Lecture::getPerformanceSchemes, Lecture::setPerformanceSchemes);
 
                 /* ########### Listeners ########### */
+
+                exercises.addValueChangeListener(event -> LOGGER.debug("exercises changed " + event.getValue().size()));
+                performanceSchemes.addValueChangeListener(event -> LOGGER.debug("performanceSchemes changed " + event.getValue().size()));
 
                 institutes.addValueChangeListener(event -> {
                         hiwiDataProvider.setFilter(event.getValue());

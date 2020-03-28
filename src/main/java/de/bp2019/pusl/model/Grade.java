@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * A class to model a single grade entry
+ * Model of a grade entry. Is a Database Entity.
  * 
  * @author Leon Chemnitz
  */

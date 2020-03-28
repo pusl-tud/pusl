@@ -1,5 +1,7 @@
 package de.bp2019.pusl.ui.institute;
 
+import static org.junit.Assert.assertTrue;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -56,7 +58,7 @@ public class EditInstituteViewIT extends BaseUITest {
 
     /**
      * @throws Exception
-     * @author Luca Dinies
+     * @author Luca Dinies, Leon Chemnitz
      */
     @Test
     public void testCreateNewInstitute() throws Exception {
@@ -65,10 +67,12 @@ public class EditInstituteViewIT extends BaseUITest {
         login(UserType.SUPERADMIN);
         goToURL(EditInstituteView.ROUTE + "/new");
 
-        findElementById("name").sendKeys(RandomStringUtils.random(8, true, true));
+        String name = RandomStringUtils.random(8, true, true);
+        findElementById("name").sendKeys(name);
         findButtonContainingText("Speichern").click();
 
         waitForURL(ManageInstitutesView.ROUTE);
+        assertTrue(instituteRepository.findByName(name).isPresent());
     }
 
 

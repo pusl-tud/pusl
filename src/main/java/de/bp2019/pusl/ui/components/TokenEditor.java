@@ -1,6 +1,7 @@
 package de.bp2019.pusl.ui.components;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import com.vaadin.flow.component.button.Button;
@@ -14,18 +15,18 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.textfield.TextField;
 
-import de.bp2019.pusl.ui.views.exercisescheme.EditExerciseSchemeView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.bp2019.pusl.model.Token;
 import de.bp2019.pusl.service.ExerciseSchemeService;
+import de.bp2019.pusl.ui.views.exercisescheme.EditExerciseSchemeView;
 
 /**
  * Component used as a Field to add and remove {@link Token}s in a list. Used in
  * {@link EditExerciseSchemeView}.
  *
- * @author Luca Dinies
+ * @author Luca Dinies, Leon Chemnitz
  */
 public class TokenEditor extends CustomField<Set<Token>> {
 
@@ -48,8 +49,8 @@ public class TokenEditor extends CustomField<Set<Token>> {
         tokenGrid.setWidth("100%");
         tokenGrid.setItems(gridItems);
         tokenGrid.addColumn(Token::getName).setAutoWidth(true);
-        tokenGrid.addComponentColumn(item -> createHiWiAccessCheckbox(item));
-        tokenGrid.addComponentColumn(item -> createDeleteButton(item));
+        tokenGrid.addComponentColumn(this::createHiWiAccessCheckbox);
+        tokenGrid.addComponentColumn(this::createDeleteButton);
         tokenGrid.setSelectionMode(Grid.SelectionMode.NONE);
         tokenGrid.setHeight("15em");
         add(tokenGrid);
@@ -60,16 +61,19 @@ public class TokenEditor extends CustomField<Set<Token>> {
         tokenFormLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("5em", 1),
                 new FormLayout.ResponsiveStep("5em", 2));
 
-        TextField addedToken = new TextField();
-        addedToken.setPlaceholder("Token");
-        tokenFormLayout.add(addedToken);
+        TextField tokenName = new TextField();
+        tokenName.setPlaceholder("Token");
+        tokenName.setId("token-name");
+        tokenFormLayout.add(tokenName);
 
         Button tokenButton = new Button("Token Hinzufügen", event -> {
-            gridItems.add(new Token(addedToken.getValue(), false));
+            gridItems.add(new Token(tokenName.getValue(), false));
             tokenGrid.getDataProvider().refreshAll();
-            setValue(new HashSet<>(gridItems));
-            addedToken.clear();
+            updateValue();
+            tokenName.clear();
         });
+
+        tokenButton.setId("add-token");
 
         tokenFormLayout.add(tokenButton);
         add(tokenFormLayout);
@@ -78,16 +82,14 @@ public class TokenEditor extends CustomField<Set<Token>> {
     @Override
     protected Set<Token> generateModelValue() {
         Set<Token> modelValue = new HashSet<>();
-
-        modelValue.addAll(gridItems);
+        gridItems.forEach(t -> modelValue.add(new Token(t)));
         return modelValue;
     }
 
     @Override
     protected void setPresentationValue(Set<Token> newPresentationValue) {
         gridItems.clear();
-        newPresentationValue.stream().forEach(token -> gridItems.add(token.copy()));
-
+        gridItems.addAll(newPresentationValue);
         tokenGrid.getDataProvider().refreshAll();
     }
 
@@ -95,18 +97,26 @@ public class TokenEditor extends CustomField<Set<Token>> {
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {
             gridItems.remove(item);
             tokenGrid.getDataProvider().refreshAll();
-            setValue(new HashSet<>(gridItems));
+            updateValue();
         });
         button.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
         return button;
     }
 
     private Checkbox createHiWiAccessCheckbox(Token item) {
-        Checkbox checkbox = new Checkbox("HiWi", changeEvent -> {
-            item.setAssignableByHIWI(changeEvent.getValue());
-            LOGGER.debug(String.valueOf(item.getAssignableByHIWI()));
-        });
+        Checkbox checkbox = new Checkbox("HiWi");
         checkbox.setValue(item.getAssignableByHIWI());
+        checkbox.addValueChangeListener(event -> {
+            Optional<Token> changedExercise = gridItems.stream().filter(i -> i.getId().equals(item.getId()))
+                    .findFirst();
+
+            if (changedExercise.isPresent()) {
+                changedExercise.get().setAssignableByHIWI(event.getValue());
+                LOGGER.debug(
+                        "Token " + item.getName() + " changed HIWI access to " + String.valueOf(event.getValue()));
+                updateValue();
+            }
+        });
         return checkbox;
     }
 }

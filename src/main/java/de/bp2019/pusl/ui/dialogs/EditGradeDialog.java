@@ -16,9 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.bp2019.pusl.model.Grade;
+import de.bp2019.pusl.model.GradeFilter;
 import de.bp2019.pusl.service.AuthenticationService;
 import de.bp2019.pusl.service.GradeService;
-import de.bp2019.pusl.service.dataproviders.GradeFilter;
 import de.bp2019.pusl.ui.components.GradeComposer;
 import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;

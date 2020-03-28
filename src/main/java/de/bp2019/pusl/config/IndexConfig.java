@@ -13,6 +13,11 @@ import org.springframework.data.mongodb.core.mapping.BasicMongoPersistentEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
+/**
+ * Configuration class to set up MongoDB Indices
+ * 
+ * @author Leon Chemnitz
+ */
 @Configuration
 public class IndexConfig {
   private static final Logger LOGGER = LoggerFactory.getLogger(IndexConfig.class);

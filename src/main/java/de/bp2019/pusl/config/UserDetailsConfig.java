@@ -11,6 +11,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
 
+/**
+ * Configure Spring UserDetailsService. Needed for Spring Security
+ * 
+ * @author Leon Chemnitz
+ */
 @Configuration
 public class UserDetailsConfig implements UserDetailsService {
     @Autowired

@@ -4,6 +4,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -15,22 +16,23 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Token {
 
+    private ObjectId id;
     private String name;
     private boolean assignableByHIWI;
 
     public Token() {
     }
 
-    public Token(String name, boolean assignableByHIWI) {
-        this.name = name;
-        this.assignableByHIWI = assignableByHIWI;
+    public Token(Token o){
+        this.id = o.getId();
+        this.name = new String(o.getName());
+        this.assignableByHIWI = o.getAssignableByHIWI();
     }
 
-    public Token copy() {
-        Token copy = new Token();
-        copy.setName(name);
-        copy.setAssignableByHIWI(assignableByHIWI);
-        return copy;
+    public Token(String name, boolean assignableByHIWI) {
+        setId(ObjectId.get());
+        this.name = name;
+        this.assignableByHIWI = assignableByHIWI;
     }
 
     public String getName() {
@@ -49,6 +51,14 @@ public class Token {
         this.assignableByHIWI = assignableByHIWI;
     }
 
+    public ObjectId getId() {
+        return id;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
@@ -63,4 +73,5 @@ public class Token {
     public boolean equals(Object o) {
         return EqualsBuilder.reflectionEquals(this, o);
     }
+
 }

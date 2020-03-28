@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 /**
- * Class to handle all the MongoDB configuration
+ * Class to handle all the MongoDB configuration exept for Index creation. See {@link IndexConfig}
  * 
  * @author Leon Chemnitz
  */

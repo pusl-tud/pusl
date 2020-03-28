@@ -20,7 +20,7 @@ import de.bp2019.pusl.enums.UserType;
 
 /**
  * Model of a User. Implements {@link UserDetails} to be used with Spring
- * Security
+ * Security. Is a Database Entity.
  * 
  * @author Leon Chemnitz
  */

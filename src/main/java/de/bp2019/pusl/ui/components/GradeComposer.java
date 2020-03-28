@@ -22,11 +22,11 @@ import org.slf4j.LoggerFactory;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.ExerciseScheme;
+import de.bp2019.pusl.model.GradeFilter;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.model.Token;
 import de.bp2019.pusl.service.AuthenticationService;
 import de.bp2019.pusl.service.LectureService;
-import de.bp2019.pusl.service.dataproviders.GradeFilter;
 import de.bp2019.pusl.util.Service;
 
 /**

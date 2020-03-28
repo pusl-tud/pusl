@@ -53,10 +53,12 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
         TextField nameField = new TextField();
         nameField.setValueChangeMode(ValueChangeMode.EAGER);
         nameField.setPlaceholder("Name");
+        nameField.setId("performance-name");
         formLayout.add(nameField);
 
         Button createButton = new Button("Leistung hinzufügen", new Icon(VaadinIcon.PLUS_CIRCLE));
         createButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+        createButton.setId("create-performance");
 
         formLayout.add(createButton);
 
@@ -80,7 +82,7 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
                 performanceNames.add(performanceName);
                 tabs.addTab(performanceName, createCalculationRuleField(defaultCalculationRule));
                 nameField.setValue("");
-                setPresentationValue(generateModelValue());
+                updateValue();
             }
         });
 
@@ -139,6 +141,7 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
         editor.setWidth("100%");
         editor.getStyle().set("minHeight", "18em");
         editor.setValue(calculationRule);
+        editor.setVisible(false);
 
         editor.addValueChangeListener(event -> {
             setValue(generateModelValue());

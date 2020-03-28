@@ -11,7 +11,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * Model of an Institute
+ * Model of an Institute. Is a Database Entity
  *
  * @author Leon Chemnitz
  */

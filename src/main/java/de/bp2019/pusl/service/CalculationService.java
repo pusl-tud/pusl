@@ -19,12 +19,11 @@ import org.springframework.stereotype.Service;
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Grade;
+import de.bp2019.pusl.model.GradeFilter;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.model.Performance;
 import de.bp2019.pusl.model.PerformanceScheme;
-import de.bp2019.pusl.service.dataproviders.GradeFilter;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
-import de.bp2019.pusl.util.exceptions.JSException;
 
 @Service
 @Scope("session")
@@ -41,6 +40,7 @@ public class CalculationService {
         try {
             matrNumbers.forEach(matrNumber -> result.add(calculatePerformance(matrNumber, lecture, performanceScheme)));
         } catch (Exception e) {
+            LOGGER.error(e.toString());
             ErrorDialog.open("Es gab einen Fehler mit der Berechnungsregel");
 
             matrNumbers.forEach(matrNumber -> result.add(new Performance(matrNumber, performanceScheme, " ")));
@@ -56,7 +56,7 @@ public class CalculationService {
         filter.setLecture(lecture);        
 
         List<Grade> grades = gradeService.fetch(new Query<>(), filter).collect(Collectors.toList());
-        LOGGER.info(grades.toString());
+        LOGGER.debug("fetched grades for matr Number " + matrNumber + " : " + grades.toString());
 
         List<Object> gradeValues = new ArrayList<>();
 
@@ -104,16 +104,16 @@ public class CalculationService {
         return report;
     }
 
-    public void checkPerformanceScheme(PerformanceScheme performanceScheme) throws JSException {
-        Context cx = Context.enter();
-        Scriptable scope = cx.initStandardObjects();
+    // public void checkPerformanceScheme(PerformanceScheme performanceScheme) throws JSException {
+    //     Context cx = Context.enter();
+    //     Scriptable scope = cx.initStandardObjects();
 
-        cx.evaluateString(scope, performanceScheme.getCalculationRule(), "pusl", 1, null);
+    //     cx.evaluateString(scope, performanceScheme.getCalculationRule(), "pusl", 1, null);
 
-        Object fObj = scope.get("calculate", scope);
+    //     Object fObj = scope.get("calculate", scope);
 
-        if (!(fObj instanceof Function)) {
-            throw new JSException();
-        }
-    }
+    //     if (!(fObj instanceof Function)) {
+    //         throw new JSException();
+    //     }
+    // }
 }

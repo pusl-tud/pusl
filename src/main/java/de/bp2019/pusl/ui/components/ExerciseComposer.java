@@ -2,6 +2,7 @@ package de.bp2019.pusl.ui.components;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -72,27 +73,22 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
                 new ResponsiveStep("1em", 3));
 
         nameTextField = new TextField();
+        nameTextField.setId("new-exercise-name");
         nameTextField.setPlaceholder("Prüfung");
         nameTextField.setValueChangeMode(ValueChangeMode.EAGER);
         formLayout.add(nameTextField, 1);
 
         exerciseSchemeSelect = new Select<>();
+        exerciseSchemeSelect.setId("new-exercise-scheme");
         exerciseSchemeSelect.setItemLabelGenerator(ExerciseScheme::getName);
         exerciseSchemeSelect.setDataProvider(exerciseSchemeService);
-        // if (allExerciseSchemes.size() > 0) {
-        //     exerciseSchemeSelect.setValue(allExerciseSchemes.get(0));
-        // }
+
         formLayout.add(exerciseSchemeSelect, 1);
 
-        Button exerciseSchemesButton = new Button("hinzufügen", new Icon(VaadinIcon.PLUS_CIRCLE));
-        exerciseSchemesButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-        exerciseSchemesButton.addClickListener(event -> {
-            Exercise exercise = new Exercise(nameTextField.getValue(), exerciseSchemeSelect.getValue(), false);
-            gridItems.add(exercise);
-            setValue(new ArrayList<>(gridItems));
-        });
+        Button newExerciseButton = new Button("hinzufügen", new Icon(VaadinIcon.PLUS_CIRCLE));
+        newExerciseButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
 
-        formLayout.add(exerciseSchemesButton, 1);
+        formLayout.add(newExerciseButton, 1);
 
         add(formLayout);
 
@@ -100,7 +96,9 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
 
         grid.addDragStartListener(event -> {
             draggedItem = event.getDraggedItems().get(0);
-            grid.setDropMode(GridDropMode.BETWEEN);
+            if (draggedItem != null) {
+                grid.setDropMode(GridDropMode.BETWEEN);
+            }
         });
 
         grid.addDragEndListener(event -> {
@@ -109,32 +107,42 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
         });
 
         grid.addDropListener(event -> {
-            Exercise dropOverItem = event.getDropTargetItem().get();
-            if (!dropOverItem.equals(draggedItem)) {
-                gridItems.remove(draggedItem);
-                int dropIndex = gridItems.indexOf(dropOverItem)
-                        + (event.getDropLocation() == GridDropLocation.BELOW ? 1 : 0);
-                gridItems.add(dropIndex, draggedItem);
-                setValue(new ArrayList<>(gridItems));
+            if (event.getDropTargetItem().isPresent()) {
+                Exercise dropOverItem = event.getDropTargetItem().get();
+                if (!dropOverItem.equals(draggedItem)) {
+                    gridItems.remove(draggedItem);
+                    int dropIndex = gridItems.indexOf(dropOverItem)
+                            + (event.getDropLocation() == GridDropLocation.BELOW ? 1 : 0);
+                    gridItems.add(dropIndex, draggedItem);
+                    grid.getDataProvider().refreshAll();
+                    updateValue();
+                }
             }
         });
 
         /* ########### Grid edit Logic ########### */
 
         grid.asSingleSelect().addValueChangeListener(event -> {
-            nameTextField.setValue(event.getValue().getName());
-            ExerciseScheme exerciseScheme = exerciseSchemeService.fetch(new Query<>())
-                    .filter(es -> es.getId().equals(event.getValue().getScheme().getId())).findFirst().get();
-            exerciseSchemeSelect.setValue(exerciseScheme);
+            if (event.getValue() != null) {
+                nameTextField.setValue(event.getValue().getName());
+                ExerciseScheme exerciseScheme = exerciseSchemeService.fetch(new Query<>())
+                        .filter(es -> es.getId().equals(event.getValue().getScheme().getId())).findFirst().get();
+                exerciseSchemeSelect.setValue(exerciseScheme);
+            }
         });
 
         nameTextField.addValueChangeListener(event -> {
             Exercise exercise = grid.asSingleSelect().getValue();
 
             if (exercise != null) {
-                exercise.setName(event.getValue());
-                grid.asSingleSelect().setValue(exercise);
-                grid.getDataProvider().refreshItem(exercise);
+                Optional<Exercise> changedExercise = gridItems.stream().filter(i -> i.getId().equals(exercise.getId()))
+                        .findFirst();
+
+                if (changedExercise.isPresent()) {
+                    changedExercise.get().setName(event.getValue());
+                    grid.getDataProvider().refreshAll();
+                    updateValue();
+                }
             }
         });
 
@@ -142,23 +150,41 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
             Exercise exercise = grid.asSingleSelect().getValue();
 
             if (exercise != null) {
-                exercise.setScheme(event.getValue());
-                grid.asSingleSelect().setValue(exercise);
-                grid.getDataProvider().refreshItem(exercise);
+                Optional<Exercise> changedExercise = gridItems.stream().filter(i -> i.getId().equals(exercise.getId()))
+                        .findFirst();
+
+                if (changedExercise.isPresent()) {
+                    grid.getDataProvider().refreshAll();
+                    changedExercise.get().setScheme(event.getValue());
+                    grid.getDataProvider().refreshAll();
+                    updateValue();
+                }
             }
+        });
+
+        newExerciseButton.addClickListener(event -> {
+            LOGGER.debug("added new Exercise");
+
+            Exercise exercise = new Exercise(nameTextField.getValue(), exerciseSchemeSelect.getValue(), false);
+            gridItems.add(exercise);
+            grid.getDataProvider().refreshAll();
+            updateValue();
+
+            nameTextField.setValue("");
         });
     }
 
     @Override
     protected List<Exercise> generateModelValue() {
-        LOGGER.info(gridItems.toString());
-        return gridItems;
+        List<Exercise> modelValue = new ArrayList<>();
+        gridItems.forEach(e -> modelValue.add(new Exercise(e)));
+        return modelValue;
     }
 
     @Override
     protected void setPresentationValue(List<Exercise> newPresentationValue) {
         gridItems.clear();
-        newPresentationValue.forEach(item -> gridItems.add(item));
+        gridItems.addAll(newPresentationValue);
         grid.getDataProvider().refreshAll();
     }
 
@@ -172,7 +198,8 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
     private Button createDeleteButton(Exercise item) {
         Button button = new Button(new Icon(VaadinIcon.CLOSE), clickEvent -> {
             gridItems.remove(item);
-            setValue(new ArrayList<>(gridItems));
+            grid.getDataProvider().refreshAll();
+            updateValue();
         });
         button.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
         return button;
@@ -185,10 +212,19 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
     }
 
     private Checkbox createHiWiAccessCheckbox(Exercise item) {
-        Checkbox checkbox = new Checkbox("HiWi", event -> {
-            item.setAssignableByHIWI(event.getValue());
-        });
+        Checkbox checkbox = new Checkbox("HiWi");
         checkbox.setValue(item.isAssignableByHIWI());
+        checkbox.addValueChangeListener(event -> {
+            Optional<Exercise> changedExercise = gridItems.stream().filter(i -> i.getId().equals(item.getId()))
+                    .findFirst();
+
+            if (changedExercise.isPresent()) {
+                changedExercise.get().setAssignableByHIWI(event.getValue());
+                LOGGER.debug(
+                        "Exercise " + item.getName() + " changed HIWI access to " + String.valueOf(event.getValue()));
+                updateValue();
+            }
+        });
         return checkbox;
     }
 }

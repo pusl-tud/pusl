@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.model.Grade;
+import de.bp2019.pusl.model.GradeFilter;
 import de.bp2019.pusl.service.GradeService;
 
 @Service

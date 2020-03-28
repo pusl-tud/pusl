@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Model of an ExerciseScheme. Used in {@link Exercise}
+ * Is a Database Entity
  * 
  * @author Leon Chemnitz
  */
@@ -32,13 +33,14 @@ public class ExerciseScheme {
 
 	public ExerciseScheme() {
 		this.defaultValueNumeric = 5.0;
+		this.isNumeric = true;
 		this.tokens = new HashSet<>();
 		this.institutes = new HashSet<>();
 		this.hasAccess = new HashSet<>();
 	}
 
-	public ExerciseScheme(String name, boolean isNumeric, double defaultValueNumeric, Token defaultValueToken, Set<Token> tokens,
-			Set<Institute> institutes, Set<User> hasAccess) {
+	public ExerciseScheme(String name, boolean isNumeric, double defaultValueNumeric, Token defaultValueToken,
+			Set<Token> tokens, Set<Institute> institutes, Set<User> hasAccess) {
 		this.name = name;
 		this.isNumeric = isNumeric;
 		this.defaultValueNumeric = defaultValueNumeric;

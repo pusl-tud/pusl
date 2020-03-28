@@ -4,7 +4,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
- * Model of a PerformanceScheme used in {@link Lecture}
+ * Model of a PerformanceScheme always an embeded document of {@link Lecture}
+ * therefor not a Database Entity. Used to create {@link Performace}s
  * 
  * @author Leon Chemnitz
  */
@@ -36,9 +37,9 @@ public class PerformanceScheme {
     public PerformanceScheme() {
     }
 
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-	}
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
 
 }

@@ -74,8 +74,8 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                 name.setLabel("Name");
                 name.setPlaceholder("Name des Instituts");
                 name.setValueChangeMode(ValueChangeMode.EAGER);
-            name.setId("name");
-            form.add(name, 1);
+                name.setId("name");
+                form.add(name, 1);
 
                 Button save = new Button("Speichern");
                 save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -99,7 +99,7 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
 
                 save.addClickListener(event -> {
 
-                        if(!instituteService.checkNameAvailable(name.getValue(), instituteId)){
+                        if (!instituteService.checkNameAvailable(name.getValue(), instituteId)) {
                                 ErrorDialog.open("Name bereits vergeben");
                                 return;
                         }
@@ -123,7 +123,8 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                                                 .filter(BindingValidationStatus::isError)
                                                 .map(BindingValidationStatus::getMessage).map(Optional::get).distinct()
                                                 .collect(Collectors.joining(", "));
-                                LOGGER.info("Institute could not be saved because of validation errors. Errors were: " + errorText);
+                                LOGGER.info("Institute could not be saved because of validation errors. Errors were: "
+                                                + errorText);
                         }
                 });
 
@@ -138,17 +139,17 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                 } else {
                         try {
                                 Institute fetchedInstitute;
-                                fetchedInstitute = instituteService.getById(idParameter);                                
+                                fetchedInstitute = instituteService.getById(idParameter);
                                 instituteId = Optional.of(fetchedInstitute.getId());
                                 binder.readBean(fetchedInstitute);
                         } catch (UnauthorizedException e) {
                                 event.rerouteTo(PuslProperties.ROOT_ROUTE);
-                                UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);      
+                                UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
                                 ErrorDialog.open("Nicht authorisiert um Institut zu bearbeiten!");
-                        } catch (DataNotFoundException e) {                   
-                                event.rerouteTo(PuslProperties.ROOT_ROUTE);       
-                                UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE); 
-                                ErrorDialog.open("Institut nicht in Datenbank gefunden!");    
+                        } catch (DataNotFoundException e) {
+                                event.rerouteTo(PuslProperties.ROOT_ROUTE);
+                                UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
+                                ErrorDialog.open("Institut nicht in Datenbank gefunden!");
                         }
                 }
         }
