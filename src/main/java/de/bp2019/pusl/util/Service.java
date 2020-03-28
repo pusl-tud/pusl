@@ -4,12 +4,14 @@ import com.vaadin.flow.server.VaadinServlet;
 
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-public class Service
-{
-  public static <T> T get(Class<T> serviceType)
-  {
-    return WebApplicationContextUtils
-        .getWebApplicationContext(VaadinServlet.getCurrent().getServletContext())
+/**
+ * Simple class to access Beans in a static way. Needed in views
+ * 
+ * @author Leon Chemnitz
+ */
+public class Service {
+  public static <T> T get(Class<T> serviceType) {
+    return WebApplicationContextUtils.getWebApplicationContext(VaadinServlet.getCurrent().getServletContext())
         .getBean(serviceType);
   }
 }

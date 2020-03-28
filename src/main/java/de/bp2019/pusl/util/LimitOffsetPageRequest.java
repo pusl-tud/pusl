@@ -4,11 +4,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
+/**
+ * Custom Pageable used to get Vaadin and Spring to cooperate
+ * 
+ * @author Leon Chemnitz
+ */
 public class LimitOffsetPageRequest implements Pageable {
     private int limit;
     private int offset;
 
-    // Constructor could be expanded if sorting is needed
     private Sort sort = Sort.by(Direction.DESC, "id");
 
     public LimitOffsetPageRequest(int limit, int offset) {
@@ -44,14 +48,10 @@ public class LimitOffsetPageRequest implements Pageable {
 
     @Override
     public Pageable next() {
-        // Typecast possible because number of entries cannot be bigger than integer
-        // (primary key is integer)
         return new LimitOffsetPageRequest(getPageSize(), (int) (getOffset() + getPageSize()));
     }
 
     public Pageable previous() {
-        // The integers are positive. Subtracting does not let them become bigger than
-        // integer.
         return hasPrevious() ? new LimitOffsetPageRequest(getPageSize(), (int) (getOffset() - getPageSize())) : this;
     }
 

@@ -79,7 +79,8 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
         Thread.sleep(500);
 
         findElementById("save").click();
-        waitForURL(ManageExerciseSchemesView.ROUTE);
+        
+        Thread.sleep(2000);
 
         ExerciseScheme exerciseScheme = exerciseSchemeRepository.findAll().get(0);
 

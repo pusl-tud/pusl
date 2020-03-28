@@ -15,6 +15,15 @@ import org.apache.commons.lang3.math.NumberUtils;
  * @author Leon Chemnitz
  */
 public final class Utils {
+
+    /**
+     * Checks whether a class implements a given interface
+     * 
+     * @param clazz
+     * @param interfaze
+     * @return
+     * @author Leon Chemnitz
+     */
     public static boolean implementsInterface(Class<?> clazz, Class<?> interfaze) {
         for (Class<?> c : clazz.getInterfaces()) {
             if (c.equals(interfaze)) {
@@ -24,6 +33,15 @@ public final class Utils {
         return false;
     }
 
+    /**
+     * Checks if a collection contains any Elements of another collection
+     * 
+     * @param <T>
+     * @param col1
+     * @param col2
+     * @return
+     * @author Leon Chemnitz
+     */
     public static <T> boolean containsAny(Collection<T> col1, Collection<T> col2) {
         for (T item : col2) {
             if (col1.contains(item)) {
@@ -33,6 +51,14 @@ public final class Utils {
         return false;
     }
 
+    /**
+     * Generate a random Date between two dates
+     * 
+     * @param start
+     * @param end
+     * @return
+     * @author Leon Chemnitz
+     */
     public static LocalDate randomDateBetween(LocalDate start, LocalDate end){
             long startSeconds = start.atStartOfDay(ZoneId.systemDefault()).toInstant().getEpochSecond();
             long endSeconds = end.atStartOfDay(ZoneId.systemDefault()).toInstant().getEpochSecond();
@@ -43,6 +69,12 @@ public final class Utils {
             return LocalDate.ofInstant(Instant.ofEpochSecond(random), ZoneId.systemDefault());
     }
 
+    /**
+     * 
+     * 
+     * @param localDate
+     * @return
+     */
     public static Date localDateToDate(LocalDate localDate){
         if(localDate == null){
             return null;

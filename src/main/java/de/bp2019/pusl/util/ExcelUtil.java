@@ -13,6 +13,11 @@ import org.slf4j.LoggerFactory;
 
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 
+/**
+ * Utility functions for Excel
+ * 
+ * @author Luca Dinies, Leon Chemnitz
+ */
 public final class ExcelUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelUtil.class);
 

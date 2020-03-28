@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 
 /**
+ * Used to create Excel Sheets. Has an API similar to vaadin Grid
  * 
  * @param <T>
  * @author Luca Dinies, Leon Chemnitz
@@ -40,6 +41,13 @@ public class ExcelExporter<T> {
         removeAllColumns();
     }
 
+    /**
+     * Add Column to the sheet
+     * 
+     * @param header
+     * @param valueProvider
+     * @author Leon Chemnitz
+     */
     public void addColumn(String header, ValueProvider<T, String> valueProvider) {
         headers.add(header);
         valueProviders.add(valueProvider);
@@ -54,6 +62,13 @@ public class ExcelExporter<T> {
         this.dataProvider = dataProvider;
     }
 
+    /**
+     * Used to Write to a StreamResource
+     * 
+     * @param outputStream
+     * @param vaadinSession
+     * @author Leon Chemnitz
+     */
     public void createResource(OutputStream outputStream, VaadinSession vaadinSession) {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet worksheet = workbook.createSheet();
