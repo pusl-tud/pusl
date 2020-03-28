@@ -31,7 +31,7 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
      * @author Luca Dinies, Leon Chemnitz
      * @throws Exception
      */
-   // @Test
+   @Test
     public void testCreateNewExerciseScheme() throws Exception {
         LOGGER.info("Testing create new ExerciseScheme");
 
