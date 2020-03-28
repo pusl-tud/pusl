@@ -159,9 +159,11 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         grid.addColumn(item -> item.getExercise().getName()).setKey("exercise").setHeader("Übung").setAutoWidth(true);
         grid.addColumn(item -> {
                 if( item.getHandIn() != null){
-                    return item.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM. uuuu");
-                } else return "";
-            })).setKey("handIn")
+                    return item.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM. uuuu"));
+                } else{
+                    return "";
+                }
+            }).setKey("handIn")
                 .setHeader("Abgabedatum").setAutoWidth(true);
         grid.addColumn(Grade::getValue).setHeader("Note").setAutoWidth(true);
         grid.setSortableColumns("matrNumber", "handIn");
