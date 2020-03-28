@@ -26,6 +26,9 @@ import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.UserRepository;
 
+/**
+ * @author Leon Chemnitz
+ */
 @SpringBootTest
 public class UserServiceIT {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceIT.class);
@@ -42,8 +45,12 @@ public class UserServiceIT {
     @Autowired
     UserService userService;
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
     @Test
-    public void testGetByIds(){
+    public void testGetByIds() throws Exception {
         LOGGER.info("Testing getByIds");
         List<User> users = new ArrayList<>();
 
@@ -78,6 +85,10 @@ public class UserServiceIT {
         TestUtils.assertCollectionsAreEqual(Arrays.asList(user1), fetchedUsers);
     }
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
     @Test
     public void testSize() throws Exception {
         LOGGER.info("Testing size");
@@ -98,7 +109,7 @@ public class UserServiceIT {
         user1.setInstitutes(Sets.newSet(institute1));
         user1.setType(UserType.HIWI);
         userRepository.save(user1);
-        
+
         User user2 = new User();
         user2.setInstitutes(Sets.newSet(institute2));
         user2.setType(UserType.HIWI);

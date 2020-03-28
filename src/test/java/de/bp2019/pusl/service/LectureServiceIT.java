@@ -22,6 +22,9 @@ import de.bp2019.pusl.repository.LectureRepository;
 import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
+/**
+ * @author Leon Chemnitz
+ */
 @SpringBootTest
 public class LectureServiceIT {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceIT.class);

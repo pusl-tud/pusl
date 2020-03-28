@@ -28,7 +28,46 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewIT.class);
 
 
+    /**
+     * @author Luca Dinies, Leon Chemnitz
+     * @throws Exception
+     */
+    @Test
+    public void testCreateNewExerciseScheme() throws Exception {
+        LOGGER.info("Testing create new ExerciseScheme");
 
+        Institute institute = new Institute(RandomStringUtils.random(16, true, true));
+        instituteRepository.save(institute);
+
+        login(UserType.SUPERADMIN);
+
+        goToURL(EditExerciseSchemeView.ROUTE + "/new");
+
+        String name = RandomStringUtils.random(16, true, true);
+        findElementById("name").sendKeys(name);
+        findMSCBByIdAndSelectByTexts("institutes", Arrays.asList(institute.getName()));
+        findElementById("token-based").click();
+
+        String tokenName = RandomStringUtils.randomAlphanumeric(16);
+        findElementById("token-name").sendKeys(tokenName);
+        findElementById("add-token").click();
+
+        Thread.sleep(500);
+        findElementById("default-value-token").sendKeys(tokenName);
+        findElementById("default-value-token").sendKeys(Keys.ENTER);
+        Thread.sleep(500);
+
+        findElementById("save").click();
+        waitForURL(ManageExerciseSchemesView.ROUTE);
+
+        ExerciseScheme exerciseScheme = exerciseSchemeRepository.findAll().get(0);
+
+        assertEquals(name, exerciseScheme.getName());
+        assertEquals(false, exerciseScheme.isNumeric());
+        assertEquals(tokenName, exerciseScheme.getDefaultValueToken().getName());
+    }
+
+    
     /**
      * @author Luca Dinies
      * @throws Exception
@@ -48,45 +87,6 @@ public class EditExerciseSchemeViewIT extends BaseUITest {
 
         findButtonContainingText("Speichern").click();
         timeoutWrongURL(ManageExerciseSchemesView.ROUTE);
-    }
-
-    /**
-     * @author Luca Dinies, Leon Chemnitz
-     * @throws Exception
-     */
-    @Test
-    public void testCreateNewExerciseScheme() throws Exception {
-        LOGGER.info("Testing create new ExerciseScheme");
-
-        Institute institute = new Institute(RandomStringUtils.random(8, true, true));
-        instituteRepository.save(institute);
-
-        login(UserType.SUPERADMIN);
-        goToURL(EditExerciseSchemeView.ROUTE + "/new");
-
-        String name = RandomStringUtils.random(16, true, true);
-        findElementById("name").sendKeys(name);
-        findMSCBByIdAndSelectByTexts("institutes", Arrays.asList(institute.getName()));
-        findElementById("token-based").click();
-
-        String tokenName = RandomStringUtils.randomAlphanumeric(16);
-        findElementById("token-name").sendKeys(tokenName);
-        findElementById("add-token").click();
-
-        Thread.sleep(500);
-        findElementById("default-value-token").sendKeys(tokenName);
-        findElementById("default-value-token").sendKeys(Keys.ENTER);
-        Thread.sleep(500);
-
-        findElementById("save").click();
-        
-        Thread.sleep(2000);
-
-        ExerciseScheme exerciseScheme = exerciseSchemeRepository.findAll().get(0);
-
-        assertEquals(name, exerciseScheme.getName());
-        assertEquals(false, exerciseScheme.isNumeric());
-        assertEquals(tokenName, exerciseScheme.getDefaultValueToken().getName());
     }
 
     /**

@@ -27,6 +27,10 @@ import de.bp2019.pusl.ui.views.lecture.ManageLecturesView;
 public class EditLectureViewIT extends BaseUITest {
     private static final Logger LOGGER = LoggerFactory.getLogger(EditLectureViewIT.class);
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
     @Test
     public void testCreateNewLecture() throws Exception {
         LOGGER.info("testing create new Lecture");

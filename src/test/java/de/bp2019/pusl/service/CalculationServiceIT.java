@@ -24,6 +24,9 @@ import de.bp2019.pusl.repository.ExerciseSchemeRepository;
 import de.bp2019.pusl.repository.GradeRepository;
 import de.bp2019.pusl.repository.LectureRepository;
 
+/**
+ * @author Leon Chemnitz
+ */
 @SpringBootTest
 public class CalculationServiceIT {    
     private static final Logger LOGGER = LoggerFactory.getLogger(CalculationServiceIT.class);
@@ -43,6 +46,10 @@ public class CalculationServiceIT {
     @Autowired
     GradeRepository gradeRepository;
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
     @Test
     public void calculatePerformances() throws Exception{
         LOGGER.info("testing calculatePerformances");

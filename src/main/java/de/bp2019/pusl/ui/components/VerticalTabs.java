@@ -41,7 +41,7 @@ public class VerticalTabs extends HorizontalLayout {
 
         tabsComponent.addSelectedChangeListener(event -> {
             var selectedTab = tabsComponent.getSelectedTab();
-            LOGGER.debug("changed tab selcetion to:" + selectedTab.getLabel());
+            LOGGER.debug("changed tab selection to: " + selectedTab.getLabel());
 
             Component selectedPage = titleToPages.get(selectedTab.getLabel());
             if (selectedPage != null) {
