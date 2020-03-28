@@ -16,6 +16,11 @@ import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
 
+/**
+ * Service providing current authentication details. Bean is stateful t
+ * 
+ * @author Leon Chemnitz
+ */
 @Service
 @Scope("session")
 public class AuthenticationService {
@@ -27,8 +32,7 @@ public class AuthenticationService {
     private Optional<User> currentUser = Optional.empty();
 
     /**
-     * Returns the currently logged in User as a {@link User} Object. If Current
-     * user isn't found in DB, user is logged out
+     * Returns the currently logged in User as a {@link User} Object.
      * 
      * @return current User
      * @author Leon Chemnitz

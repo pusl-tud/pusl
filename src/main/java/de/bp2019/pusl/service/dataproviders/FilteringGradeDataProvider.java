@@ -16,6 +16,12 @@ import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.GradeFilter;
 import de.bp2019.pusl.service.GradeService;
 
+/**
+ * Statefull bean serving {@link Grade}s filtered by a {@link GradeFilter}. Used
+ * as a DataProvider in {@link WorkView}.
+ * 
+ * @author Leon Chemnitz
+ */
 @Service
 @UIScope
 public class FilteringGradeDataProvider extends AbstractDataProvider<Grade, String>
@@ -29,7 +35,7 @@ public class FilteringGradeDataProvider extends AbstractDataProvider<Grade, Stri
     private GradeService gradeService;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         filter = new GradeFilter();
     }
 
