@@ -1,4 +1,4 @@
-# pusl ![alt text](./src/main/resources/META-INF/resources/images/pusl_logo_small.png) 
+# .<img src="./blob/logo/pusl_logo.png" width="60"> pusl
 
 System for managing student achievements for the institutes of transportation at **TU Darmstadt**
 
