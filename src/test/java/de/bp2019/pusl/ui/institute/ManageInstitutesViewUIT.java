@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.BaseUIT;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Institute;
@@ -23,8 +23,8 @@ import de.bp2019.pusl.ui.views.institute.ManageInstitutesView;
  *
  * @author Leon Chemnitz
  */
-public class ManageInstitutesViewIT extends BaseUITest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ManageInstitutesViewIT.class);
+public class ManageInstitutesViewUIT extends BaseUIT {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ManageInstitutesViewUIT.class);
 
     Institute institute;
 

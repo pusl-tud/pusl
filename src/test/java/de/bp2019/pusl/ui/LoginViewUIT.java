@@ -5,13 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.BaseUIT;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
 
-public class LoginViewIT extends BaseUITest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewIT.class);
+public class LoginViewUIT extends BaseUIT {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewUIT.class);
 
     @Test
     public void testLoginCorrectCredentials() throws Exception {

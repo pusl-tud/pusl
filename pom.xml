@@ -120,6 +120,7 @@
   </dependencyManagement>
   <build>
     <plugins>
+      <!-- Surefire is disabled to unify Unit-, Integration- and UI-test with failsafe -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -143,10 +144,9 @@
             <configuration>
               <includes>
                 <include>**/*Test.java</include>
+                <include>**/*IT.java</include>
+                <include>**/*UIT.java</include>
               </includes>
-              <excludes>
-                  <exclude>**/*IT.java</exclude>
-              </excludes>
               <argLine>${failsafeArgLine}</argLine>
               <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
             </configuration>
@@ -213,6 +213,7 @@
       <id>production</id>
       <properties>
         <vaadin.productionMode>true</vaadin.productionMode>
+        <spring.profiles.active>production</spring.profiles.active>
         <spring.port>8088</spring.port>
       </properties>
       <dependencies>
@@ -223,6 +224,14 @@
       </dependencies>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>2.3.1</version>
+            <configuration>
+              <outputDirectory>installation/jar</outputDirectory>
+            </configuration>
+          </plugin>
           <plugin>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>

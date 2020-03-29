@@ -50,7 +50,7 @@ import de.bp2019.pusl.ui.views.LoginView;
 /**
  * Base Class for UI tests. Starts Webdriver and fills database with one
  * {@link User} of each {@link UserType}. Also contains some utility functions.
- * Very Expensive! If you can test something with a Unit-Test instead, do that!
+ * Very Expensive! If you can test something with a Unit-Test or Integreation-Test instead, do that!
  * If something is unclear try searching for "selenium tutorial" on the
  * internet.
  * 
@@ -58,8 +58,8 @@ import de.bp2019.pusl.ui.views.LoginView;
  */
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DependsOn({ "testProperties" })
-public abstract class BaseUITest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseUITest.class);
+public abstract class BaseUIT {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseUIT.class);
 
     private static ChromeDriverService service;
     protected WebDriver driver;

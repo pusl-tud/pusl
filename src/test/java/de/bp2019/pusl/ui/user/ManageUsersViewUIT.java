@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.BaseUIT;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
-import de.bp2019.pusl.ui.LoginViewIT;
+import de.bp2019.pusl.ui.LoginViewUIT;
 import de.bp2019.pusl.ui.views.user.EditUserView;
 import de.bp2019.pusl.ui.views.user.ManageUsersView;
 
@@ -19,8 +19,8 @@ import de.bp2019.pusl.ui.views.user.ManageUsersView;
  * 
  * @author Leon Chemnitz
  */
-public class ManageUsersViewIT extends BaseUITest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewIT.class);
+public class ManageUsersViewUIT extends BaseUIT {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewUIT.class);
 
     /**
      * @author Leon Chemnitz

@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.BaseUIT;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
@@ -23,8 +23,8 @@ import de.bp2019.pusl.ui.views.user.ManageUsersView;
  * 
  * @author Leon Chemnitz
  */
-public class AccountViewIT extends BaseUITest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AccountViewIT.class);
+public class AccountViewUIT extends BaseUIT {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountViewUIT.class);
 
     @Autowired
     UserRepository userRepository;

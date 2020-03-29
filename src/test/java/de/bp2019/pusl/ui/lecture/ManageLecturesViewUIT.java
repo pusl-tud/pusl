@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.BaseUIT;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Lecture;
@@ -20,8 +20,8 @@ import de.bp2019.pusl.ui.views.lecture.ManageLecturesView;
  * 
  * @author Leon Chemnitz
  */
-public class ManageLecturesViewIT extends BaseUITest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ManageLecturesViewIT.class);
+public class ManageLecturesViewUIT extends BaseUIT {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ManageLecturesViewUIT.class);
 
     /**
      * @author Leon Chemnitz
