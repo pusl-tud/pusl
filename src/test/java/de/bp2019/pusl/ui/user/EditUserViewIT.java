@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,8 @@ public class EditUserViewIT extends BaseUITest {
         goToURL(EditUserView.ROUTE + "/new");
 
         User user = new User();
-        user.setEmailAddress(RandomStringUtils.random(8, true, true) + "@" + RandomStringUtils.random(8, true, true)
+        user.setEmailAddress(RandomStringUtils.random(8, true, true)
+                + "@" + RandomStringUtils.random(8, true, true)
                 + "." + RandomStringUtils.random(4, true, false));
         user.setFirstName(RandomStringUtils.random(8, true, true));
         user.setLastName(RandomStringUtils.random(8, true, true));
@@ -102,7 +104,8 @@ public class EditUserViewIT extends BaseUITest {
         login(UserType.SUPERADMIN);
 
         User user = new User();
-        user.setEmailAddress(RandomStringUtils.random(8, true, true) + "@" + RandomStringUtils.random(8, true, true)
+        user.setEmailAddress(RandomStringUtils.random(8, true, true)
+                + "@" + RandomStringUtils.random(8, true, true)
                 + "." + RandomStringUtils.random(4, true, false));
         user.setFirstName(RandomStringUtils.random(8, true, true));
         user.setLastName(RandomStringUtils.random(8, true, true));
@@ -153,7 +156,8 @@ public class EditUserViewIT extends BaseUITest {
         login(UserType.SUPERADMIN);
 
         User user = new User();
-        user.setEmailAddress(RandomStringUtils.random(8, true, true) + "@" + RandomStringUtils.random(8, true, true)
+        user.setEmailAddress(RandomStringUtils.random(8, true, true)
+                + "@" + RandomStringUtils.random(8, true, true)
                 + "." + RandomStringUtils.random(4, true, false));
         user.setFirstName(RandomStringUtils.random(8, true, true));
         user.setLastName(RandomStringUtils.random(8, true, true));
@@ -204,6 +208,84 @@ public class EditUserViewIT extends BaseUITest {
         LOGGER.info("Testing access as HIWI");
         login(UserType.HIWI);
         goToURLandWaitForRedirect(EditUserView.ROUTE + "/new", PuslProperties.ROOT_ROUTE);
+    }
+
+    /**
+     * @throws Exception
+     * @author Luca Dinies
+     */
+    @Test
+    public void testEmailDuplicate() throws Exception {
+        LOGGER.info("Testing create new User with assigned Email");
+
+        institute = new Institute(RandomStringUtils.random(8, true, true));
+        instituteRepository.save(institute);
+
+        User user = new User();
+        user.setEmailAddress(RandomStringUtils.random(8, true, true)
+                + "@" + RandomStringUtils.random(8, true, true)
+                + "." + RandomStringUtils.random(4, true, false));
+        user.setFirstName(RandomStringUtils.random(8, true, true));
+        user.setLastName(RandomStringUtils.random(8, true, true));
+        user.setPassword(RandomStringUtils.random(8, true, true));
+        user.setType(UserType.SUPERADMIN);
+
+        userRepository.save(user);
+
+        login(UserType.SUPERADMIN);
+
+        goToURL(EditUserView.ROUTE + "/new");
+
+        findElementById("email-address").sendKeys(user.getEmailAddress());
+        findElementById("first-name").sendKeys(user.getFirstName());
+        findElementById("last-name").sendKeys(user.getLastName());
+        findMSCBByIdAndSelectByTexts("institutes", Arrays.asList(institute.getName()));
+        findSelectByIdAndSelectByText("user-type", user.getType().toString());
+        findPasswordFieldById("password").sendKeys(user.getPassword());
+        findPasswordFieldById("confirm-password").sendKeys(user.getPassword());
+
+        findButtonContainingText("Speichern").click();
+        timeoutWrongURL(ManageUsersView.ROUTE);
+    }
+
+    /**
+     * @throws Exception
+     * @author Luca Dinies
+     */
+    @Test
+    public void testAutorisationWithParameters() throws Exception {
+        LOGGER.info("Testing autorisation for query Parameters");
+
+        User user = new User();
+        user.setEmailAddress(RandomStringUtils.random(8, true, true)
+                + "@" + RandomStringUtils.random(8, true, true)
+                + "." + RandomStringUtils.random(4, true, false));
+        user.setFirstName(RandomStringUtils.random(8, true, true));
+        user.setLastName(RandomStringUtils.random(8, true, true));
+        user.setPassword(RandomStringUtils.random(8, true, true));
+        user.setType(UserType.SUPERADMIN);
+
+        userRepository.save(user);
+
+        ObjectId id = userRepository.findByEmailAddress(user.getEmailAddress()).get().getId();
+
+        login(UserType.HIWI);
+
+        goToURLandWaitForRedirect(EditUserView.ROUTE + "/" + id.toString(), PuslProperties.ROOT_ROUTE);
+    }
+
+    /**
+     * @throws Exception
+     * @author Luca Dinies
+     */
+    @Test
+    public void testWrongParameters() throws Exception {
+        LOGGER.info("Testing wrong query Parameters");
+
+        login(UserType.SUPERADMIN);
+
+        goToURLandWaitForRedirect(EditUserView.ROUTE + "/" + RandomStringUtils.random(10),
+                PuslProperties.ROOT_ROUTE);
     }
 
 }

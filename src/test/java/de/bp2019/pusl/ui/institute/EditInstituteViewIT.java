@@ -2,7 +2,10 @@ package de.bp2019.pusl.ui.institute;
 
 import static org.junit.Assert.assertTrue;
 
+import de.bp2019.pusl.model.User;
+import de.bp2019.pusl.ui.views.user.EditUserView;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,5 +113,39 @@ public class EditInstituteViewIT extends BaseUITest {
         findButtonContainingText("Speichern").click();
 
         timeoutWrongURL(ManageInstitutesView.ROUTE);
+    }
+
+    /**
+     * @throws Exception
+     * @author Luca Dinies
+     */
+    @Test
+    public void testAutorisationWithParameters() throws Exception {
+        LOGGER.info("Testing autorisation for query Parameters");
+
+        Institute institute = new Institute();
+        institute.setName(RandomStringUtils.random(12));
+
+        instituteRepository.save(institute);
+
+        ObjectId id = instituteRepository.findAll().get(0).getId();
+
+        login(UserType.HIWI);
+
+        goToURLandWaitForRedirect(EditInstituteView.ROUTE + "/" + id.toString(), PuslProperties.ROOT_ROUTE);
+    }
+
+    /**
+     * @throws Exception
+     * @author Luca Dinies
+     */
+    @Test
+    public void testWrongParameters() throws Exception {
+        LOGGER.info("Testing wrong query Parameters");
+
+        login(UserType.SUPERADMIN);
+
+        goToURLandWaitForRedirect(EditInstituteView.ROUTE + "/" + RandomStringUtils.random(10),
+                PuslProperties.ROOT_ROUTE);
     }
 }
