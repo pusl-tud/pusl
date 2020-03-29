@@ -39,7 +39,7 @@ public final class ExcelUtil {
             XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
             XSSFSheet worksheet = workbook.getSheetAt(0);
 
-            for (int i = 0; i < worksheet.getLastRowNum(); i++) {
+            for (int i = 0; i <= worksheet.getLastRowNum(); i++) {
                 XSSFRow row = worksheet.getRow(i);
 
                 if (row != null) {

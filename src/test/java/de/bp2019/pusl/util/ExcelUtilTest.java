@@ -14,13 +14,20 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author Leon Chemnitz
+ */
 public class ExcelUtilTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelUtilTest.class);
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
     @Test
     public void testReadColumnToList() throws Exception {
         LOGGER.info("testing read column");
-        final int numRows = 20;
+        final int numRows = 30;
 
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet worksheet = workbook.createSheet();
@@ -28,7 +35,7 @@ public class ExcelUtilTest {
         List<String> demoData = new ArrayList<>();
 
         for (int i = 0; i < numRows; i++) {
-            String cellContent = RandomStringUtils.randomAlphabetic(0, 16);
+            String cellContent = RandomStringUtils.randomAlphanumeric(2, 16);
             worksheet.createRow(i).createCell(0).setCellValue(cellContent);
             demoData.add(cellContent);
         }
