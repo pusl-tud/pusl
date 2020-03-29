@@ -12,4 +12,4 @@
 * **Excel** Export und Import
 
 Eine Installationsanleitung, sowie ein Benutzerhandbuch finden sich auf unserer [Wiki-Seite](https://github.com/leonchemnitz/pusl/wiki/)  
-Für Entwickler gibt es eine generetierte [javadoc](https://leonchemnitz.github.io/pusl/apidocs/)
+Für Entwickler gibt es eine generierte [javadoc](https://leonchemnitz.github.io/pusl/apidocs/)
