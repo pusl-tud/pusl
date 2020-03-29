@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.vaadin.flow.data.provider.ListDataProvider;
 
@@ -17,68 +18,67 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author Leon Chemnitz
+ */
 public class ExcelExporterTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelExporterTest.class);
 
-    class DemoEntity{
-        private String field1;
-        private String field2;
-        private String field3;
+    class DemoEntity {
+        private String stringField;
+        private Integer intField;
 
-        public DemoEntity(String field1, String field2, String field3) {
-            this.field1 = field1;
-            this.field2 = field2;
-            this.field3 = field3;
+        public String getStringField() {
+            return this.stringField;
         }
 
-        public String getField1() {
-            return this.field1;
+        public void setStringField(String stringField) {
+            this.stringField = stringField;
         }
 
-        public void setField1(String field1) {
-            this.field1 = field1;
+        public Integer getIntField() {
+            return this.intField;
         }
 
-        public String getField2() {
-            return this.field2;
+        public void setIntField(Integer intField) {
+            this.intField = intField;
         }
 
-        public void setField2(String field2) {
-            this.field2 = field2;
-        }
+        public DemoEntity(String stringField, Integer intField) {
+            this.stringField = stringField;
+            this.intField = intField;
+        };
 
-        public String getField3() {
-            return this.field3;
-        }
-
-        public void setField3(String field3) {
-            this.field3 = field3;
-        }
     }
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
     @Test
-    public void testcreateResource() throws Exception {
+    public void testCreateResource() throws Exception {
+        LOGGER.info("Testing create Resource");
+
+        final int numRows = 20;
+
         ExcelExporter<DemoEntity> excelExporter = new ExcelExporter<>();
 
         List<DemoEntity> items = new ArrayList<>();
 
-        for(int i = 0; i < 100; i++){
-            String randString1 = RandomStringUtils.randomAlphanumeric(1, 16);
-            String randString2 = RandomStringUtils.randomAlphanumeric(1, 16);
-            String randString3 = RandomStringUtils.randomAlphanumeric(1, 16);
-            items.add(new DemoEntity(randString1, randString2, randString3));
+        for (int i = 0; i < numRows; i++) {
+            String randString = RandomStringUtils.randomAlphabetic(1, 8);
+            Integer randInt = new Random().nextInt(1000);
+            items.add(new DemoEntity(randString, randInt));
         }
 
         ListDataProvider<DemoEntity> dataProvider = new ListDataProvider<>(items);
 
         String header1 = RandomStringUtils.randomAlphanumeric(1, 16);
         String header2 = RandomStringUtils.randomAlphanumeric(1, 16);
-        String header3 = RandomStringUtils.randomAlphanumeric(1, 16);
 
         excelExporter.setDataProvider(dataProvider);
-        excelExporter.addColumn(header1, DemoEntity::getField1);
-        excelExporter.addColumn(header2, DemoEntity::getField2);
-        excelExporter.addColumn(header3, DemoEntity::getField3);
+        excelExporter.addColumn(header1, DemoEntity::getStringField);
+        excelExporter.addColumn(header2, item -> item.getIntField().toString());
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         excelExporter.createResource(bos, null);
@@ -91,10 +91,22 @@ public class ExcelExporterTest {
         LOGGER.info("checking Header");
         XSSFRow headerRow = worksheet.getRow(0);
 
-        assertEquals(header1, headerRow.getCell(0).getRawValue());
-        assertEquals(header2, headerRow.getCell(1).getRawValue());
-        assertEquals(header3, headerRow.getCell(2).getRawValue());
+        assertEquals(header1, headerRow.getCell(0).getStringCellValue());
+        LOGGER.info("header1 okay");
+        assertEquals(header2, headerRow.getCell(1).getStringCellValue());
+        LOGGER.info("header2 okay");
+
+        LOGGER.info("checking rows");
+        for (int i = 0; i < numRows; i++) {
+            XSSFRow row = worksheet.getRow(i + 1);
+
+            assertEquals(items.get(i).getStringField(), row.getCell(0).getStringCellValue());
+            assertEquals(items.get(i).getIntField().doubleValue(), row.getCell(1).getNumericCellValue());
+
+            LOGGER.info("row " + (i + 1) + " okay");
+        }
 
         workbook.close();
+        LOGGER.info("Test successful");
     }
 }

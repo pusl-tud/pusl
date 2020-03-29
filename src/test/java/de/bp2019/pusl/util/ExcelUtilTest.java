@@ -1,5 +1,7 @@
 package de.bp2019.pusl.util;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -16,14 +18,16 @@ public class ExcelUtilTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelUtilTest.class);
 
     @Test
-    public void testReadColumnToList() throws Exception{
+    public void testReadColumnToList() throws Exception {
+        LOGGER.info("testing read column");
+        final int numRows = 20;
 
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet worksheet = workbook.createSheet();
 
         List<String> demoData = new ArrayList<>();
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < numRows; i++) {
             String cellContent = RandomStringUtils.randomAlphanumeric(0, 16);
             worksheet.createRow(i).createCell(0).setCellValue(cellContent);
             demoData.add(cellContent);
@@ -34,10 +38,13 @@ public class ExcelUtilTest {
         byte[] barray = bos.toByteArray();
 
         List<String> readColumn = ExcelUtil.readColumnToList(new ByteArrayInputStream(barray), 0);
-        LOGGER.info(readColumn.toString());
-        LOGGER.info(demoData.toString());
 
-        
+        for (int i = 0; i < numRows; i++) {
+            assertEquals(demoData.get(i), readColumn.get(i));
+            LOGGER.info("row " + i + " okay");
+        }
+
         workbook.close();
+        LOGGER.info("test successful");
     }
 }
