@@ -15,7 +15,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.BaseUIT;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.ExerciseScheme;
@@ -31,8 +31,8 @@ import de.bp2019.pusl.ui.views.WorkView;
  * 
  * @author Leon Chemnitz
  */
-public class WorkViewIT extends BaseUITest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkViewIT.class);
+public class WorkViewUIT extends BaseUIT {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkViewUIT.class);
 
     @Test
     public void testSaveGradeNumeric() throws Exception {

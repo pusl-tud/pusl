@@ -9,14 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.BaseUIT;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.repository.ExerciseSchemeRepository;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.UserRepository;
-import de.bp2019.pusl.ui.LoginViewIT;
+import de.bp2019.pusl.ui.LoginViewUIT;
 import de.bp2019.pusl.ui.views.exercisescheme.EditExerciseSchemeView;
 import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
 
@@ -26,8 +26,8 @@ import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
  *
  * @author Luca Dinies
  */
-public class ManageExerciseSchemesViewIT extends BaseUITest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewIT.class);
+public class ManageExerciseSchemesViewUIT extends BaseUIT {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewUIT.class);
 
     @Autowired
     ExerciseSchemeRepository exerciseSchemeRepository;

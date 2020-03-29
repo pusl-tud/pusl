@@ -9,13 +9,14 @@
   </parent>
   <groupId>de.bp2019</groupId>
   <artifactId>pusl</artifactId>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
   <name>pusl</name>
   <description>Management system for the Institutes of Transportation at TU Darmstadt</description>
   <properties>
     <java.version>11</java.version>
     <vaadin.version>14.1.16</vaadin.version>
     <vaadin.productionMode>false</vaadin.productionMode>
+    <pusl.skipTests>false</pusl.skipTests>
   </properties>
   <dependencies>
     <dependency>
@@ -119,15 +120,20 @@
   </dependencyManagement>
   <build>
     <plugins>
+      <!-- Surefire is disabled to unify Unit-, Integration- and UI-test with failsafe -->
       <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M4</version>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>3.0.0-M4</version>
         <configuration>
-          <!-- <skipTests>true</skipTests> -->
+          <skipTests>${pusl.skipTests}</skipTests>
         </configuration>
         <executions>
           <execution>
@@ -136,10 +142,20 @@
               <goal>verify</goal>
             </goals>
             <configuration>
+              <includes>
+                <include>**/*Test.java</include>
+                <include>**/*IT.java</include>
+                <include>**/*UIT.java</include>
+              </includes>
               <argLine>${failsafeArgLine}</argLine>
+              <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>com.vaadin</groupId>
@@ -168,7 +184,7 @@
         <version>0.8.5</version>
         <executions>
           <execution>
-            <id>pre-unit-test</id>
+            <id>pre-integration-test</id>
             <goals>
               <goal>prepare-agent</goal>
             </goals>
@@ -197,6 +213,7 @@
       <id>production</id>
       <properties>
         <vaadin.productionMode>true</vaadin.productionMode>
+        <spring.profiles.active>production</spring.profiles.active>
         <spring.port>8088</spring.port>
       </properties>
       <dependencies>
@@ -207,6 +224,14 @@
       </dependencies>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>2.3.1</version>
+            <configuration>
+              <outputDirectory>installation/jar</outputDirectory>
+            </configuration>
+          </plugin>
           <plugin>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>

@@ -12,7 +12,7 @@ import org.mockito.internal.util.collections.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.BaseUIT;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.ui.views.lecture.EditLectureView;
@@ -23,8 +23,8 @@ import de.bp2019.pusl.ui.views.lecture.ManageLecturesView;
  * 
  * @author Leon Chemnitz
  */
-public class EditLectureViewIT extends BaseUITest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EditLectureViewIT.class);
+public class EditLectureViewUIT extends BaseUIT {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditLectureViewUIT.class);
 
     /**
      * @author Leon Chemnitz

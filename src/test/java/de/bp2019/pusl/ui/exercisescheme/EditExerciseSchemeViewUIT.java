@@ -10,7 +10,7 @@ import org.openqa.selenium.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.bp2019.pusl.config.BaseUITest;
+import de.bp2019.pusl.config.BaseUIT;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.ExerciseScheme;
@@ -23,8 +23,8 @@ import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
  *
  * @author Luca Dinies
  */
-public class EditExerciseSchemeViewIT extends BaseUITest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EditExerciseSchemeViewIT.class);
+public class EditExerciseSchemeViewUIT extends BaseUIT {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditExerciseSchemeViewUIT.class);
 
 
     /**

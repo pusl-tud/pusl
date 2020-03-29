@@ -16,6 +16,8 @@ import org.apache.commons.lang3.math.NumberUtils;
  */
 public final class Utils {
 
+    private Utils(){}
+
     /**
      * Checks whether a class implements a given interface
      * 

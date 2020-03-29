@@ -17,6 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
  *	@author Leon Chemnitz
  */
 public final class SecurityUtils {
+	
+	private SecurityUtils(){};
 
 	/**
 	 * Tests if the request is an internal framework request. The test consists of
