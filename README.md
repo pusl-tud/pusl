@@ -1,4 +1,4 @@
-<img align="right" src="https://www.tu-darmstadt.de/media/resources/images_1/tu_logo_web.svg" width="180">
+<img align="right" src="https://www.verkehr.tu-darmstadt.de/media/corporate_design/cd_grafiken/tud_logo_web_druck.png" width="180">
 
 <img src="./blob/logo/pusl_logo.png" width="40"> pusl 
 =============================================================================================
