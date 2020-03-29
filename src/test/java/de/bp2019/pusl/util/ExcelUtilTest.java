@@ -28,7 +28,7 @@ public class ExcelUtilTest {
         List<String> demoData = new ArrayList<>();
 
         for (int i = 0; i < numRows; i++) {
-            String cellContent = RandomStringUtils.randomAlphanumeric(0, 16);
+            String cellContent = RandomStringUtils.randomAlphabetic(0, 16);
             worksheet.createRow(i).createCell(0).setCellValue(cellContent);
             demoData.add(cellContent);
         }
