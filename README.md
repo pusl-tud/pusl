@@ -10,5 +10,8 @@
 
 * Erfassung von Übungs- / Klausurnoten
 * Berechnung von Leistungen durch benutzerdefinierte Berechnungsregeln in **JavaScript**
+* Hierarchische Zugriffskontrolle
+* **Excel** Export und Import
 
-[javadoc](./apidocs/)
+Eine Installationsanleitung, sowie ein Benutzerhandbuch finden sich auf unserer [Wiki-Seite](https://github.com/leonchemnitz/pusl/wiki/)  
+Für Entwickler gibt es eine generetierte [javadoc](https://leonchemnitz.github.io/pusl/apidocs/)
