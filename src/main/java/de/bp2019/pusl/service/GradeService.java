@@ -50,7 +50,7 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
     private static final long serialVersionUID = -8681198334128727062L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GradeService.class);
-    
+
     @Autowired
     AuthenticationService authenticationService;
 
@@ -145,7 +145,8 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
         switch (currentUser.getType()) {
             default:
             case HIWI:
-                if (!grade.getExercise().isAssignableByHIWI())
+                if (!grade.getExercise().isAssignableByHIWI()
+                        || !grade.getLecture().getHasAccess().contains(currentUser.getId()))
                     break;
             case WIMI:
             case ADMIN:
@@ -290,10 +291,10 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
             SuccessDialog.open("Kein Notenwert angegeben, Standardwert wird gesetzt");
 
             ExerciseScheme exerciseScheme = exercise.getScheme();
-            
-            if(exerciseScheme.isNumeric()){
+
+            if (exerciseScheme.isNumeric()) {
                 grade.setValue(Double.toString(exerciseScheme.getDefaultValueNumeric()));
-            }else{
+            } else {
                 grade.setValue(exerciseScheme.getDefaultValueToken().getName());
             }
 

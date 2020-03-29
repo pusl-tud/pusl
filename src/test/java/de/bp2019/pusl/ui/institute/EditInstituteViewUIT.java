@@ -2,8 +2,6 @@ package de.bp2019.pusl.ui.institute;
 
 import static org.junit.Assert.assertTrue;
 
-import de.bp2019.pusl.model.User;
-import de.bp2019.pusl.ui.views.user.EditUserView;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;

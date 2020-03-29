@@ -16,8 +16,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.server.PWA;
 
-import org.springframework.security.core.context.SecurityContextHolder;
-
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
@@ -41,8 +39,10 @@ public class MainAppView extends AppLayout {
 
     private static final long serialVersionUID = 5473180730294862712L;
 
+    private AuthenticationService authenticationService;
+
     public MainAppView() {
-        AuthenticationService authenticationService = Service.get(AuthenticationService.class);
+        authenticationService = Service.get(AuthenticationService.class);
         User currentUser = authenticationService.currentUser();
 
         HorizontalLayout titleLayout = new HorizontalLayout();
@@ -146,14 +146,7 @@ public class MainAppView extends AppLayout {
     private Button generateLogoutButton() {
         Button button = new Button("logout");
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        button.addClickListener(event -> {
-            /* Clear the Spring Authentication */
-            SecurityContextHolder.clearContext();
-            /* Close the VaadinServiceSession */
-            UI.getCurrent().getSession().close();
-            /* Redirect to avoid keeping the removed UI open in the browser */
-            UI.getCurrent().navigate(LoginView.ROUTE);
-        });
+        button.addClickListener(event -> authenticationService.deauthenticate());
         button.getStyle().set("font-weight", "200");
         button.getStyle().set("padding-left", "0");
 

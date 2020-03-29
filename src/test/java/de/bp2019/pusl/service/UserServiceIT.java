@@ -1,6 +1,7 @@
 package de.bp2019.pusl.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +26,7 @@ import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.UserRepository;
+import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
  * @author Leon Chemnitz
@@ -44,6 +46,86 @@ public class UserServiceIT {
 
     @Autowired
     UserService userService;
+
+    /**
+     * @author Leon Chemnitz
+     */
+    @Test
+    public void testDelete() throws Exception{
+        LOGGER.info("testing delete");
+
+        Institute institute = new Institute();
+        institute.setName(RandomStringUtils.randomAlphanumeric(1,16));
+        instituteRepository.save(institute);
+
+        User user = new User(); 
+        user.setEmailAddress(RandomStringUtils.randomAlphanumeric(1,16));
+        user.setInstitutes(Sets.newSet(institute));
+
+        userRepository.save(user);
+
+        LOGGER.info("testing as SUPERADMIN");
+        userRepository.deleteAll();
+        testUtils.authenticateAs(UserType.SUPERADMIN);
+        userService.delete(user);
+        assertEquals(1, userRepository.count());
+
+        LOGGER.info("test successful");
+    }
+
+    /**
+     * @author Leon Chemnitz
+     */
+    @Test
+    public void testSave() throws Exception{
+        LOGGER.info("testing save");
+
+        Institute institute = new Institute();
+        institute.setName(RandomStringUtils.randomAlphanumeric(1,16));
+        instituteRepository.save(institute);
+
+        User user = new User(); 
+        user.setEmailAddress(RandomStringUtils.randomAlphanumeric(1,16));
+        user.setInstitutes(Sets.newSet(institute));
+
+        LOGGER.info("testing as SUPERADMIN");
+        userRepository.deleteAll();
+        testUtils.authenticateAs(UserType.SUPERADMIN);
+        userService.save(user);
+        assertEquals(2, userRepository.count());
+
+        LOGGER.info("testing as ADMIN unauthorized");
+        userRepository.deleteAll();
+        User admin = testUtils.authenticateAs(UserType.ADMIN);
+        assertThrows(UnauthorizedException.class, () -> userService.save(user));
+        assertEquals(1, userRepository.count());
+
+        LOGGER.info("testing as ADMIN authorized");
+        userRepository.deleteAll();
+        admin.setInstitutes(Sets.newSet(institute));
+        userRepository.save(admin);
+        testUtils.authenticateAs(admin);
+        userService.save(user);
+        assertEquals(2, userRepository.count());
+        
+        LOGGER.info("testing as WIMI unauthorized");
+        userRepository.deleteAll();
+        User wimi = testUtils.createUser(UserType.WIMI);
+        wimi.setInstitutes(Sets.newSet(institute));
+        testUtils.authenticateAs(wimi);
+        assertThrows(UnauthorizedException.class, () -> userService.save(user));
+        assertEquals(1, userRepository.count());
+        
+        LOGGER.info("testing as HIWI unauthorized");
+        userRepository.deleteAll();
+        User hiwi = testUtils.createUser(UserType.HIWI);
+        hiwi.setInstitutes(Sets.newSet(institute));
+        testUtils.authenticateAs(hiwi);
+        assertThrows(UnauthorizedException.class, () -> userService.save(user));
+        assertEquals(1, userRepository.count());
+
+        LOGGER.info("test successful");
+    }
 
     /**
      * @author Leon Chemnitz

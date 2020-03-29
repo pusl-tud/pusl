@@ -165,7 +165,16 @@ public class AccountView extends BaseView {
 
 					userService.save(currentUser);
 					UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
-					SuccessDialog.open("Nutzer erfolgreich gespeichert");
+					
+					if(!emailAddress.getValue().equals(authenticationService.currentUser().getEmailAddress())){
+						LOGGER.info("deauthenticating user because email address of user changed");
+						authenticationService.deauthenticate();
+					} else{
+						authenticationService.clearCache();						
+						UI.getCurrent().getPage().reload();
+					}
+					
+					SuccessDialog.open("Account erfolgreich angepasst");
 				} catch (UnauthorizedException e) {
 					ErrorDialog.open("nicht authorisiert um Nutzer zu speichern!");
 				} catch (DataNotFoundException e1) {

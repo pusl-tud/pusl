@@ -14,6 +14,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
+import de.bp2019.pusl.service.AuthenticationService;
 
 /**
  * Utility Bean for testing. Includes things like authentication
@@ -31,11 +33,15 @@ import de.bp2019.pusl.repository.UserRepository;
  * @author Leon Chemnitz
  */
 @Component
+@Scope("session")
 public class TestUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestUtils.class);
 
     @Autowired
     AuthenticationManager authenticationManager;
+
+    @Autowired
+    AuthenticationService authenticationService;
 
     @Autowired
     TestProperties testProperties;
@@ -107,6 +113,8 @@ public class TestUtils {
      */
     public User authenticateAs(User user) {
         LOGGER.info("authenticating as " + user.toString());
+
+        authenticationService.clearCache();
 
         SecurityContextHolder.clearContext();
         Authentication authentication;

@@ -1,6 +1,7 @@
 package de.bp2019.pusl.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -19,14 +20,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import de.bp2019.pusl.config.TestUtils;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Exercise;
+import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.Lecture;
+import de.bp2019.pusl.model.Token;
 import de.bp2019.pusl.model.User;
+import de.bp2019.pusl.repository.ExerciseSchemeRepository;
 import de.bp2019.pusl.repository.GradeRepository;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.LectureRepository;
 import de.bp2019.pusl.repository.UserRepository;
+import de.bp2019.pusl.util.exceptions.UnauthorizedException;
 
 /**
  * Tests for {@link GradeService}
@@ -48,9 +53,12 @@ public class GradeServiceIT {
 
     @Autowired
     InstituteRepository instituteRepository;
-    
+
     @Autowired
     LectureRepository lectureRepository;
+
+    @Autowired
+    ExerciseSchemeRepository exerciseSchemeRepository;
 
     @Autowired
     GradeRepository gradeRepository;
@@ -62,6 +70,145 @@ public class GradeServiceIT {
     public void cleanUp() {
         instituteRepository.deleteAll();
         gradeRepository.deleteAll();
+    }
+
+    /**
+     * @author Leon Chemnitz
+     */
+    @Test
+    public void testDelete() throws Exception{
+        LOGGER.info("Tetsing delete");
+
+        Institute institute = new Institute();
+        institute.setName(RandomStringUtils.randomAlphanumeric(1, 16));
+        instituteRepository.save(institute);
+            
+        Token token1 = new Token();
+        token1.setName(RandomStringUtils.randomAlphanumeric(1,16));
+            
+        Token token2 = new Token();
+        token2.setName(RandomStringUtils.randomAlphanumeric(1,16));
+
+        ExerciseScheme exerciseScheme = new ExerciseScheme();
+        exerciseScheme.setName(RandomStringUtils.randomAlphanumeric(1, 16));
+        exerciseScheme.setTokens(Sets.newSet(token2,token1));
+        exerciseScheme.setDefaultValueToken(token1);
+        exerciseSchemeRepository.save(exerciseScheme);
+
+        Exercise exercise = new Exercise();
+        exercise.setName(RandomStringUtils.randomAlphanumeric(1,16));
+
+        Lecture lecture = new Lecture();
+        lecture.setInstitutes(Sets.newSet(institute));
+        lecture.setName(RandomStringUtils.randomAlphanumeric(1,16));
+        lecture.setExercises(Arrays.asList(exercise));
+
+        Grade grade = new Grade();
+        grade.setMatrNumber(RandomStringUtils.randomNumeric(7));
+        grade.setLecture(lecture);
+        grade.setExercise(exercise);
+
+        gradeRepository.deleteAll();
+        gradeRepository.save(grade);
+
+        LOGGER.info("testing as SUPERADMIN");
+        testUtils.authenticateAs(UserType.SUPERADMIN);
+        gradeService.delete(grade);
+        assertEquals(0, gradeRepository.count());
+
+        LOGGER.info("test successful");
+    }
+
+    /**
+     * @author Leon Chemnitz
+     */
+    @Test
+    public void testSave() throws Exception{
+        LOGGER.info("Tetsing save");
+
+        Institute institute = new Institute();
+        institute.setName(RandomStringUtils.randomAlphanumeric(1, 16));
+        instituteRepository.save(institute);
+            
+        Token token1 = new Token();
+        token1.setName(RandomStringUtils.randomAlphanumeric(1,16));
+            
+        Token token2 = new Token();
+        token2.setName(RandomStringUtils.randomAlphanumeric(1,16));
+
+        ExerciseScheme exerciseScheme = new ExerciseScheme();
+        exerciseScheme.setName(RandomStringUtils.randomAlphanumeric(1, 16));
+        exerciseScheme.setTokens(Sets.newSet(token2,token1));
+        exerciseScheme.setDefaultValueToken(token1);
+        exerciseSchemeRepository.save(exerciseScheme);
+
+        Exercise exercise = new Exercise();
+        exercise.setName(RandomStringUtils.randomAlphanumeric(1,16));
+
+        Lecture lecture = new Lecture();
+        lecture.setInstitutes(Sets.newSet(institute));
+        lecture.setName(RandomStringUtils.randomAlphanumeric(1,16));
+        lecture.setExercises(Arrays.asList(exercise));
+
+        Grade grade = new Grade();
+        grade.setMatrNumber(RandomStringUtils.randomNumeric(7));
+        grade.setLecture(lecture);
+        grade.setExercise(exercise);
+
+        LOGGER.info("testing as SUPERADMIN");
+        gradeRepository.deleteAll();
+        testUtils.authenticateAs(UserType.SUPERADMIN);
+        gradeService.save(grade);
+        assertEquals(1, gradeRepository.count());
+        
+        LOGGER.info("testing as ADMIN unauthorized");
+        gradeRepository.deleteAll();
+        User admin = testUtils.authenticateAs(UserType.ADMIN);
+        assertThrows(UnauthorizedException.class, () -> gradeService.save(grade));
+        assertEquals(0, gradeRepository.count());
+
+        LOGGER.info("testing as ADMIN authorized");
+        gradeRepository.deleteAll();
+        admin.setInstitutes(Sets.newSet(institute));
+        userRepository.save(admin);
+        testUtils.authenticateAs(admin);
+        gradeService.save(grade);
+        assertEquals(1, gradeRepository.count());
+        
+        LOGGER.info("testing as WIMI unauthorized");
+        gradeRepository.deleteAll();
+        User wimi = testUtils.authenticateAs(UserType.WIMI);
+        assertThrows(UnauthorizedException.class, () -> gradeService.save(grade));
+        assertEquals(0, gradeRepository.count());
+        
+        LOGGER.info("testing as WIMI authorized");
+        gradeRepository.deleteAll();
+        wimi.setInstitutes(Sets.newSet(institute));
+        userRepository.save(wimi);
+        testUtils.authenticateAs(wimi);
+        gradeService.save(grade);
+        assertEquals(1, gradeRepository.count());
+
+        LOGGER.info("testing as HIWI not authorized");
+        gradeRepository.deleteAll();
+        User hiwi = testUtils.authenticateAs(UserType.HIWI);
+        assertThrows(UnauthorizedException.class, () -> gradeService.save(grade));
+        assertEquals(0, gradeRepository.count());
+        
+        LOGGER.info("testing HIWI authorized");
+        gradeRepository.deleteAll();
+        hiwi.setInstitutes(Sets.newSet(institute));
+        userRepository.save(hiwi);
+        testUtils.authenticateAs(hiwi);
+        exercise.setAssignableByHIWI(true);
+        lecture.setHasAccess(Sets.newSet(hiwi.getId()));
+        grade.setLecture(lecture);
+        grade.setExercise(exercise);
+        testUtils.authenticateAs(hiwi);
+        gradeService.save(grade);
+        assertEquals(1, gradeRepository.count());
+
+        LOGGER.info("test successful");
     }
 
     @Test
