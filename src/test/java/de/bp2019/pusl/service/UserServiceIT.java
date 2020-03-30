@@ -62,13 +62,20 @@ public class UserServiceIT {
         user.setEmailAddress(RandomStringUtils.randomAlphanumeric(1,16));
         user.setInstitutes(Sets.newSet(institute));
 
-        userRepository.save(user);
 
-        LOGGER.info("testing as SUPERADMIN");
-        userRepository.deleteAll();
+        LOGGER.info("testing as SUPERADMIN");        
+        userRepository.deleteAll();        
+        userRepository.save(user);
         testUtils.authenticateAs(UserType.SUPERADMIN);
         userService.delete(user);
         assertEquals(1, userRepository.count());
+        
+        LOGGER.info("testing as HIWI");
+        userRepository.deleteAll();        
+        userRepository.save(user);
+        testUtils.authenticateAs(UserType.HIWI);
+        assertThrows(UnauthorizedException.class, () -> userService.delete(user));
+        assertEquals(2, userRepository.count());
 
         LOGGER.info("test successful");
     }
@@ -134,6 +141,7 @@ public class UserServiceIT {
     @Test
     public void testGetByIds() throws Exception {
         LOGGER.info("Testing getByIds");
+
         List<User> users = new ArrayList<>();
 
         User user1 = new User();
@@ -150,6 +158,9 @@ public class UserServiceIT {
         user3.setEmailAddress(RandomStringUtils.randomAlphanumeric(10));
         userRepository.save(user3);
 
+        LOGGER.info("Testing null");
+        assertEquals(0, userService.getByIds(null).size());
+
         LOGGER.info("Testing all Ids in DB");
         LOGGER.info("Users to get: " + users.toString());
 
@@ -165,6 +176,47 @@ public class UserServiceIT {
         LOGGER.info("Users gotten: " + fetchedUsers.toString());
 
         TestUtils.assertCollectionsAreEqual(Arrays.asList(user1), fetchedUsers);
+    }
+
+    /**
+     * @author Leon Chemnitz
+     */
+    @Test
+    public void testFetchHiwis() throws Exception{
+        LOGGER.info("Testing fetchHiwis");
+
+        Institute institute = new Institute();
+        institute.setName(RandomStringUtils.randomAlphanumeric(1,16));
+        instituteRepository.save(institute);
+
+        User user1 = new User();
+        user1.setEmailAddress(RandomStringUtils.randomAlphanumeric(10));
+        user1.setInstitutes(Sets.newSet(institute));
+        user1.setType(UserType.HIWI);
+        userRepository.save(user1);
+
+        User user2 = new User();
+        user2.setEmailAddress(RandomStringUtils.randomAlphanumeric(10));
+        user2.setInstitutes(Sets.newSet(institute));
+        user2.setType(UserType.WIMI);
+        userRepository.save(user2);
+
+        User user3 = new User();
+        user3.setEmailAddress(RandomStringUtils.randomAlphanumeric(10));
+        user3.setType(UserType.HIWI);
+        userRepository.save(user3);
+
+        LOGGER.info("Testing as SUPERADMIN");
+        testUtils.authenticateAs(UserType.SUPERADMIN);
+        assertEquals(1, userService.fetchHiwis(new Query<>(), Sets.newSet(institute)).count());
+
+        LOGGER.info("Testing as ADMIN");
+        testUtils.authenticateAs(UserType.ADMIN);
+        assertEquals(0, userService.fetchHiwis(new Query<>(), Sets.newSet(institute)).count());
+
+        LOGGER.info("Testing as HIWI");
+        testUtils.authenticateAs(UserType.HIWI);
+        assertEquals(0, userService.fetchHiwis(new Query<>(), Sets.newSet(institute)).count());
     }
 
     /**

@@ -1,5 +1,6 @@
 package de.bp2019.pusl.service;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -48,6 +49,38 @@ public class LectureServiceIT {
     @Autowired
     UserRepository userRepository;
 
+    /**
+     * @author Leon Chemnitz
+     */
+    @Test
+    public void testDelete() throws Exception{
+        LOGGER.info("testing delete");
+
+        Institute institute = new Institute();
+        institute.setName(RandomStringUtils.randomAlphanumeric(1,16));
+        instituteRepository.save(institute);
+
+        Lecture lecture = new Lecture();
+        lecture.setName(RandomStringUtils.randomAlphanumeric(8));
+        lecture.setInstitutes(Sets.newSet(institute));
+
+
+        LOGGER.info("testing as SUPERADMIN");        
+        lectureRepository.deleteAll();        
+        lectureRepository.save(lecture);
+        testUtils.authenticateAs(UserType.SUPERADMIN);
+        lectureService.delete(lecture);
+        assertEquals(0, lectureRepository.count());
+        
+        LOGGER.info("testing as HIWI");
+        lectureRepository.deleteAll();        
+        lectureRepository.save(lecture);
+        testUtils.authenticateAs(UserType.HIWI);
+        assertThrows(UnauthorizedException.class, () -> lectureService.delete(lecture));
+        assertEquals(1, lectureRepository.count());
+
+        LOGGER.info("test successful");
+    }
     /**
      * @author Leon Chemnitz
      */

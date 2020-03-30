@@ -52,13 +52,20 @@ public class ExerciseSchemeServiceIT {
 
         ExerciseScheme exerciseScheme = new ExerciseScheme(RandomStringUtils.randomAlphanumeric(1, 16), false, 0, null,
                 null, null, null);
-        exerciseSchemeRepository.save(exerciseScheme);
 
         LOGGER.info("testing as SUPERADMIN");
         exerciseSchemeRepository.deleteAll();
+        exerciseSchemeRepository.save(exerciseScheme);
         testUtils.authenticateAs(UserType.SUPERADMIN);
         exerciseSchemeService.delete(exerciseScheme);
         assertEquals(0, exerciseSchemeRepository.count());
+
+        LOGGER.info("testing as HIWI");
+        exerciseSchemeRepository.deleteAll();
+        exerciseSchemeRepository.save(exerciseScheme);
+        testUtils.authenticateAs(UserType.HIWI);
+        assertThrows(UnauthorizedException.class, () -> exerciseSchemeService.delete(exerciseScheme));        
+        assertEquals(1, exerciseSchemeRepository.count());
 
         LOGGER.info("test successful");
     }
