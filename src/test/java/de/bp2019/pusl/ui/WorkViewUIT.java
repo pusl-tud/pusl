@@ -34,6 +34,7 @@ import de.bp2019.pusl.ui.views.WorkView;
 public class WorkViewUIT extends BaseUIT {
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkViewUIT.class);
 
+
     @Test
     public void testSaveGradeNumeric() throws Exception {
         LOGGER.info("Testing save grade");
@@ -286,6 +287,44 @@ public class WorkViewUIT extends BaseUIT {
             logout();
         }
     }
+
+    /**
+     * @author Leon Chemnitz
+     */
+    @Test
+    public void testSetParameter() throws Exception{
+        LOGGER.info("Testing setParameter");
+
+        Institute institute = new Institute();
+        institute.setName(RandomStringUtils.randomAlphanumeric(1, 16));
+        instituteRepository.save(institute);
+
+        ExerciseScheme scheme = new ExerciseScheme();
+        scheme.setName(RandomStringUtils.randomAlphanumeric(1, 16));
+        scheme.setIsNumeric(true);
+        scheme.setInstitutes(Sets.newSet(institute));
+        exerciseSchemeRepository.save(scheme);
+
+        Exercise exercise = new Exercise();
+        exercise.setName(RandomStringUtils.randomAlphanumeric(1, 16));
+        exercise.setScheme(scheme);
+
+        Lecture lecture = new Lecture();
+        lecture.setName(RandomStringUtils.randomAlphanumeric(1,16));
+        lecture.setExercises(Arrays.asList(exercise));
+        lecture.setInstitutes(Sets.newSet(institute));
+        lectureRepository.save(lecture);
+
+        LOGGER.info("testing lecture not found");        
+        login(UserType.SUPERADMIN);
+        goToURL(WorkView.ROUTE + "?lecture=notFound");
+        logout();
+
+        LOGGER.info("testing lecture and exercise present");
+        login(UserType.SUPERADMIN);
+        goToURL(WorkView.ROUTE + "?lecture="+lecture.getId() + "&exercise=" + exercise.getName() + "&matrNumber=12312412");
+    }
+
 
     /**
      * @author Leon Chemnitz
