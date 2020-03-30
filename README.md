@@ -11,5 +11,5 @@
 * Hierarchische Zugriffskontrolle
 * **Excel** Export und Import
 
-Eine Installationsanleitung, sowie ein Benutzerhandbuch finden sich auf unserer [Wiki-Seite](https://github.com/leonchemnitz/pusl/wiki/)  
-Für Entwickler gibt es eine generierte [javadoc](https://leonchemnitz.github.io/pusl/apidocs/)
+Eine Installationsanleitung, sowie ein Benutzerhandbuch finden sich auf unserer [Wiki-Seite](https://github.com/pusl-tud/pusl/wiki/)  
+Für Entwickler gibt es eine generierte [Javadoc](https://pusl-tud.github.io/pusl/apidocs/)
