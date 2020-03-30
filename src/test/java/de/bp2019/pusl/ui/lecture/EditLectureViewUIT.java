@@ -2,19 +2,29 @@ package de.bp2019.pusl.ui.lecture;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import de.bp2019.pusl.model.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.bp2019.pusl.config.BaseUIT;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.enums.UserType;
+import de.bp2019.pusl.model.Exercise;
+import de.bp2019.pusl.model.ExerciseScheme;
+import de.bp2019.pusl.model.Institute;
+import de.bp2019.pusl.model.Lecture;
+import de.bp2019.pusl.model.PerformanceScheme;
 import de.bp2019.pusl.ui.views.lecture.EditLectureView;
 import de.bp2019.pusl.ui.views.lecture.ManageLecturesView;
 
@@ -64,11 +74,11 @@ public class EditLectureViewUIT extends BaseUIT {
         findElementById("create-performance").click();
 
         findButtonContainingText("Speichern").click();
-        
+
         waitForURL(ManageLecturesView.ROUTE);
 
         Lecture lecture = lectureRepository.findAll().get(0);
-        
+
         assertEquals(name, lecture.getName());
         assertEquals(exerciseName, lecture.getExercises().get(0).getName());
         assertEquals(exerciseScheme, lecture.getExercises().get(0).getScheme());
@@ -108,8 +118,8 @@ public class EditLectureViewUIT extends BaseUIT {
      * @author Luca Dinies
      */
     @Test
-    public void testAutorisationWithParameters() throws Exception {
-        LOGGER.info("Testing autorisation for query Parameters");
+    public void testAuthorisationWithParameters() throws Exception {
+        LOGGER.info("Testing authorisation for query Parameters");
 
         Institute institute = new Institute();
         institute.setName(RandomStringUtils.randomAlphabetic(16));
@@ -163,7 +173,73 @@ public class EditLectureViewUIT extends BaseUIT {
 
         login(UserType.SUPERADMIN);
 
-        goToURLandWaitForRedirect(EditLectureView.ROUTE + "/" + RandomStringUtils.random(10), PuslProperties.ROOT_ROUTE);
+        goToURLandWaitForRedirect(EditLectureView.ROUTE + "/" + RandomStringUtils.random(10),
+                PuslProperties.ROOT_ROUTE);
+    }
+
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
+    @Test
+    public void testChangeExercise() throws Exception {
+        LOGGER.info("testing change exercise");
+
+        Institute institute = new Institute();
+        institute.setName(RandomStringUtils.randomAlphabetic(16));
+        instituteRepository.save(institute);
+
+        ExerciseScheme exerciseScheme1 = new ExerciseScheme();
+        exerciseScheme1.setName(RandomStringUtils.randomAlphanumeric(1));
+        exerciseScheme1.setInstitutes(Sets.newSet(institute));
+        exerciseSchemeRepository.save(exerciseScheme1);
+
+        ExerciseScheme exerciseScheme2 = new ExerciseScheme();
+        exerciseScheme2.setName(RandomStringUtils.randomAlphanumeric(16));
+        exerciseScheme2.setInstitutes(Sets.newSet(institute));
+        exerciseSchemeRepository.save(exerciseScheme2);
+
+        login(UserType.SUPERADMIN);
+
+        goToURL(EditLectureView.ROUTE + "/new");
+
+        String name = RandomStringUtils.randomAlphanumeric(16);
+        findElementById("lecture-name").sendKeys(name);
+        findMSCBByIdAndSelectByTexts("lecture-institutes", Arrays.asList(institute.getName()));
+
+        String exerciseName1 = RandomStringUtils.randomAlphanumeric(1);
+        findElementById("new-exercise-name").sendKeys(exerciseName1);
+
+        findElementById("new-exercise-scheme").sendKeys(exerciseScheme1.getName());
+        Thread.sleep(500);
+        findButtonContainingText("hinzufügen").click();
+
+        Thread.sleep(500);
+        driver.findElement(By.cssSelector("vaadin-grid-cell-content:nth-child(26)")).click();
+
+        
+        Thread.sleep(500);
+        findElementById("new-exercise-name").sendKeys(Keys.BACK_SPACE);
+        
+        Thread.sleep(500);
+        String exerciseName2 = RandomStringUtils.randomAlphanumeric(16);
+        findElementById("new-exercise-name").sendKeys(exerciseName2);
+
+        Thread.sleep(500);
+        findElementById("new-exercise-scheme").sendKeys(Keys.BACK_SPACE);
+        Thread.sleep(500);
+        findElementById("new-exercise-scheme").sendKeys(exerciseScheme2.getName());
+
+        Thread.sleep(500);
+
+        findButtonContainingText("Speichern").click();
+
+        waitForURL(ManageLecturesView.ROUTE);
+
+        Lecture lecture = lectureRepository.findAll().get(0);
+
+        assertEquals(exerciseName2, lecture.getExercises().get(0).getName());
+        assertEquals(exerciseScheme2, lecture.getExercises().get(0).getScheme());
     }
 
     /**

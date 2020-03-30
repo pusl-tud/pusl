@@ -94,8 +94,6 @@ public abstract class BaseUIT {
 
     @BeforeAll
     public static void startService() throws Exception {
-
-
         LOGGER.info("Starting Chromedriver service");
 
         service = new ChromeDriverService.Builder().usingDriverExecutable(findFile()).usingAnyFreePort().build();

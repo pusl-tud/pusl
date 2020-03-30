@@ -163,15 +163,18 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
         });
 
         newExerciseButton.addClickListener(event -> {
-            LOGGER.debug("added new Exercise");
+            if (!nameTextField.getValue().equals("") && exerciseSchemeSelect.getValue() != null) {
+                LOGGER.debug("added new Exercise");
 
-            Exercise exercise = new Exercise(nameTextField.getValue(), exerciseSchemeSelect.getValue(), false);
-            gridItems.add(exercise);
-            grid.getDataProvider().refreshAll();
-            updateValue();
+                Exercise exercise = new Exercise(nameTextField.getValue(), exerciseSchemeSelect.getValue(), false);
+                gridItems.add(exercise);
+                grid.getDataProvider().refreshAll();
+                updateValue();
 
-            nameTextField.setValue("");
+                nameTextField.setValue("");
+            }
         });
+
     }
 
     @Override
