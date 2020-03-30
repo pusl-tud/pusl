@@ -12,4 +12,4 @@
 * **Excel** Export und Import
 
 Eine Installationsanleitung, sowie ein Benutzerhandbuch finden sich auf unserer [Wiki-Seite](https://github.com/pusl-tud/pusl/wiki/)  
-Für Entwickler gibt es eine generierte [javadoc](https://pusl-tud.github.io/pusl/apidocs/)
+Für Entwickler gibt es eine generierte [Javadoc](https://pusl-tud.github.io/pusl/apidocs/)
