@@ -1,6 +1,7 @@
 package de.bp2019.pusl.ui;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -33,7 +34,6 @@ import de.bp2019.pusl.ui.views.WorkView;
  */
 public class WorkViewUIT extends BaseUIT {
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkViewUIT.class);
-
 
     @Test
     public void testSaveGradeNumeric() throws Exception {
@@ -261,7 +261,7 @@ public class WorkViewUIT extends BaseUIT {
             Actions actions = new Actions(driver);
             WebElement gridItem = driver.findElement(By.tagName("vaadin-grid-cell-content"));
             actions.doubleClick(gridItem).perform();
-            
+
             Thread.sleep(500);
 
             String newValue = RandomStringUtils.randomNumeric(2);
@@ -270,7 +270,7 @@ public class WorkViewUIT extends BaseUIT {
             findElementById("dialog-gc-numeric").sendKeys(newValue);
 
             findButtonContainingText("speichern").click();
-            
+
             Thread.sleep(1000);
 
             Grade foundGrade = gradeRepository.findById(grade.getId().toString()).get();
@@ -288,11 +288,73 @@ public class WorkViewUIT extends BaseUIT {
         }
     }
 
+    @Test
+    public void testDeleteGrade() throws Exception {
+        LOGGER.info("Testing delete Grade");
+
+        String matrNumber = "2920560";
+
+        Institute institute = new Institute();
+        institute.setName(RandomStringUtils.randomAlphanumeric(16));
+        instituteRepository.save(institute);
+
+        ExerciseScheme exerciseScheme = new ExerciseScheme();
+        exerciseScheme.setName(RandomStringUtils.randomAlphanumeric(16));
+        exerciseScheme.setInstitutes(Sets.newSet(institute));
+        exerciseScheme.setIsNumeric(true);
+        exerciseSchemeRepository.save(exerciseScheme);
+
+        String value = RandomStringUtils.randomNumeric(1);
+
+        Exercise exercise = new Exercise();
+        exercise.setName(RandomStringUtils.randomAlphanumeric(16));
+        exercise.setScheme(exerciseScheme);
+        exercise.setAssignableByHIWI(true);
+
+        User user = testUtils.createUser(UserType.SUPERADMIN);
+        user.setInstitutes(Sets.newSet(institute));
+        userRepository.save(user);
+
+        Lecture lecture = new Lecture();
+        lecture.setName(RandomStringUtils.randomAlphanumeric(16));
+        lecture.setHasAccess(Sets.newSet(user.getId()));
+        lecture.setInstitutes(Sets.newSet(institute));
+        lecture.setExercises(Arrays.asList(exercise));
+        lectureRepository.save(lecture);
+
+        Grade grade = new Grade();
+        grade.setMatrNumber(matrNumber);
+        grade.setLecture(lecture);
+        grade.setExercise(exercise);
+        grade.setValue(value);
+        grade.setGradedBy(user);
+        grade.setHandIn(LocalDate.now());
+        gradeRepository.save(grade);
+
+        login(user);
+
+        findElementById("vtabs-einsehen").click();
+        Thread.sleep(500);
+
+        Actions actions = new Actions(driver);
+        WebElement gridItem = driver.findElement(By.tagName("vaadin-grid-cell-content"));
+        actions.doubleClick(gridItem).perform();
+
+        Thread.sleep(500);
+
+        findButtonContainingText("löschen").click();
+        acceptConfirmDeletionDialog("2920560");
+
+        Thread.sleep(1000);
+
+        assertTrue(gradeRepository.findById(grade.getId().toString()).isEmpty());
+    }
+
     /**
      * @author Leon Chemnitz
      */
     @Test
-    public void testSetParameter() throws Exception{
+    public void testSetParameter() throws Exception {
         LOGGER.info("Testing setParameter");
 
         Institute institute = new Institute();
@@ -310,21 +372,21 @@ public class WorkViewUIT extends BaseUIT {
         exercise.setScheme(scheme);
 
         Lecture lecture = new Lecture();
-        lecture.setName(RandomStringUtils.randomAlphanumeric(1,16));
+        lecture.setName(RandomStringUtils.randomAlphanumeric(1, 16));
         lecture.setExercises(Arrays.asList(exercise));
         lecture.setInstitutes(Sets.newSet(institute));
         lectureRepository.save(lecture);
 
-        LOGGER.info("testing lecture not found");        
+        LOGGER.info("testing lecture not found");
         login(UserType.SUPERADMIN);
         goToURL(WorkView.ROUTE + "?lecture=notFound");
         logout();
 
         LOGGER.info("testing lecture and exercise present");
         login(UserType.SUPERADMIN);
-        goToURL(WorkView.ROUTE + "?lecture="+lecture.getId() + "&exercise=" + exercise.getName() + "&matrNumber=12312412");
+        goToURL(WorkView.ROUTE + "?lecture=" + lecture.getId() + "&exercise=" + exercise.getName()
+                + "&matrNumber=12312412");
     }
-
 
     /**
      * @author Leon Chemnitz
