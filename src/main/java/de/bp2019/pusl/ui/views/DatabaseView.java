@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.Route;
 
@@ -28,6 +30,7 @@ import de.bp2019.pusl.repository.GradeRepository;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.repository.LectureRepository;
 import de.bp2019.pusl.repository.UserRepository;
+import de.bp2019.pusl.service.AuthenticationService;
 import de.bp2019.pusl.ui.interfaces.AccessibleBySuperadmin;
 import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.Utils;
@@ -49,9 +52,11 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
         private ExerciseSchemeRepository exerciseSchemeRepository;
         private LectureRepository lectureRepository;
         private GradeRepository gradeRepository;
+        private AuthenticationService authenticationService;
         private PasswordEncoder passwordEncoder;
 
-        IntegerField numGradesField;
+        private IntegerField numGradesField;
+        private IntegerField numUsersField;
 
         public DatabaseView() {
                 super("Datenbank");
@@ -61,57 +66,230 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
                 exerciseSchemeRepository = Service.get(ExerciseSchemeRepository.class);
                 lectureRepository = Service.get(LectureRepository.class);
                 gradeRepository = Service.get(GradeRepository.class);
+                authenticationService = Service.get(AuthenticationService.class);
                 passwordEncoder = Service.get(PasswordEncoder.class);
 
-                Button refillDatabaseButton = new Button("Datenbank neu befüllen");
-                add(refillDatabaseButton);
+                FormLayout layout = new FormLayout();
+                layout.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
+                layout.setWidth("100%");
+
+                Button refillDatabaseButton = new Button("Institute, Veranstaltungen & Übungsschemas generieren");
+                layout.add(refillDatabaseButton, 2);
+
+                numUsersField = new IntegerField();
+                numUsersField.setId("numUsers");
+                numUsersField.setPlaceholder("Anzahl Nutzer");
+                layout.add(numUsersField, 1);
+
+                Button generateUsersButton = new Button("Nutzer generieren");
+                layout.add(generateUsersButton, 1);
 
                 numGradesField = new IntegerField();
-            numGradesField.setId("numGrades");
-            add(numGradesField);
+                numGradesField.setId("numGrades");
+                numGradesField.setPlaceholder("Anzahl Noten");
+                layout.add(numGradesField, 1);
 
-                Button refillGradesButton = new Button("Noten generieren");
-                add(refillGradesButton);
+                Button generateGradesButton = new Button("Noten generieren");
+                layout.add(generateGradesButton, 1);
 
-                refillDatabaseButton.addClickListener(event -> {
-                        refillDatabase();
-                });
+                add(layout);
 
-                refillGradesButton.addClickListener(event -> {
-                        refillGrades();
-                });
+                /* ############ Listeners ########## */
+
+                refillDatabaseButton.addClickListener(event -> refillDatabase());
+                generateGradesButton.addClickListener(event -> refillGrades());
+                generateUsersButton.addClickListener(event -> refillUsers());
         }
 
         private void refillDatabase() {
 
                 LOGGER.info("deleting all Database entries");
                 instituteRepository.deleteAll();
-                userRepository.deleteAll();
                 exerciseSchemeRepository.deleteAll();
                 lectureRepository.deleteAll();
 
                 LOGGER.info("refilling Database...");
-                instituteRepository.save(new Institute("Verkehrsplanung"));
-                instituteRepository.save(new Institute("Bahnsysteme"));
-                instituteRepository.save(new Institute("Straßenwesen"));
-                instituteRepository.save(new Institute("Luftverkehr"));
 
-                List<Institute> institutes = instituteRepository.findAll();
+                Institute verkehrsplanung = new Institute("Verkehrsplanung");
+                instituteRepository.save(verkehrsplanung);
 
-                String password = passwordEncoder.encode("password");
-                String adminPassword = passwordEncoder.encode("admin");
+                Institute bahnsysteme = new Institute("Bahnsysteme");
+                instituteRepository.save(bahnsysteme);
 
-                userRepository.save(new User(null, null, "admin", adminPassword, new HashSet<Institute>(),
-                                UserType.SUPERADMIN));
+                Institute strassenwesen = new Institute("Straßenwesen");
+                instituteRepository.save(strassenwesen);
 
-                User user;
-                Set<Institute> instituteSet;
+                Institute luftverkehr = new Institute("Luftverkehr");
+                instituteRepository.save(luftverkehr);
 
-                for (Institute institute : institutes) {
-                        instituteSet = new HashSet<>();
+                Set<Token> uebungTokens = new HashSet<>();
+                Token defaultTokenUebung = new Token("O", true);
+                uebungTokens.add(defaultTokenUebung);
+                uebungTokens.add(new Token("T", true));
+                uebungTokens.add(new Token("J", true));
+                uebungTokens.add(new Token("N", true));
+
+                ExerciseScheme uebung = new ExerciseScheme();
+                uebung.setName("Hausübung");
+                uebung.setDefaultValueToken(defaultTokenUebung);
+                uebung.setIsNumeric(false);
+                uebung.setTokens(uebungTokens);
+                uebung.setInstitutes(Set.of(verkehrsplanung, strassenwesen, bahnsysteme, luftverkehr));
+                exerciseSchemeRepository.save(uebung);
+
+                Set<Token> exkursionTokens = new HashSet<>();
+                Token defaultTokenExkursion = new Token("O", true);
+                exkursionTokens.add(defaultTokenExkursion);
+                exkursionTokens.add(new Token("J", true));
+
+                ExerciseScheme exkursion = new ExerciseScheme();
+                exkursion.setName("Exkursion");
+                exkursion.setDefaultValueToken(defaultTokenExkursion);
+                exkursion.setIsNumeric(false);
+                exkursion.setTokens(exkursionTokens);
+                exkursion.setInstitutes(Set.of(verkehrsplanung, strassenwesen, bahnsysteme, luftverkehr));
+                exerciseSchemeRepository.save(exkursion);
+
+                ExerciseScheme klausur = new ExerciseScheme();
+                klausur.setName("Klausur");
+                klausur.setDefaultValueNumeric(5.0);
+                klausur.setIsNumeric(true);
+                klausur.setInstitutes(Set.of(verkehrsplanung, strassenwesen, bahnsysteme, luftverkehr));
+                exerciseSchemeRepository.save(klausur);
+
+                PerformanceScheme pruefungsLeistungVerkehr = new PerformanceScheme();
+                pruefungsLeistungVerkehr.setName("Prüfungsleistung");
+                String plVerkehrCR = "function calculate(results) { \n";
+                plVerkehrCR += "    return results[6];\n";
+                plVerkehrCR += "}";
+                pruefungsLeistungVerkehr.setCalculationRule(plVerkehrCR);
+
+                PerformanceScheme studienLeistungVerkehr = new PerformanceScheme();
+                studienLeistungVerkehr.setName("Studienleistung");
+                String slVerkehrCR = "function calculate(results) { \n";
+                slVerkehrCR += "for(var i = 0; i < 5; i++){\n";
+                slVerkehrCR += "        if(results[i] != 'J' && results[i] != 'T'){\n";
+                slVerkehrCR += "                return 'nicht bestanden';\n";
+                slVerkehrCR += "        }\n";
+                slVerkehrCR += "}\n";
+                slVerkehrCR += "return 'bestanden'\n";
+                slVerkehrCR += "}";
+                studienLeistungVerkehr.setCalculationRule(slVerkehrCR);
+
+                PerformanceScheme bonusPunkteVerkehr = new PerformanceScheme();
+                bonusPunkteVerkehr.setName("Bonuspunkte");
+                String bpVerkehrCr = "function calculate(results) { \n";
+                bpVerkehrCr += "var count = 0;\n";
+                bpVerkehrCr += "for(var i = 0; i < 5; i++){\n";
+                bpVerkehrCr += "        if(results[i] != 'J' && results[i] != 'T'){\n";
+                bpVerkehrCr += "                return 0;\n";
+                bpVerkehrCr += "        }\n";
+                bpVerkehrCr += "        if(results[i] == 'T'){\n";
+                bpVerkehrCr += "            count++;\n";
+                bpVerkehrCr += "        }\n";
+                bpVerkehrCr += "}\n";
+                bpVerkehrCr += "return count;\n";
+                bpVerkehrCr += "}";
+                bonusPunkteVerkehr.setCalculationRule(bpVerkehrCr);
+
+                List<Exercise> exercisesVerkehrI = Arrays.asList(new Exercise("Hausübung 1-1", uebung, true),
+                                new Exercise("Hausübung 1-2", uebung, true),
+                                new Exercise("Hausübung 1-3", uebung, true),
+                                new Exercise("Hausübung 1-4", uebung, true), 
+                                new Exercise("Hausübung 1-5", uebung, true),
+                                new Exercise("Exkursion", exkursion, false),
+                                new Exercise("Klausur", klausur, false));
+
+                Lecture verkehrI = new Lecture();
+                verkehrI.setName("Verkehr I");
+                verkehrI.setInstitutes(Set.of(verkehrsplanung));
+                verkehrI.setExercises(exercisesVerkehrI);
+                verkehrI.setPerformanceSchemes(List.of(pruefungsLeistungVerkehr, studienLeistungVerkehr, bonusPunkteVerkehr));
+                lectureRepository.save(verkehrI);
+
+                List<Exercise> exercisesVerkehrII = Arrays.asList(new Exercise("Hausübung 2-1", uebung, true),
+                                new Exercise("Hausübung 2-2", uebung, true),
+                                new Exercise("Hausübung 2-3", uebung, true),
+                                new Exercise("Hausübung 2-4", uebung, true),
+                                new Exercise("Hausübung 2-5", uebung, true),
+                                new Exercise("Hausübung 2-6", uebung, true), new Exercise("Klausur", klausur, false));
+
+                Lecture verkehrII = new Lecture();
+                verkehrII.setName("Verkehr II");
+                verkehrII.setInstitutes(Set.of(verkehrsplanung));
+                verkehrII.setExercises(exercisesVerkehrII);
+                verkehrII.setPerformanceSchemes(List.of(pruefungsLeistungVerkehr, studienLeistungVerkehr, bonusPunkteVerkehr));
+                lectureRepository.save(verkehrII);
+
+                /* ########## BAHN ########## */
+
+                PerformanceScheme bahnBpruefungsleistung = new PerformanceScheme();
+                bahnBpruefungsleistung.setName("Prüfungsleistung");
+                String bahnBPlCr = "function calculate(results) { \n";
+                bahnBPlCr += "    return results[2];\n";
+                bahnBPlCr += "}";
+                bahnBpruefungsleistung.setCalculationRule(bahnBPlCr);
+
+                PerformanceScheme bahnBbonuspunkte = new PerformanceScheme();
+                bahnBbonuspunkte.setName("Prüfungsleistung");
+                String bahnBBpCr = "function calculate(results) { \n";
+                bahnBBpCr += "    return 'platzhalter';\n";
+                bahnBBpCr += "}";
+                bahnBbonuspunkte.setCalculationRule(bahnBBpCr);
+
+                List<Exercise> exercisesBahnB = Arrays.asList(new Exercise("Entwurf", uebung, true),
+                                new Exercise("Abgabekolloquium", uebung, true),
+                                new Exercise("Klausur", klausur, false));
+
+                Lecture bahnB = new Lecture();
+                bahnB.setName("Bahn B");
+                bahnB.setInstitutes(Set.of(bahnsysteme));
+                bahnB.setExercises(exercisesBahnB);
+                bahnB.setPerformanceSchemes(List.of(bahnBpruefungsleistung, bahnBbonuspunkte));
+                lectureRepository.save(bahnB);
+
+                PerformanceScheme ebwPerformanceScheme = new PerformanceScheme();
+                ebwPerformanceScheme.setName("Prüfungsleistung");
+                String ebwCalculationRule = "function calculate(results) { \n";
+                ebwCalculationRule += "    return results[0];\n";
+                ebwCalculationRule += "}";
+                ebwPerformanceScheme.setCalculationRule(ebwCalculationRule);
+
+                Lecture ebwI = new Lecture();
+                ebwI.setName("EBW I");
+                ebwI.setInstitutes(Set.of(bahnsysteme));
+                ebwI.setExercises(Arrays.asList(new Exercise("mdl. Klausur", klausur, false)));
+                ebwI.setPerformanceSchemes(Arrays.asList(ebwPerformanceScheme));
+                lectureRepository.save(ebwI);
+
+                Lecture ebwII = new Lecture();
+                ebwII.setName("EBW II");
+                ebwII.setInstitutes(Set.of(bahnsysteme));
+                ebwII.setExercises(Arrays.asList(new Exercise("mdl. Klausur", klausur, false)));
+                ebwII.setPerformanceSchemes(Arrays.asList(ebwPerformanceScheme));
+                lectureRepository.save(ebwII);
+
+                LOGGER.info("refilling Database done.");
+        }
+
+        private void refillUsers() {
+                User currentUser = authenticationService.currentUser();
+                userRepository.deleteAll();
+                userRepository.save(currentUser);
+
+                Integer numUsers = numUsersField.getValue();
+
+                if (numUsers == null || numUsers == 0) {
+                        return;
+                }
+
+                for (Institute institute : instituteRepository.findAll()) {
+                        Set<Institute> instituteSet = new HashSet<>();
                         instituteSet.add(institute);
 
-                        user = new User();
+                        String password = passwordEncoder.encode("password");
+
+                        User user = new User();
                         user.setType(UserType.ADMIN);
                         user.setEmailAddress("admin@" + institute.getName().toLowerCase() + ".de");
                         user.setFirstName("admin");
@@ -120,7 +298,7 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
                         user.setInstitutes(instituteSet);
                         userRepository.save(user);
 
-                        for (int i = 1; i <= 3; i++) {
+                        for (int i = 1; i <= numUsers; i++) {
                                 user = new User();
                                 user.setType(UserType.HIWI);
                                 user.setEmailAddress("hiwi" + i + "@" + institute.getName().toLowerCase() + ".de");
@@ -140,105 +318,6 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
                                 userRepository.save(user);
                         }
                 }
-
-                Set<Token> tokenSet1;
-                ExerciseScheme exerciseScheme;
-                Lecture lecture;
-
-                tokenSet1 = new HashSet<>();
-                Token defaultToken = new Token("O", true);
-                tokenSet1.add(defaultToken);
-                tokenSet1.add(new Token("T", true));
-                tokenSet1.add(new Token("J", true));
-                tokenSet1.add(new Token("N", true));
-
-                exerciseScheme = new ExerciseScheme();
-                exerciseScheme.setName("Hausübung");
-                exerciseScheme.setDefaultValueToken(defaultToken);
-                exerciseScheme.setIsNumeric(false);
-                exerciseScheme.setTokens(tokenSet1);
-                exerciseScheme.setInstitutes(Set.of(institutes.get(0), institutes.get(1)));
-                exerciseSchemeRepository.save(exerciseScheme);
-
-                tokenSet1 = new HashSet<>();
-                tokenSet1.add(new Token("O", true));
-                tokenSet1.add(new Token("J", true));
-
-                exerciseScheme = new ExerciseScheme();
-                exerciseScheme.setName("Exkursion");
-                exerciseScheme.setDefaultValueToken(defaultToken);
-                exerciseScheme.setIsNumeric(false);
-                exerciseScheme.setTokens(tokenSet1);
-                exerciseScheme.setInstitutes(Set.of(institutes.get(0)));
-                exerciseSchemeRepository.save(exerciseScheme);
-
-                exerciseScheme = new ExerciseScheme();
-                exerciseScheme.setName("Klausur");
-                exerciseScheme.setDefaultValueNumeric(5.0);
-                exerciseScheme.setIsNumeric(true);
-                exerciseScheme.setInstitutes(Set.of(institutes.get(0)));
-                exerciseSchemeRepository.save(exerciseScheme);
-
-                List<ExerciseScheme> exerciseSchemes = exerciseSchemeRepository.findAll();
-
-                List<Exercise> exerciseList = Arrays.asList(new Exercise("Übung 1", exerciseSchemes.get(0), true),
-                                new Exercise("Übung 2", exerciseSchemes.get(0), true),
-                                new Exercise("Übung 3", exerciseSchemes.get(0), true),
-                                new Exercise("Übung 4", exerciseSchemes.get(0), true),
-                                new Exercise("Übung 5", exerciseSchemes.get(0), true),
-                                new Exercise("Exkursion", exerciseSchemes.get(1), false),
-                                new Exercise("Klausur", exerciseSchemes.get(2), false));
-
-                String defaultValue = "function calculate(results) { \n";
-                defaultValue += "     \n";
-                defaultValue += "    return 'nicht definiert';\n";
-                defaultValue += "}";
-
-                PerformanceScheme pruefungsLeistung = new PerformanceScheme();
-                pruefungsLeistung.setName("Prüfungsleistung");
-                pruefungsLeistung.setCalculationRule(defaultValue);
-
-                PerformanceScheme studienLeistung = new PerformanceScheme();
-                studienLeistung.setName("Studienleistung");
-                studienLeistung.setCalculationRule(defaultValue);
-
-                lecture = new Lecture();
-                lecture.setName("Verkehr I");
-                lecture.setInstitutes(Set.of(institutes.get(0)));
-                lecture.setExercises(exerciseList);
-                lecture.setPerformanceSchemes(List.of(pruefungsLeistung, studienLeistung));
-                lectureRepository.save(lecture);
-
-                exerciseList = Arrays.asList(new Exercise("Übung 1", exerciseSchemes.get(0), true),
-                                new Exercise("Übung 2", exerciseSchemes.get(0), true),
-                                new Exercise("Übung 3", exerciseSchemes.get(0), true),
-                                new Exercise("Übung 4", exerciseSchemes.get(0), true),
-                                new Exercise("Übung 5", exerciseSchemes.get(0), true),
-                                new Exercise("Übung 6", exerciseSchemes.get(0), true),
-                                new Exercise("Klausur", exerciseSchemes.get(2), false));
-
-                lecture = new Lecture();
-                lecture.setName("Verkehr II");
-                lecture.setInstitutes(Set.of(institutes.get(0)));
-                lecture.setExercises(exerciseList);
-                lecture.setPerformanceSchemes(List.of(pruefungsLeistung, studienLeistung));
-                lectureRepository.save(lecture);
-
-                exerciseList = Arrays.asList(new Exercise("Übung 1", exerciseSchemes.get(0), true),
-                                new Exercise("Übung 2", exerciseSchemes.get(0), true),
-                                new Exercise("Übung 3", exerciseSchemes.get(0), true),
-                                new Exercise("Übung 4", exerciseSchemes.get(0), true),
-                                new Exercise("Übung 6", exerciseSchemes.get(0), true),
-                                new Exercise("Klausur", exerciseSchemes.get(2), false));
-
-                lecture = new Lecture();
-                lecture.setName("Bahn B");
-                lecture.setInstitutes(Set.of(institutes.get(1)));
-                lecture.setExercises(exerciseList);
-                lecture.setPerformanceSchemes(List.of(pruefungsLeistung, studienLeistung));
-                lectureRepository.save(lecture);
-
-                LOGGER.info("refilling Database done.");
         }
 
         private void refillGrades() {
@@ -251,7 +330,7 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
                 int currentGrade = 0;
                 int matrInt = 1524750;
 
-                if(lectures.size() == 0 || numGrades == null){
+                if (lectures.size() == 0 || numGrades == null) {
                         return;
                 }
 

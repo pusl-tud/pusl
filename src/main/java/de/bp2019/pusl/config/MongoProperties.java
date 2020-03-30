@@ -9,9 +9,39 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties("pusl.mongo")
 public class MongoProperties {
+    
+    private MongoProperties(){}
+    
     private String address;
     private String port;
     private String dbName;
+    private String username;
+    private String password;
+    private String adminDb;
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return this.password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getAdminDb() {
+        return this.adminDb;
+    }
+
+    public void setAdminDb(String adminDb) {
+        this.adminDb = adminDb;
+    }
 
     public String getAddress() {
         return this.address;

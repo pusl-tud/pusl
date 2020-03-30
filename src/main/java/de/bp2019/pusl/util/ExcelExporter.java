@@ -20,6 +20,8 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 
@@ -70,6 +72,13 @@ public class ExcelExporter<T> {
      * @author Leon Chemnitz
      */
     public void createResource(OutputStream outputStream, VaadinSession vaadinSession) {
+        if (vaadinSession != null) {
+            vaadinSession.lock();
+            Authentication authentication = vaadinSession.getAttribute(Authentication.class);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            vaadinSession.unlock();
+        }
+
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet worksheet = workbook.createSheet();
 
@@ -95,11 +104,11 @@ public class ExcelExporter<T> {
                 XSSFCell cell = row.createCell(j);
 
                 String value = valueProviders.get(j).apply(items.get(i));
-                if(NumberUtils.isDigits(value)){
+                if (NumberUtils.isDigits(value)) {
                     cell.setCellValue(Integer.parseInt(value));
-                }else if(NumberUtils.isParsable(value)) { 
+                } else if (NumberUtils.isParsable(value)) {
                     cell.setCellValue(Double.parseDouble(value));
-                }else{
+                } else {
                     cell.setCellValue(value);
                 }
             }

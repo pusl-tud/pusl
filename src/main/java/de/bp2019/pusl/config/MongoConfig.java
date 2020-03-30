@@ -6,9 +6,11 @@ import java.util.Collection;
 import java.util.List;
 
 import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.MongoClientSettings.Builder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -34,10 +36,22 @@ class MongoConfig extends AbstractMongoClientConfiguration {
 
   @Override
   public MongoClient mongoClient() {
-    MongoClientSettings settings = MongoClientSettings.builder()
-        .applyToClusterSettings(builder -> builder.hosts(
-            Arrays.asList(new ServerAddress(mongoProperties.getAddress(), Integer.valueOf(mongoProperties.getPort())))))
-        .build();
+    String address = mongoProperties.getAddress();
+    int port = Integer.valueOf(mongoProperties.getPort());
+    String username = mongoProperties.getUsername();
+    String password = mongoProperties.getPassword();
+    String adminDB = mongoProperties.getAdminDb();
+
+    Builder settingsBuilder = MongoClientSettings
+        .builder()
+    .applyToClusterSettings(builder -> builder.hosts(
+        Arrays.asList(new ServerAddress(address, port))));
+
+    if(!username.equals("")){
+      settingsBuilder = settingsBuilder.credential(MongoCredential.createCredential(username, adminDB, password.toCharArray()));
+    }
+    
+    MongoClientSettings settings = settingsBuilder.build();
 
     return MongoClients.create(settings);
   }

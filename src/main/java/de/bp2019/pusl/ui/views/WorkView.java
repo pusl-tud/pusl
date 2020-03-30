@@ -25,6 +25,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.VaadinSession;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Exercise;
@@ -134,7 +138,10 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         showGradesHeader.add(endDateFilter, 1);
 
         ExcelExporter<Grade> excelExporter = createExcelExporter();
-        Anchor download = new Anchor(new StreamResource("noten.xlsx", excelExporter::createResource), "");
+        VaadinSession.getCurrent().setAttribute(Authentication.class, SecurityContextHolder.getContext().getAuthentication());
+        Anchor download = new Anchor(new StreamResource("noten.xlsx", (stream, session) -> {
+            excelExporter.createResource(stream,session);
+        }), "");
         download.getElement().setAttribute("download", true);
         Button downloadButton = new Button("Download Excel");
         downloadButton.setWidthFull();
