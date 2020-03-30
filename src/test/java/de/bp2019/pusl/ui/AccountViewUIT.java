@@ -84,6 +84,7 @@ public class AccountViewUIT extends BaseUIT {
             User oldUser = login(type);
             ObjectId id = oldUser.getId();
             String password = oldUser.getPassword();
+            String email = oldUser.getEmailAddress();
 
             goToURL(AccountView.ROUTE);
         
@@ -91,16 +92,11 @@ public class AccountViewUIT extends BaseUIT {
             LOGGER.info("first name: " + firstName);
             String lastName = RandomStringUtils.randomAlphanumeric(14);
             LOGGER.info("last name: " + lastName);
-            String email = RandomStringUtils.randomAlphanumeric(14) + "@" + RandomStringUtils.randomAlphanumeric(14)
-                    + ".de";
-            LOGGER.info("email address: " + email);
     
             clearFieldById("firstName");
             findElementById("firstName").sendKeys(firstName);
             clearFieldById("lastName");
             findElementById("lastName").sendKeys(lastName);
-            clearFieldById("email");
-            findElementById("email").sendKeys(email);
     
             findButtonContainingText("Änderungen speichern").click();
     

@@ -70,6 +70,7 @@ public class GradeServiceIT {
     public void cleanUp() {
         instituteRepository.deleteAll();
         gradeRepository.deleteAll();
+        lectureRepository.deleteAll();
     }
 
     /**
