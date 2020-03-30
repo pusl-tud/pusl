@@ -63,9 +63,9 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
     /**
      * Save one Grade
      *
-     * @param user to persist
+     * @param grade to persist
      * @author Leon Chemnitz
-     * @throws UnauthorizedException
+     * @throws UnauthorizedException if user not authorized to access
      */
     public void save(Grade grade) throws UnauthorizedException {
         LOGGER.info("saving grade");
@@ -84,7 +84,7 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
      *
      * @param grade to delete
      * @author Leon Chemnitz
-     * @throws UnauthorizedException
+     * @throws UnauthorizedException if user not authorized to access
      */
     public void delete(Grade grade) throws UnauthorizedException {
         LOGGER.info("deleting grade");
@@ -105,8 +105,8 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
      * @param id Id to search for
      * @return found Grade with matching Id, null if none is found
      * @author Leon Chemnitz
-     * @throws DataNotFoundException
-     * @throws UnauthorizedException
+     * @throws DataNotFoundException if entity not found in database
+     * @throws UnauthorizedException if user not authorized to access
      */
     public Grade getById(String id) throws DataNotFoundException, UnauthorizedException {
         LOGGER.info("checking if grade with id " + id + " is present");
@@ -134,8 +134,8 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
     /**
      * Check if current user is authorized to access the {@link Grade}
      * 
-     * @param grade
-     * @return
+     * @param grade entity to check
+     * @return true if authorized
      * @author Leon Chemnitz
      */
     private boolean userIsAuthorized(Grade grade) {
@@ -202,8 +202,8 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
     /**
      * Build efficient Query criteria matching the filter
      * 
-     * @param filter
-     * @return
+     * @param filter Query filter
+     * @return Query criteria
      * @author Leon Chemnitz
      */
     private Criteria buildCriteria(GradeFilter filter) {
@@ -264,8 +264,8 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
     /**
      * Check if MatrNumber is valid with the validation algorithm of TU Darmstadt
      * 
-     * @param grade
-     * @return
+     * @param grade entity to check
+     * @return true if valid
      * @author Leon Chemnitz
      */
     public static boolean gradeIsValid(Grade grade) {

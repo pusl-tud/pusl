@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import de.bp2019.pusl.ui.components.GradeComposer;
 
 /**
  * A Filter used to query {@link Grade}s. Used in {@link GradeComposer}. Not a

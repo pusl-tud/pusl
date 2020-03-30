@@ -21,9 +21,9 @@ public final class Utils {
     /**
      * Checks whether a class implements a given interface
      * 
-     * @param clazz
-     * @param interfaze
-     * @return
+     * @param clazz class to check
+     * @param interfaze interface
+     * @return true if implements
      * @author Leon Chemnitz
      */
     public static boolean implementsInterface(Class<?> clazz, Class<?> interfaze) {
@@ -38,10 +38,10 @@ public final class Utils {
     /**
      * Checks if a collection contains any Elements of another collection
      * 
-     * @param <T>
-     * @param col1
-     * @param col2
-     * @return
+     * @param <T> type of entity
+     * @param col1 collection 1
+     * @param col2 Collection 2
+     * @return true if contains any
      * @author Leon Chemnitz
      */
     public static <T> boolean containsAny(Collection<T> col1, Collection<T> col2) {
@@ -56,9 +56,9 @@ public final class Utils {
     /**
      * Generate a random Date between two dates
      * 
-     * @param start
-     * @param end
-     * @return
+     * @param start inclusive start
+     * @param end exclusive end
+     * @return random LocalDate
      * @author Leon Chemnitz
      */
     public static LocalDate randomDateBetween(LocalDate start, LocalDate end) {
@@ -72,8 +72,8 @@ public final class Utils {
     /**
      * Converts a LocalDate to a Date
      * 
-     * @param localDate
-     * @return
+     * @param localDate to convert
+     * @return converted Date
      * @author Leon Chemnitz
      */
     public static Date localDateToDate(LocalDate localDate) {
@@ -88,8 +88,8 @@ public final class Utils {
      * Checks wether a given String is a valid MatrikelNumber with the validation
      * algorithm of TU Darmstadt
      * 
-     * @param m
-     * @return
+     * @param m matrNumber to check
+     * @return true if valid
      * @author Leon Chemnitz
      */
     public static boolean isMatrNumber(String m) {
@@ -111,6 +111,15 @@ public final class Utils {
         return false;
     }
 
+    
+    /**
+     * Checks wether a given String is a valid MatrikelNumber with the validation
+     * algorithm of TU Darmstadt
+     * 
+     * @param m matrNumber to check
+     * @return true if valid
+     * @author Leon Chemnitz
+     */
     public static boolean isMatrNumber(int m) {
         return isMatrNumber(Integer.toString(m));
     }

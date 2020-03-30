@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.GradeFilter;
 import de.bp2019.pusl.service.GradeService;
+import de.bp2019.pusl.ui.views.WorkView;
 
 /**
  * Statefull bean serving {@link Grade}s filtered by a {@link GradeFilter}. Used

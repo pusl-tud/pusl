@@ -28,7 +28,7 @@ import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 /**
  * Used to create Excel Sheets. Has an API similar to vaadin Grid
  * 
- * @param <T>
+ * @param <T> type of entity exportes
  * @author Luca Dinies, Leon Chemnitz
  */
 public class ExcelExporter<T> {
@@ -46,8 +46,8 @@ public class ExcelExporter<T> {
     /**
      * Add Column to the sheet
      * 
-     * @param header
-     * @param valueProvider
+     * @param header title of header
+     * @param valueProvider function to convert field of type to string
      * @author Leon Chemnitz
      */
     public void addColumn(String header, ValueProvider<T, String> valueProvider) {
@@ -67,8 +67,8 @@ public class ExcelExporter<T> {
     /**
      * Used to Write to a StreamResource
      * 
-     * @param outputStream
-     * @param vaadinSession
+     * @param outputStream outputStream to write to
+     * @param vaadinSession vaadin session containing authentication data
      * @author Leon Chemnitz
      */
     public void createResource(OutputStream outputStream, VaadinSession vaadinSession) {

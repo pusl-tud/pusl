@@ -5,7 +5,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
  * Model of a PerformanceScheme always an embeded document of {@link Lecture}
- * therefor not a Database Entity. Used to create {@link Performace}s
+ * therefor not a Database Entity. Used to create {@link Performance}s
  * 
  * @author Leon Chemnitz
  */

@@ -23,6 +23,7 @@ import de.bp2019.pusl.ui.components.GradeComposer;
 import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
 import de.bp2019.pusl.util.exceptions.UnauthorizedException;
+import de.bp2019.pusl.ui.views.WorkView;
 
 /**
  * Dialog to edit a {@link Grade}. Used in {@link WorkView}

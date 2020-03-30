@@ -43,10 +43,10 @@ public class CalculationService {
      * Calulates the performances of students with matrNumbers given as argument.
      * Looks up all relevant {@link Grade}s from Database.
      * 
-     * @param matrNumbers
-     * @param lecture
-     * @param performanceScheme
-     * @return
+     * @param matrNumbers list of matrNumbers to evaluate
+     * @param lecture lecture to calculate
+     * @param performanceScheme performanceScheme to calculate
+     * @return list of calculated performances
      * @author Leon Chemnitz
      */
     public List<Performance> calculatePerformances(List<String> matrNumbers, Lecture lecture,
@@ -69,10 +69,10 @@ public class CalculationService {
      * Calculate a single perfomance. Looks up all relevant {@link Grade}s from
      * Database.
      * 
-     * @param matrNumber
-     * @param lecture
-     * @param performanceScheme
-     * @return
+     * @param matrNumber matrNumber to evaluate
+     * @param lecture lecture to calculate
+     * @param performanceScheme performanceScheme to calculate
+     * @return resulting performance
      * @author Leon Chemnitz
      */
     public Performance calculatePerformance(String matrNumber, Lecture lecture, PerformanceScheme performanceScheme) {
@@ -113,9 +113,9 @@ public class CalculationService {
 
     /**
      * 
-     * @param script
-     * @param grades
-     * @return
+     * @param script JS calculation rule
+     * @param grades exercise grades
+     * @return calculation result
      * @author Leon Chemnitz
      */
     private String calculate(String script, Object[] grades) {

@@ -48,8 +48,8 @@ public class ExerciseSchemeService extends AbstractDataProvider<ExerciseScheme, 
      * @param id to search for
      * @return found {@link ExerciseScheme} with maching Id
      * @author Leon Chemnitz
-     * @throws DataNotFoundException
-     * @throws UnauthorizedException
+     * @throws DataNotFoundException if entity not found in database
+     * @throws UnauthorizedException if user not authorized to access
      */
     public ExerciseScheme getById(String id) throws DataNotFoundException, UnauthorizedException {
         LOGGER.info("checking if exerciseScheme with id " + id + " is present");
@@ -78,7 +78,7 @@ public class ExerciseSchemeService extends AbstractDataProvider<ExerciseScheme, 
      * 
      * @param exerciseScheme to persist
      * @author Leon Chemnitz
-     * @throws UnauthorizedException
+     * @throws UnauthorizedException if user not authorized to access
      */
     public void save(ExerciseScheme exerciseScheme) throws UnauthorizedException {
         LOGGER.info("saving lecture");
@@ -97,7 +97,7 @@ public class ExerciseSchemeService extends AbstractDataProvider<ExerciseScheme, 
      *
      * @param exerciseScheme to delete
      * @author Leon Chemnitz
-     * @throws UnauthorizedException
+     * @throws UnauthorizedException if user not authorized to access
      */
     public void delete(ExerciseScheme exerciseScheme) throws UnauthorizedException {
         LOGGER.info("deleting lecture");
@@ -114,8 +114,8 @@ public class ExerciseSchemeService extends AbstractDataProvider<ExerciseScheme, 
     /**
      * Check if current user is authorized to access the {@link ExerciseScheme}
      * 
-     * @param exerciseScheme
-     * @return
+     * @param exerciseScheme entity to check
+     * @return true if authorized
      * @author Leon Chemnitz
      */
     private boolean userIsAuthorized(ExerciseScheme exerciseScheme) {
@@ -142,9 +142,9 @@ public class ExerciseSchemeService extends AbstractDataProvider<ExerciseScheme, 
      * Id from the check. This is neccessairy for updating an existing
      * {@link ExerciseScheme}.
      * 
-     * @param name
-     * @param id
-     * @return
+     * @param name name to check
+     * @param id current user id
+     * @return true if available
      * @author Leon Chemnitz
      */
     public boolean checkNameAvailable(String name, Optional<ObjectId> id) {

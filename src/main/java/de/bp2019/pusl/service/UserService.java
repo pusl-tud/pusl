@@ -55,7 +55,7 @@ public class UserService extends AbstractDataProvider<User, String> {
      *
      * @param user to persist
      * @author Leon Chemnitz
-     * @throws UnauthorizedException
+     * @throws UnauthorizedException if user not authorized to access
      */
     public void save(User user) throws UnauthorizedException {
         LOGGER.info("saving user");
@@ -74,7 +74,7 @@ public class UserService extends AbstractDataProvider<User, String> {
      *
      * @param user to delete
      * @author Leon Chemnitz
-     * @throws UnauthorizedException
+     * @throws UnauthorizedException if user not authorized to access
      */
     public void delete(User user) throws UnauthorizedException {
         LOGGER.info("deleting user");
@@ -95,8 +95,8 @@ public class UserService extends AbstractDataProvider<User, String> {
      * @param id Id to search for
      * @return found User with matching Id, null if none is found
      * @author Leon Chemnitz
-     * @throws DataNotFoundException
-     * @throws UnauthorizedException
+     * @throws DataNotFoundException if entity not found in database
+     * @throws UnauthorizedException if user not authorized to access
      */
     public User getById(String id) throws DataNotFoundException, UnauthorizedException {
         LOGGER.info("checking if user with id " + id + " is present");
@@ -141,8 +141,8 @@ public class UserService extends AbstractDataProvider<User, String> {
     /**
      * Check if current user is authorized to access the {@link User}
      * 
-     * @param user
-     * @return
+     * @param user entity to check
+     * @return true if authorized
      * @author Leon Chemnitz
      */
     private boolean userIsAuthorized(User user) {
@@ -173,9 +173,9 @@ public class UserService extends AbstractDataProvider<User, String> {
      * Database. Also takes an id parameter which excludes the entity with matching
      * Id from the check. This is neccessairy for updating an existing {@link User}.
      * 
-     * @param name
-     * @param id
-     * @return
+     * @param email email to check
+     * @param id id of current user
+     * @return true if available
      * @author Leon Chemnitz
      */
     public boolean checkEmailAvailable(String email, Optional<ObjectId> id) {
@@ -202,9 +202,8 @@ public class UserService extends AbstractDataProvider<User, String> {
     /**
      * Returns all the UserTypes the current User is allowed to act upon.
      * 
-     * @return
+     * @return list of user types
      * @author Leon Chemnitz
-     * @throws UnauthorizedException
      */
     public List<UserType> getUserTypes() {
         UserType currentUserType = authenticationService.currentUserType();
@@ -229,9 +228,9 @@ public class UserService extends AbstractDataProvider<User, String> {
 
     /**
      * 
-     * @param query
-     * @param filter
-     * @return
+     * @param query Query
+     * @param institutes query filter
+     * @return num of hiwis
      * @author Leon Chemnitz
      */
     public int sizeHiwis(Query<User, String> query, Set<Institute> institutes) {
@@ -285,9 +284,9 @@ public class UserService extends AbstractDataProvider<User, String> {
 
     /**
      * 
-     * @param query
-     * @param filter
-     * @return
+     * @param query Query
+     * @param institutes query filter
+     * @return stream of fetched users
      * @author Leon Chemnitz
      */
     public Stream<User> fetchHiwis(Query<User, String> query, Set<Institute> institutes) {

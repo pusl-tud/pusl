@@ -28,9 +28,9 @@ public final class ExcelUtil {
     /**
      * Reads one column from an excel sheet and returns it as a list of strings
      * 
-     * @param inputStream
-     * @param column
-     * @return
+     * @param inputStream Excel file as input stream
+     * @param column index of column to read
+     * @return read cell entries
      * @author Leon Chemnitz, Luca Dinies
      */
     public static List<String> readColumnToList(InputStream inputStream, int column) {

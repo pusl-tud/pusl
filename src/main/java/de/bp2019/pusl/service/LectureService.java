@@ -47,8 +47,8 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
      * @param id to search for
      * @return found {@link Lecture} with maching Id
      * @author Leon Chemnitz
-     * @throws DataNotFoundException
-     * @throws UnauthorizedException
+     * @throws DataNotFoundException if entity not found in database
+     * @throws UnauthorizedException if user not authorized to access
      */
     public Lecture getById(String id) throws DataNotFoundException, UnauthorizedException {
         LOGGER.info("checking if lecture with id " + id + " is present");
@@ -78,7 +78,7 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
      * 
      * @param lecture to persist
      * @author Leon Chemnitz
-     * @throws UnauthorizedException
+     * @throws UnauthorizedException if user not authorized to access
      */
     public void save(Lecture lecture) throws UnauthorizedException {
         LOGGER.info("saving lecture");
@@ -98,7 +98,7 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
      *
      * @param lecture to delete
      * @author Leon Chemnitz
-     * @throws UnauthorizedException
+     * @throws UnauthorizedException if user not authorized to access
      */
     public void delete(Lecture lecture) throws UnauthorizedException {
         LOGGER.info("deleting lecture");
@@ -116,8 +116,8 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
     /**
      * Check if current user is authorized to access the {@link Lecture}
      * 
-     * @param lecture
-     * @return
+     * @param lecture entity to check
+     * @return true if authorized
      * @author Leon Chemnitz
      */
     private boolean userIsAuthorized(Lecture lecture) {
@@ -144,9 +144,9 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
      * Also takes an id parameter which excludes the entity with matching Id from
      * the check. This is neccessairy for updating an existing {@link Lecture}.
      * 
-     * @param name
-     * @param id
-     * @return
+     * @param name name to check
+     * @param id id of current user
+     * @return true if available
      * @author Leon Chemnitz
      */
     public boolean checkNameAvailable(String name, Optional<ObjectId> id) {

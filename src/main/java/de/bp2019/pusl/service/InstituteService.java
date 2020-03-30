@@ -48,8 +48,8 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
      * @param id Id to search for
      * @return found Institute with matching Id
      * @author Leon Chemnitz
-     * @throws UnauthorizedException
-     * @throws DataNotFoundException
+     * @throws UnauthorizedException if user not authorized to access
+     * @throws DataNotFoundException if entity not found in database
      */
     public Institute getById(String id) throws UnauthorizedException, DataNotFoundException {
         LOGGER.info("checking if institute with id " + id + " is present");
@@ -80,7 +80,7 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
      *
      * @param institute to persist
      * @author Leon Chemnitz
-     * @throws UnauthorizedException
+     * @throws UnauthorizedException if user not authorized to access
      */
     public void save(Institute institute) throws UnauthorizedException {
         LOGGER.info("saving institute");
@@ -99,7 +99,7 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
      *
      * @param institute to delete
      * @author Leon Chemnitz
-     * @throws UnauthorizedException
+     * @throws UnauthorizedException if user not authorized to access
      */
     public void delete(Institute institute) throws UnauthorizedException {
         LOGGER.info("deleting institute");
@@ -116,8 +116,8 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
     /**
      * Check if current user is authorized to access the {@link Institute}
      * 
-     * @param institute
-     * @return
+     * @param institute entity to check
+     * @return true if authorized
      * @author Leon Chemnitz
      */
     private boolean userIsAuthorized(Institute institute) {
@@ -141,9 +141,9 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
      * Id from the check. This is neccessairy for updating an existing
      * {@link Institute}.
      * 
-     * @param name
-     * @param id
-     * @return
+     * @param name name to check
+     * @param id id of current User
+     * @return true if available
      * @author Leon Chemnitz
      */
     public boolean checkNameAvailable(String name, Optional<ObjectId> id) {

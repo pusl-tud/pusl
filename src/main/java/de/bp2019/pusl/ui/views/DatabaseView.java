@@ -167,7 +167,7 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
                 PerformanceScheme studienLeistungVerkehr = new PerformanceScheme();
                 studienLeistungVerkehr.setName("Studienleistung");
                 String slVerkehrCR = "function calculate(results) { \n";
-                slVerkehrCR += "for(var i = 0; i < 5; i++){\n";
+                slVerkehrCR += "for(var i = 0; i < 6; i++){\n";
                 slVerkehrCR += "        if(results[i] != 'J' && results[i] != 'T'){\n";
                 slVerkehrCR += "                return 'nicht bestanden';\n";
                 slVerkehrCR += "        }\n";
@@ -180,7 +180,7 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
                 bonusPunkteVerkehr.setName("Bonuspunkte");
                 String bpVerkehrCr = "function calculate(results) { \n";
                 bpVerkehrCr += "var count = 0;\n";
-                bpVerkehrCr += "for(var i = 0; i < 5; i++){\n";
+                bpVerkehrCr += "for(var i = 0; i < 6; i++){\n";
                 bpVerkehrCr += "        if(results[i] != 'J' && results[i] != 'T'){\n";
                 bpVerkehrCr += "                return 0;\n";
                 bpVerkehrCr += "        }\n";

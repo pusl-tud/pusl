@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * Handle for all the MongoDB configuration in application.properties
  * 
- * @auhtor Leon Chemnitz
+ * @author Leon Chemnitz
  */
 @ConfigurationProperties("pusl.mongo")
 public class MongoProperties {
