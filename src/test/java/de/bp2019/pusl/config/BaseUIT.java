@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -57,7 +56,6 @@ import de.bp2019.pusl.ui.views.LoginView;
  * @author Leon Chemnitz
  */
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DependsOn({ "testProperties" })
 public abstract class BaseUIT {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseUIT.class);
 
@@ -96,6 +94,8 @@ public abstract class BaseUIT {
 
     @BeforeAll
     public static void startService() throws Exception {
+
+
         LOGGER.info("Starting Chromedriver service");
 
         service = new ChromeDriverService.Builder().usingDriverExecutable(findFile()).usingAnyFreePort().build();

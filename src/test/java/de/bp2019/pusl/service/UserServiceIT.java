@@ -100,14 +100,6 @@ public class UserServiceIT {
         assertThrows(UnauthorizedException.class, () -> userService.save(user));
         assertEquals(1, userRepository.count());
 
-        LOGGER.info("testing as ADMIN authorized");
-        userRepository.deleteAll();
-        admin.setInstitutes(Sets.newSet(institute));
-        userRepository.save(admin);
-        testUtils.authenticateAs(admin);
-        userService.save(user);
-        assertEquals(2, userRepository.count());
-        
         LOGGER.info("testing as WIMI unauthorized");
         userRepository.deleteAll();
         User wimi = testUtils.createUser(UserType.WIMI);
@@ -124,6 +116,14 @@ public class UserServiceIT {
         assertThrows(UnauthorizedException.class, () -> userService.save(user));
         assertEquals(1, userRepository.count());
 
+        LOGGER.info("testing as ADMIN authorized");
+        userRepository.deleteAll();
+        admin.setInstitutes(Sets.newSet(institute));
+        userRepository.save(admin);
+        testUtils.authenticateAs(admin);
+        userService.save(user);
+        assertEquals(2, userRepository.count());
+        
         LOGGER.info("test successful");
     }
 

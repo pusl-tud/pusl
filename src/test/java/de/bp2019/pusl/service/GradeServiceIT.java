@@ -166,6 +166,18 @@ public class GradeServiceIT {
         User admin = testUtils.authenticateAs(UserType.ADMIN);
         assertThrows(UnauthorizedException.class, () -> gradeService.save(grade));
         assertEquals(0, gradeRepository.count());
+        
+        LOGGER.info("testing as WIMI unauthorized");
+        gradeRepository.deleteAll();
+        User wimi = testUtils.authenticateAs(UserType.WIMI);
+        assertThrows(UnauthorizedException.class, () -> gradeService.save(grade));
+        assertEquals(0, gradeRepository.count());
+
+        LOGGER.info("testing as HIWI unauthorized");
+        gradeRepository.deleteAll();
+        User hiwi = testUtils.authenticateAs(UserType.HIWI);
+        assertThrows(UnauthorizedException.class, () -> gradeService.save(grade));
+        assertEquals(0, gradeRepository.count());
 
         LOGGER.info("testing as ADMIN authorized");
         gradeRepository.deleteAll();
@@ -175,12 +187,6 @@ public class GradeServiceIT {
         gradeService.save(grade);
         assertEquals(1, gradeRepository.count());
         
-        LOGGER.info("testing as WIMI unauthorized");
-        gradeRepository.deleteAll();
-        User wimi = testUtils.authenticateAs(UserType.WIMI);
-        assertThrows(UnauthorizedException.class, () -> gradeService.save(grade));
-        assertEquals(0, gradeRepository.count());
-        
         LOGGER.info("testing as WIMI authorized");
         gradeRepository.deleteAll();
         wimi.setInstitutes(Sets.newSet(institute));
@@ -188,12 +194,6 @@ public class GradeServiceIT {
         testUtils.authenticateAs(wimi);
         gradeService.save(grade);
         assertEquals(1, gradeRepository.count());
-
-        LOGGER.info("testing as HIWI not authorized");
-        gradeRepository.deleteAll();
-        User hiwi = testUtils.authenticateAs(UserType.HIWI);
-        assertThrows(UnauthorizedException.class, () -> gradeService.save(grade));
-        assertEquals(0, gradeRepository.count());
         
         LOGGER.info("testing HIWI authorized");
         gradeRepository.deleteAll();

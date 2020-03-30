@@ -90,14 +90,6 @@ public class ExerciseSchemeServiceIT {
         assertThrows(UnauthorizedException.class, () -> exerciseSchemeService.save(exerciseScheme));
         assertEquals(0, exerciseSchemeRepository.count());
 
-        LOGGER.info("testing as ADMIN authorized");
-        exerciseSchemeRepository.deleteAll();
-        admin.setInstitutes(Sets.newSet(institute));
-        userRepository.save(admin);
-        testUtils.authenticateAs(admin);
-        exerciseSchemeService.save(exerciseScheme);
-        assertEquals(1, exerciseSchemeRepository.count());
-
         LOGGER.info("testing as WIMI unauthorized");
         exerciseSchemeRepository.deleteAll();
         User wimi = testUtils.createUser(UserType.WIMI);
@@ -113,6 +105,14 @@ public class ExerciseSchemeServiceIT {
         testUtils.authenticateAs(hiwi);
         assertThrows(UnauthorizedException.class, () -> exerciseSchemeService.save(exerciseScheme));
         assertEquals(0, exerciseSchemeRepository.count());
+
+        LOGGER.info("testing as ADMIN authorized");
+        exerciseSchemeRepository.deleteAll();
+        admin.setInstitutes(Sets.newSet(institute));
+        userRepository.save(admin);
+        testUtils.authenticateAs(admin);
+        exerciseSchemeService.save(exerciseScheme);
+        assertEquals(1, exerciseSchemeRepository.count());
 
         LOGGER.info("test successful");
     }
