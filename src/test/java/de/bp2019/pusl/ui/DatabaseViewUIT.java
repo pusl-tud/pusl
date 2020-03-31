@@ -63,7 +63,7 @@ public class DatabaseViewUIT extends BaseUIT {
 
         goToURL(DatabaseView.ROUTE);
 
-        findButtonContainingText("Datenbank neu befüllen").click();
+        findButtonContainingText("Institute, Veranstaltungen & Übungsschemas generieren").click();
         findElementById("numUsers").sendKeys("3");
         findButtonContainingText("Nutzer generieren").click();
         findElementById("numGrades").sendKeys("50");
