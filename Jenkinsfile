@@ -13,6 +13,17 @@ pipeline {
                 '''
             }
         }
+  
+        stage ('Build') {
+            steps {
+                sh 'mvn clean install' 
+            }
+            post {
+                success {
+                    junit 'target/surefire-reports/**/*.xml' 
+                }
+            }
+        }
 
         stage ('OWASP Dependency-Check Vulnerabilities') {
             steps {
@@ -25,17 +36,6 @@ pipeline {
                 dependencyCheckPublisher pattern: 'dependency-check-report.xml'
             }
         } 
-  
-        stage ('Build') {
-            steps {
-                sh 'mvn clean install' 
-            }
-            post {
-                success {
-                    junit 'target/surefire-reports/**/*.xml' 
-                }
-            }
-        }
 
         stage('SonarQube analysis') {
             environment {
