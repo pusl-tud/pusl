@@ -15,7 +15,7 @@
   <properties>
     <java.version>11</java.version>
     <vaadin.version>14.1.16</vaadin.version>
-    <pusl.skipTests>true</pusl.skipTests>
+    <pusl.skipTests>false</pusl.skipTests>
   </properties>
   <dependencies>
     <dependency>
@@ -125,7 +125,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.0.0-M4</version>
         <configuration>
-          <skipTests>false</skipTests>
+          <skipTests>true</skipTests>
         </configuration>
       </plugin>
       <plugin>
@@ -222,39 +222,6 @@
       </dependencies>
       <build>
         <plugins>
-          <!-- Surefire is disabled to unify Unit-, Integration- and UI-tests with failsafe -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>3.0.0-M4</version>
-            <configuration>
-              <skipTests>false</skipTests>
-            </configuration>
-          </plugin>
-          <plugin>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <version>3.0.0-M4</version>
-            <configuration>
-              <skipTests>${pusl.skipTests}</skipTests>
-            </configuration>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>integration-test</goal>
-                  <goal>verify</goal>
-                </goals>
-                <configuration>
-                  <includes>
-                    <include>**/*Test.java</include>
-                    <include>**/*IT.java</include>
-                    <include>**/*UIT.java</include>
-                  </includes>
-                  <argLine>${failsafeArgLine}</argLine>
-                  <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
           <plugin>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>
