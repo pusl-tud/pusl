@@ -1,6 +1,6 @@
 language: java
-# sudo: true
-# dist: trusty
+os: linux
+dist: xenial
 jdk: openjdk11
 before_install:
   - chmod +x mvnw
@@ -11,7 +11,7 @@ addons:
   sonarcloud:
     organization: "pusl-tud"
     token:
-      secure: "hO+dWyRrtcNcwjh8x/k2XJfw5nTYCApEXSwE3UdFfU1I53quY89hFVbLhBIcD3V84zLcyO+FrSEQnNILtumTdRBxC5525TpSnmhM09oY7w9ZfS4dRTkuzj5C3ekqixLbN9k+XVQp5VZvTrR6Bijgc9hZVtv0B7Ce9XH+60jG2fxojydXBnAcWnFMRVXSBe/+NhHcgQHG1jkqsOYFDft0K7VE8kSb+YR2YCCwgwxQhc6gYmY51mC4iSDYhOgMej0MPAWHBdjHM7/3/K/CrapydxDzih+M+VhtnZfWXXJa1jPvo28QZ9CYxkP/o3zrNEUjIq1nhy1V+Qqd3OWhM2gAiUZQxFqPJEsaYUbDO/wOzl8mGVrDjbk4lrbA14Y+KuWCz2YSdV9y4hPcdap+H1Zrv35d8j4UIEfjxWo+FAEngpe6qRydut3F1yi/6EHMIyXn1so8n9wAT4lApbwD6pOBeICqf6rbUY4E7D0B50f4DtlE9NJJSiG9BoATnXsAnWGAsOBtgql9pWupLjh+A8BXHbchkkyQ3dLs3Ru3T09dtWcQfsveBIpWNyc0A3l/z6iiPKcPh6plcjhpOf1k2JHRuLlDwzcQHQZxyxByFFgaFN4iEP0CLzvR4eRcoLyQEfDeHkHlAWPg8L24nqJMJddK0TVFeXhLA0+ieyrd6y3xTEY="
+      secure: "GKU5cxwbtmbp5ZTy5TrINj3HVWJZQSrEjphGfmXisrBA1pyEHe/joOiL3JoxeKFf5pus/NzWegp4PzNyJPEEzt5MLnOId4/HSvr5+N+Jm0YkJvYy0hMrkUqU4R8A3LFMQIEyVsYrFe9f5LAklTODBsGChEm1IHA29klTud1htr/8Fmh6WNyJEL7VqsVsaO2BFj6gvGqkuGfZaUPn3M4G2UhF4f9ryTiBgdr3qDUmxmgVRyjp2tCNQPUGOFYt0RVrqhldjZe5I8ANGJnRhlTzE8FKk/Zjwd/y0wRjzU0GPSVXwrNZorS73fquTpYSNry1w2g6H+I18xTwbxHB2AQ+CVuIDMjYW6qw+dzOW+/cZxjnpTE0k1Uw1SbE9AoFzDdTfQXRvxQLR2ubyrdyFtZs3EU+S7MBwISFK+7mrg7EdWyG24RWbguw7WHCeik0TYDN6squK5P82t0orh46jqx58LNY82H+Z6RrqyFcQWXd1N5oxB0CL+VlBkZc+af9F/j43HZGY/8gtUKd7bIw0RqKdh2ThGNGvZRlkFWwpAZFLi0258AaHCV/Pma9ptjrnwnmJOk5Vhi7gv/WiiaDgvdaIdaUOPXs5HRaNgvVAzIQ+oYVW/AL9bktLYSgh0BMiBKDFWZMWsaNXE770Kzv4y+CFi9t6OpmHYU0kP+i5tAiuNM="
 
 script:
   - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
