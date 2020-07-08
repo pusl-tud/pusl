@@ -1,1 +1,6 @@
 language: java
+# sudo: true
+# dist: trusty
+jdk: openjdk11
+# before_install:
+#   - chmod +x mvnw
