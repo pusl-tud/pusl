@@ -160,35 +160,35 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
                 PerformanceScheme pruefungsLeistungVerkehr = new PerformanceScheme();
                 pruefungsLeistungVerkehr.setName("Prüfungsleistung");
                 String plVerkehrCR = "function calculate(results) { \n";
-                plVerkehrCR += "    return results[6];\n";
+                plVerkehrCR += "     return results[6];\n";
                 plVerkehrCR += "}";
                 pruefungsLeistungVerkehr.setCalculationRule(plVerkehrCR);
 
                 PerformanceScheme studienLeistungVerkehr = new PerformanceScheme();
                 studienLeistungVerkehr.setName("Studienleistung");
-                String slVerkehrCR = "function calculate(results) { \n";
-                slVerkehrCR += "for(var i = 0; i < 6; i++){\n";
-                slVerkehrCR += "        if(results[i] != 'J' && results[i] != 'T'){\n";
-                slVerkehrCR += "                return 'nicht bestanden';\n";
-                slVerkehrCR += "        }\n";
-                slVerkehrCR += "}\n";
-                slVerkehrCR += "return 'bestanden'\n";
+                String slVerkehrCR = "function calculate(results) {\n";
+                slVerkehrCR += "     for(var i = 0; i < 6; i++){\n";
+                slVerkehrCR += "          if(results[i] != 'J' && results[i] != 'T'){\n";
+                slVerkehrCR += "               return 'nicht bestanden';\n";
+                slVerkehrCR += "          }\n";
+                slVerkehrCR += "     }\n";
+                slVerkehrCR += "     return 'bestanden'\n";
                 slVerkehrCR += "}";
                 studienLeistungVerkehr.setCalculationRule(slVerkehrCR);
 
                 PerformanceScheme bonusPunkteVerkehr = new PerformanceScheme();
                 bonusPunkteVerkehr.setName("Bonuspunkte");
                 String bpVerkehrCr = "function calculate(results) { \n";
-                bpVerkehrCr += "var count = 0;\n";
-                bpVerkehrCr += "for(var i = 0; i < 6; i++){\n";
-                bpVerkehrCr += "        if(results[i] != 'J' && results[i] != 'T'){\n";
-                bpVerkehrCr += "                return 0;\n";
-                bpVerkehrCr += "        }\n";
-                bpVerkehrCr += "        if(results[i] == 'T'){\n";
-                bpVerkehrCr += "            count++;\n";
-                bpVerkehrCr += "        }\n";
-                bpVerkehrCr += "}\n";
-                bpVerkehrCr += "return count;\n";
+                bpVerkehrCr += "     var count = 0;\n";
+                bpVerkehrCr += "     for(var i = 0; i < 6; i++){\n";
+                bpVerkehrCr += "          if(results[i] != 'J' && results[i] != 'T'){\n";
+                bpVerkehrCr += "               return 0;\n";
+                bpVerkehrCr += "          }\n";
+                bpVerkehrCr += "          if(results[i] == 'T'){\n";
+                bpVerkehrCr += "               count++;\n";
+                bpVerkehrCr += "          }\n";
+                bpVerkehrCr += "     }\n";
+                bpVerkehrCr += "     return count;\n";
                 bpVerkehrCr += "}";
                 bonusPunkteVerkehr.setCalculationRule(bpVerkehrCr);
 
@@ -225,15 +225,15 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
 
                 PerformanceScheme bahnBpruefungsleistung = new PerformanceScheme();
                 bahnBpruefungsleistung.setName("Prüfungsleistung");
-                String bahnBPlCr = "function calculate(results) { \n";
-                bahnBPlCr += "    return results[2];\n";
+                String bahnBPlCr = "function calculate(results) {\n";
+                bahnBPlCr += "     return results[2];\n";
                 bahnBPlCr += "}";
                 bahnBpruefungsleistung.setCalculationRule(bahnBPlCr);
 
                 PerformanceScheme bahnBbonuspunkte = new PerformanceScheme();
                 bahnBbonuspunkte.setName("Prüfungsleistung");
-                String bahnBBpCr = "function calculate(results) { \n";
-                bahnBBpCr += "    return 'platzhalter';\n";
+                String bahnBBpCr = "function calculate(results) {\n";
+                bahnBBpCr += "     return 'platzhalter';\n";
                 bahnBBpCr += "}";
                 bahnBbonuspunkte.setCalculationRule(bahnBBpCr);
 
@@ -250,8 +250,8 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
 
                 PerformanceScheme ebwPerformanceScheme = new PerformanceScheme();
                 ebwPerformanceScheme.setName("Prüfungsleistung");
-                String ebwCalculationRule = "function calculate(results) { \n";
-                ebwCalculationRule += "    return results[0];\n";
+                String ebwCalculationRule = "function calculate(results) {\n";
+                ebwCalculationRule += "     return results[0];\n";
                 ebwCalculationRule += "}";
                 ebwPerformanceScheme.setCalculationRule(ebwCalculationRule);
 

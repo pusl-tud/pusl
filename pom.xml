@@ -9,13 +9,13 @@
   </parent>
   <groupId>de.bp2019</groupId>
   <artifactId>pusl</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <name>pusl</name>
   <description>Management system for the Institutes of Transportation at TU Darmstadt</description>
   <properties>
     <java.version>11</java.version>
     <vaadin.version>14.1.16</vaadin.version>
-    <pusl.skipTests>false</pusl.skipTests>
+    <pusl.skipTests>true</pusl.skipTests>
   </properties>
   <dependencies>
     <dependency>
@@ -43,6 +43,11 @@
       <artifactId>multiselect-combo-box-flow</artifactId>
       <version>2.3.0</version>
     </dependency>
+    <dependency>
+      <groupId>com.hilerio</groupId>
+      <artifactId>ace-widget</artifactId>
+      <version>1.4-Beta</version>
+   </dependency>
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>

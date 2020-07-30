@@ -45,6 +45,8 @@ public class HorizontalTabs<T extends Component> extends VerticalLayout {
      */
     public void addTab(String title, T component) {
         if (pages.isEmpty()) {
+            component.setVisible(true);
+        }else {
             component.setVisible(false);
         }
         Tab tab = new Tab(title);
@@ -129,10 +131,11 @@ public class HorizontalTabs<T extends Component> extends VerticalLayout {
             var selectedTab = tabsComponent.getSelectedTab();
 
             if (selectedTab != null) {
-                LOGGER.debug("changed tab selection to:" + selectedTab.getLabel());
+                LOGGER.debug("changed tab selection to: " + selectedTab.getLabel());
                 T selectedPage = titleToPages.get(selectedTab.getLabel());
 
                 pages.forEach(page -> page.setVisible(false));
+
                 selectedPage.setVisible(true);
             }
 
