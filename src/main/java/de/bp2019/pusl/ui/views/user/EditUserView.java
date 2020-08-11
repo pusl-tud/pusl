@@ -60,7 +60,7 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
         public static final String ROUTE = "admin/user";
 
         private UserService userService;
-        private InstituteService instituteService;        
+        private InstituteService instituteService;
         private PasswordEncoder passwordEncoder;
 
         /** Binder to bind the form Data to an Object */
@@ -144,7 +144,7 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                 actions.add(save);
                 actions.setHorizontalComponentAlignment(Alignment.END, save);
                 form.add(actions, 2);
-                
+
                 add(form);
 
                 /* ########### Data Binding and validation ########### */
@@ -169,21 +169,16 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                 binder.forField(userType).withValidator(ut -> ut != null, "Bitte Nutzer Typ wählen").bind(User::getType,
                                 User::setType);
 
-                Binding<User, String> passwordBinder = binder.forField(password)
+                Binding<User, String> passwordBinder = binder.forField(repeatPassword)
                                 .withValidator((enteredPassword, valueContext) -> {
 
-                                        if (userId.isPresent() && enteredPassword == "") {
+                                        if (userId.isPresent() && password.getValue() == "") {
                                                 /*
                                                  * User already exists and has entered no new password, therefore a new
                                                  * password is not needed
                                                  */
                                         } else {
-                                                if (enteredPassword.length() < 8) {
-                                                        return ValidationResult.error(
-                                                                        "Passwort muss länger als 8 Zeichen sein!");
-                                                }
-
-                                                if (!enteredPassword.equals(repeatPassword.getValue())) {
+                                                if (!enteredPassword.equals(password.getValue())) {
                                                         return ValidationResult
                                                                         .error("Passwörter stimmen nicht überein!");
                                                 }
@@ -195,6 +190,17 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                                                 user.setPassword(passwordEncoder.encode(pwd));
                                         }
                                 });
+
+                binder.forField(password).withValidator(enteredPassword -> {
+                        if (userId.isPresent() && enteredPassword == "") {
+                                return true;
+                        } else {
+                                passwordBinder.validate();
+                                return enteredPassword.length() >= 8;
+                        }
+                }, "Passwort muss länger als 8 Zeichen sein!").bind(pwd -> "", (user, pwd) -> {
+                        return;
+                });
 
                 /* ########### Listeners ########### */
 
@@ -226,7 +232,7 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                                         SuccessDialog.open("Nutzer erfolgreich gespeichert");
                                 } catch (UnauthorizedException e) {
                                         ErrorDialog.open("nicht authorisiert um Nutzer zu speichern!");
-                                } catch (DataNotFoundException e1) {                                        
+                                } catch (DataNotFoundException e1) {
                                         UI.getCurrent().navigate(ManageUsersView.ROUTE);
                                         ErrorDialog.open("Nutzer wurde nicht in Datenbank gefunden!");
                                 }
@@ -252,17 +258,17 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                 } else {
                         try {
                                 User fetchedUser;
-                                fetchedUser = userService.getById(idParameter);                                
+                                fetchedUser = userService.getById(idParameter);
                                 userId = Optional.of(fetchedUser.getId());
                                 binder.readBean(fetchedUser);
                         } catch (UnauthorizedException e) {
                                 event.rerouteTo(PuslProperties.ROOT_ROUTE);
-                                UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);      
+                                UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
                                 ErrorDialog.open("Nicht authorisiert um Nutzer zu bearbeiten!");
-                        } catch (DataNotFoundException e) {                   
-                                event.rerouteTo(PuslProperties.ROOT_ROUTE);       
-                                UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE); 
-                                ErrorDialog.open("Nitzer nicht in Datenbank gefunden!");    
+                        } catch (DataNotFoundException e) {
+                                event.rerouteTo(PuslProperties.ROOT_ROUTE);
+                                UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
+                                ErrorDialog.open("Nitzer nicht in Datenbank gefunden!");
                         }
                 }
         }
