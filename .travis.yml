@@ -10,7 +10,7 @@ install:
 - ./mvnw install -Dpusl.skipTests=true -Dmaven.javadoc.skip=true -B -V
 
 script:
-- mvn clean install
+- mvn install
 
 services:
 - mongodb
