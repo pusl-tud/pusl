@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -22,6 +23,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -49,9 +51,9 @@ import de.bp2019.pusl.ui.views.LoginView;
 /**
  * Base Class for UI tests. Starts Webdriver and fills database with one
  * {@link User} of each {@link UserType}. Also contains some utility functions.
- * Very Expensive! If you can test something with a Unit-Test or Integreation-Test instead, do that!
- * If something is unclear try searching for "selenium tutorial" on the
- * internet.
+ * Very Expensive! If you can test something with a Unit-Test or
+ * Integreation-Test instead, do that! If something is unclear try searching for
+ * "selenium tutorial" on the internet.
  * 
  * @author Leon Chemnitz
  */
@@ -119,26 +121,41 @@ public abstract class BaseUIT {
 
         baseUrl = testProperties.getBaseUrl() + port + "/";
 
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--no-sandbox");
-        options.addArguments("--window-size=1920,1080");
-        options.addArguments("--start-maximized");
-        if (testProperties.isHeadlessUiTests()) {
-            options.addArguments("--headless");
-        }
-        options.setExperimentalOption("useAutomationExtension", false);
-        options.addArguments("disable-infobars");
-        options.addArguments("--disable-extensions");
-        options.addArguments("--disable-gpu");
-        options.addArguments("--disable-dev-shm-usage");
-        
+        // ChromeOptions options = new ChromeOptions();
+        // options.addArguments("--no-sandbox");
+        // options.addArguments("--window-size=1920,1080");
+        // options.addArguments("--start-maximized");
+        // if (testProperties.isHeadlessUiTests()) {
+        // options.addArguments("--headless");
+        // }
+        // options.setExperimentalOption("useAutomationExtension", false);
+        // options.addArguments("disable-infobars");
+        // options.addArguments("--disable-extensions");
+        // options.addArguments("--disable-gpu");
+        // options.addArguments("--disable-dev-shm-usage");
+
         userRepository.deleteAll();
         instituteRepository.deleteAll();
         exerciseSchemeRepository.deleteAll();
         lectureRepository.deleteAll();
         gradeRepository.deleteAll();
 
-        driver = new RemoteWebDriver(service.getUrl(), options);
+        // driver = new RemoteWebDriver(service.getUrl(), options);
+
+        String URL = "https://" + "leonchemnitz1" + ":" + "w6qjjbMbyCMWmjsTXdWY" + "@hub-cloud.browserstack.com/wd/hub";
+
+        // Input capabilities
+        DesiredCapabilities caps = new DesiredCapabilities();
+        caps.setCapability("browserstack.local", "true");
+        caps.setCapability("browserstack.localIdentifier", System.getenv("BROWSERSTACK_LOCAL_IDENTIFIER"));
+        // Add other capabilities like browser name, version and os name, version
+        caps.setCapability("os_version", "10");
+        caps.setCapability("resolution", "1920x1080");
+        caps.setCapability("browser", "Chrome");
+        caps.setCapability("browser_version", "86.0 beta");
+        caps.setCapability("os", "Windows");
+
+        WebDriver driver = new RemoteWebDriver(new URL(URL), caps);
 
         driver.get(baseUrl);
 
@@ -291,7 +308,8 @@ public abstract class BaseUIT {
     }
 
     /**
-     * Login to application with given user. user must have been created with {@link TestUtils::createUser}
+     * Login to application with given user. user must have been created with
+     * {@link TestUtils::createUser}
      * 
      * @param user
      * @return
@@ -397,7 +415,6 @@ public abstract class BaseUIT {
         driver.findElement(By.xpath("//multiselect-combo-box[@id='" + id + "']")).sendKeys(Keys.ENTER);
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//vaadin-combo-box-overlay")));
     }
-
 
     /**
      * Find vaadin Password Field based on its CSS id

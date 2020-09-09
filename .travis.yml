@@ -9,6 +9,10 @@ services:
   - mongodb
 
 addons:
+  browserstack:
+    username: "leonchemnitz1"
+    access_key:
+      secure: "yXxNvKsa3/F0q6+ISlP2aPcJELly5/VKytacqBIz5TvGs2IxS65jp6/8yV6uHd5gd3uCRfB15ruFMh0Q+yLFha6rKondatpP4hVhu1126qtvRENqFtqdOyCB6lXHO/UalKKZmJd+s8Q//EoH/2S9P3LnEkKclywon0Ah8YfRzme3DS6404LvEKdFz9IylhdbnKwozTQn96UKY5ib5UjMaHak/ZGcDEA6TT/VR7KEAn2frqGY7e3fhj8sK6pgOvnfUclk5WoCTiN/w+DZhOKKWbI/rEoCu6rappLHWwiKGu1Pxm+XQuCUJUikQU2N5UG1wiDNLFfHsyW4Un3d6eS4i80PJtqIcyzjAJ61tIYOrw4+yIxiv6btAB6khazT34BZ/xhYPVfWxq4l4NB8in5Yz7qTFMXVbxpIVdnMJO3u1OQBWpgWdv9/SGGy/HXh0bV5i56OYUI2Dp4ieWxj1oJd+6KmXNdYJvbWHk6fJCInD7VI8M9jS5u4vy/Fr/s19+32hF9sFgz7BvaSZv0z0gWVemSUjWA2j5SW5EXfvu+vXu4a4LUPyZi4aYZmXn0XJr8ohUgD0CaqwcDU9LG23G4yER2BBkn3qWOgdE9hZ+XHg/6Tj3o3BdQNxp9HLnfQaLKU6zejWFaoHMYJp6jIlieN+fNyKk1laasiEQNiNgBJbp8="
   sonarcloud:
     organization: "pusl-tud"
     token:
