@@ -6,8 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import com.browserstack.local.Local;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -57,12 +60,12 @@ import de.bp2019.pusl.ui.views.LoginView;
  * 
  * @author Leon Chemnitz
  */
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public abstract class BaseUIT {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseUIT.class);
 
-    private static ChromeDriverService service;
     protected WebDriver driver;
+    private static Local bsLocal;
 
     @LocalServerPort
     int port;
@@ -96,18 +99,20 @@ public abstract class BaseUIT {
 
     @BeforeAll
     public static void startService() throws Exception {
-        LOGGER.info("Starting Chromedriver service");
+        LOGGER.info("Starting Browserstack local");
+        bsLocal = new Local();
 
-        // service = new
-        // ChromeDriverService.Builder().usingDriverExecutable(findFile()).usingAnyFreePort().build();
-        // service.start();
+        HashMap<String, String> bsLocalArgs = new HashMap<String, String>();
+        bsLocalArgs.put("key", "w6qjjbMbyCMWmjsTXdWY");
+
+        bsLocal.start(bsLocalArgs);
     }
 
     @AfterAll
-    public static void stopService() {
-        LOGGER.info("Stopping Chromedriver service");
-
-        // service.stop();
+    public static void stopService() throws Exception {
+        LOGGER.info("Stopping BSLocal");
+        
+        bsLocal.stop();
     }
 
     /**
@@ -118,7 +123,7 @@ public abstract class BaseUIT {
      */
     @BeforeEach
     public void setUp() throws Exception {
-        LOGGER.info("Starting Chromedriver");
+        LOGGER.info("Starting Webdriver");
 
         baseUrl = testProperties.getBaseUrl() + port + "/";
 
@@ -141,22 +146,32 @@ public abstract class BaseUIT {
         lectureRepository.deleteAll();
         gradeRepository.deleteAll();
 
-        // driver = new RemoteWebDriver(service.getUrl(), options);
+        String BROWSERSTACK_USERNAME = System.getenv("BROWSERSTACK_USERNAME");
+        if(BROWSERSTACK_USERNAME == null){
+            LOGGER.error("No environment variable set for BROWSERSTACK_USERNAME!");
+        }
 
-        String URL = "https://" + "leonchemnitz1" + ":" + "w6qjjbMbyCMWmjsTXdWY" + "@hub-cloud.browserstack.com/wd/hub";
+        String BROWSERSTACK_ACCESS_KEY = System.getenv("BROWSERSTACK_ACCESS_KEY");
+        if(BROWSERSTACK_ACCESS_KEY == null){
+            LOGGER.error("No environment variable set for BROWSERSTACK_ACCESS_KEY!");
+        }
+
+        String URL = "https://" + BROWSERSTACK_USERNAME + ":" + BROWSERSTACK_ACCESS_KEY + "@hub-cloud.browserstack.com/wd/hub";
 
         // Input capabilities
         DesiredCapabilities caps = new DesiredCapabilities();
         caps.setCapability("browserstack.local", "true");
-        caps.setCapability("browserstack.localIdentifier", System.getenv("BROWSERSTACK_LOCAL_IDENTIFIER"));
-        // Add other capabilities like browser name, version and os name, version
+        // caps.setCapability("browserstack.localIdentifier",
+        //System.getenv("BROWSERSTACK_LOCAL_IDENTIFIER"));
+
+        caps.setCapability("browserstack.local", "true");
         caps.setCapability("os", "Windows");
         caps.setCapability("os_version", "10");
         caps.setCapability("browser", "Chrome");
         caps.setCapability("browser_version", "80");
         caps.setCapability("name", "leonchemnitz1's First Test");
 
-        WebDriver driver = new RemoteWebDriver(new URL(URL), caps);
+        driver = new RemoteWebDriver(new URL(URL), caps);
 
         driver.get(baseUrl);
 
@@ -182,26 +197,6 @@ public abstract class BaseUIT {
         if (driver != null) {
             LOGGER.info("Stopping Chromedriver");
             driver.quit();
-        }
-    }
-
-    private static File findFile() throws IOException {
-
-        if (SystemUtils.IS_OS_WINDOWS) {
-            LOGGER.info("Platform Windows detected");
-            Resource resource = new ClassPathResource(TestProperties.chromedriverWin);
-            LOGGER.info(resource.getURL().toExternalForm());
-            return resource.getFile();
-        } else if (SystemUtils.IS_OS_LINUX) {
-            LOGGER.info("Platform Linux detected");
-            return new File(TestProperties.chromedriverLinux);
-        } else if (SystemUtils.IS_OS_MAC) {
-            LOGGER.info("Platform Mac detected");
-            Resource resource = new ClassPathResource(TestProperties.chromedriverMac);
-            LOGGER.info(resource.getURL().toExternalForm());
-            return resource.getFile();
-        } else {
-            throw new IOException("No supported plattform detected");
         }
     }
 
