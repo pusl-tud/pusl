@@ -17,6 +17,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
 import de.bp2019.pusl.model.PerformanceScheme;
+import de.bp2019.pusl.ui.components.tabs.HorizontalTabs;
 import de.bp2019.pusl.ui.views.lecture.EditLectureView;
 
 /**
