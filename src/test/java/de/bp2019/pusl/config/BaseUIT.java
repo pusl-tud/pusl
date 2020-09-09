@@ -98,7 +98,8 @@ public abstract class BaseUIT {
     public static void startService() throws Exception {
         LOGGER.info("Starting Chromedriver service");
 
-        // service = new ChromeDriverService.Builder().usingDriverExecutable(findFile()).usingAnyFreePort().build();
+        // service = new
+        // ChromeDriverService.Builder().usingDriverExecutable(findFile()).usingAnyFreePort().build();
         // service.start();
     }
 
@@ -149,11 +150,11 @@ public abstract class BaseUIT {
         caps.setCapability("browserstack.local", "true");
         caps.setCapability("browserstack.localIdentifier", System.getenv("BROWSERSTACK_LOCAL_IDENTIFIER"));
         // Add other capabilities like browser name, version and os name, version
-        caps.setCapability("os_version", "10");
-        caps.setCapability("resolution", "1920x1080");
-        caps.setCapability("browser", "Chrome");
-        caps.setCapability("browser_version", "86.0 beta");
         caps.setCapability("os", "Windows");
+        caps.setCapability("os_version", "10");
+        caps.setCapability("browser", "Chrome");
+        caps.setCapability("browser_version", "80");
+        caps.setCapability("name", "leonchemnitz1's First Test");
 
         WebDriver driver = new RemoteWebDriver(new URL(URL), caps);
 
