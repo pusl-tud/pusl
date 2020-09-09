@@ -6,6 +6,12 @@ node_js: 10
 before_install:
 - chmod +x mvnw
 
+install:
+- ./mvnw install -Dpusl.skipTests=true -Dmaven.javadoc.skip=true -B -V
+
+script:
+- mvn clean install
+
 services:
 - mongodb
 
