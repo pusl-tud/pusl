@@ -98,15 +98,15 @@ public abstract class BaseUIT {
     public static void startService() throws Exception {
         LOGGER.info("Starting Chromedriver service");
 
-        service = new ChromeDriverService.Builder().usingDriverExecutable(findFile()).usingAnyFreePort().build();
-        service.start();
+        // service = new ChromeDriverService.Builder().usingDriverExecutable(findFile()).usingAnyFreePort().build();
+        // service.start();
     }
 
     @AfterAll
     public static void stopService() {
         LOGGER.info("Stopping Chromedriver service");
 
-        service.stop();
+        // service.stop();
     }
 
     /**
