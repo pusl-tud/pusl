@@ -3,8 +3,6 @@ package de.bp2019.pusl.config;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -13,20 +11,16 @@ import java.util.concurrent.TimeUnit;
 import com.browserstack.local.Local;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriverService;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -38,11 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
@@ -63,12 +53,8 @@ import de.bp2019.pusl.ui.views.LoginView;
  * 
  * @author Leon Chemnitz
  */
-@RunWith(SpringRunner.class)
-@ContextConfiguration(classes = BaseUIT.SimpleConfiguration.class)
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public abstract class BaseUIT {
-
-    public class SimpleConfiguration{}
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseUIT.class);
 
@@ -177,7 +163,7 @@ public abstract class BaseUIT {
         caps.setCapability("os_version", "10");
         caps.setCapability("browser", "Chrome");
         caps.setCapability("browser_version", "80");
-        // caps.setCapability("name", "leonchemnitz1's First Test");
+        caps.setCapability("name", this.getClass().getSimpleName());
 
         driver = new RemoteWebDriver(new URL(URL), caps);
 
