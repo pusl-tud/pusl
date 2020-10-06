@@ -41,6 +41,8 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
@@ -61,9 +63,13 @@ import de.bp2019.pusl.ui.views.LoginView;
  * 
  * @author Leon Chemnitz
  */
-@RunWith(Parallelized.class)
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = BaseUIT.SimpleConfiguration.class)
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public abstract class BaseUIT {
+
+    public class SimpleConfiguration{}
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseUIT.class);
 
     protected WebDriver driver;
@@ -171,7 +177,7 @@ public abstract class BaseUIT {
         caps.setCapability("os_version", "10");
         caps.setCapability("browser", "Chrome");
         caps.setCapability("browser_version", "80");
-        caps.setCapability("name", "leonchemnitz1's First Test");
+        // caps.setCapability("name", "leonchemnitz1's First Test");
 
         driver = new RemoteWebDriver(new URL(URL), caps);
 
