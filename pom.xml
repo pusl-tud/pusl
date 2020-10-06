@@ -157,8 +157,8 @@
             <configuration>
               <includes>
                 <include>**/*Test.java</include>
-                <include>**/*IT.java</include>
-                <!-- <include>**/*UIT.java</include> -->
+                <!-- <include>**/*IT.java</include> -->
+                <include>**/*UIT.java</include>
               </includes>
               <excludes>
                 <exclude>
