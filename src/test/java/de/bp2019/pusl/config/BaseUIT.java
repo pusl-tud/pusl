@@ -18,6 +18,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -60,6 +61,7 @@ import de.bp2019.pusl.ui.views.LoginView;
  * 
  * @author Leon Chemnitz
  */
+@RunWith(Parallelized.class)
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public abstract class BaseUIT {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseUIT.class);
