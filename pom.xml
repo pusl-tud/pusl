@@ -160,11 +160,6 @@
                 <!-- <include>**/*IT.java</include> -->
                 <include>**/*UIT.java</include>
               </includes>
-              <excludes>
-                <exclude>
-                  **/*UIT.java
-                </exclude>
-              </excludes>
               <argLine>${failsafeArgLine}</argLine>
               <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
             </configuration>

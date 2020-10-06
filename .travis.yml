@@ -3,14 +3,18 @@ os: linux
 dist: xenial
 jdk: openjdk11
 
+cache:
+  directories:
+    - $HOME/.m2
+
 before_install:
 - chmod +x mvnw
 
 install:
+- nvm use $NODE_VERSION
 - ./mvnw install -Dpusl.skipTests=true -Dmaven.javadoc.skip=true -B -V
 
 script:
-- nvm use $NODE_VERSION
 - mvn install
 
 services:
