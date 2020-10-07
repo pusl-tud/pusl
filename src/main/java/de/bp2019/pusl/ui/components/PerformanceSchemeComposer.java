@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.hilerio.ace.AceEditor;
+import com.hilerio.ace.AceMode;
+import com.hilerio.ace.AceTheme;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.customfield.CustomField;
@@ -12,7 +15,6 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
@@ -29,16 +31,15 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
     private static final long serialVersionUID = -1741662181318687543L;
 
     private List<String> performanceNames = new ArrayList<>();
-    private HorizontalTabs<TextArea> tabs;
+    private HorizontalTabs<AceEditor> tabs;
     private Button deleteButton;
     private String defaultCalculationRule;
 
     public PerformanceSchemeComposer() {
         setWidth("100%");
 
-        defaultCalculationRule = "function calculate(results) { \n";
-        defaultCalculationRule += "     \n";
-        defaultCalculationRule += "    return 'nicht definiert';\n";
+        defaultCalculationRule = "function calculate(results) {\n";
+        defaultCalculationRule += "     return 'nicht definiert';\n";
         defaultCalculationRule += "}";
 
         tabs = new HorizontalTabs<>();
@@ -83,6 +84,8 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
                 tabs.addTab(performanceName, createCalculationRuleField(defaultCalculationRule));
                 nameField.setValue("");
                 updateValue();
+
+                setValue(generateModelValue());
             }
         });
 
@@ -127,7 +130,6 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
             }
         }
 
-
         if (tabs.getNumTabs() > 1) {
             deleteButton.setEnabled(true);
         } else {
@@ -135,19 +137,23 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
         }
     }
 
-    private TextArea createCalculationRuleField(String calculationRule) {
-        TextArea editor = new TextArea();
-        editor.setValueChangeMode(ValueChangeMode.EAGER);
-        editor.setWidth("100%");
-        editor.getStyle().set("minHeight", "18em");
-        editor.setValue(calculationRule);
-        editor.setVisible(false);
+    private AceEditor createCalculationRuleField(String calculationRule) {
+        AceEditor aceEditor = new AceEditor();
+        aceEditor.setValue(calculationRule);
+        aceEditor.setTheme(AceTheme.github);
+        aceEditor.setMode(AceMode.javascript);
 
-        editor.addValueChangeListener(event -> {
+        aceEditor.setSofttabs(false);
+        aceEditor.setTabSize(5);
+        aceEditor.setWrap(false);
+        aceEditor.setMinlines(20);
+        aceEditor.setMaxlines(20);
+        
+        aceEditor.addValueChangeListener(event -> {
             setValue(generateModelValue());
         });
 
-        return editor;
+        return aceEditor;
     }
 
 }
