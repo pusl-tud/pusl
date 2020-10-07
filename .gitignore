@@ -9,6 +9,8 @@ node_modules/
 logs/
 out
 .settings/**
+package-lock.json
+package.json
 
 
 ### STS ###
