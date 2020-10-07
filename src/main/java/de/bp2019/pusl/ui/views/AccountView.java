@@ -83,16 +83,16 @@ public class AccountView extends BaseView {
 		password.setId("password");
 		password.setValueChangeMode(ValueChangeMode.EAGER);
 
-		PasswordField confirmPassword = new PasswordField("Passwort wiederholen", "Passwort wiederholen");
-		confirmPassword.setId("confirmPassword");
-		confirmPassword.setValueChangeMode(ValueChangeMode.EAGER);
+		PasswordField repeatPassword = new PasswordField("Passwort wiederholen", "Passwort wiederholen");
+		repeatPassword.setId("confirmPassword");
+		repeatPassword.setValueChangeMode(ValueChangeMode.EAGER);
 
 		form.add(firstName, 1);
 		form.add(lastName, 1);
 		form.add(emailAddress, 1);
 		form.add(new Label(""), 1);
 		form.add(password, 1);
-		form.add(confirmPassword, 1);
+		form.add(repeatPassword, 1);
 
 		Button save = new Button("Änderungen speichern");
 		save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -118,29 +118,39 @@ public class AccountView extends BaseView {
 		binder.forField(emailAddress).withValidator(new EmailValidator("Bitte korrekte Mailadresse eingeben"))
 				.bind(User::getEmailAddress, User::setEmailAddress);
 
-		Binding<User, String> passwordBinder = binder.forField(password)
-				.withValidator((enteredPassword, valueContext) -> {
 
-					if (enteredPassword == "") {
-						/*
-						 * User has entered no new password, therefore a new password is not needed
-						 */
-					} else {
-						if (enteredPassword.length() < 8) {
-							return ValidationResult.error("Passwort muss länger als 8 Zeichen sein!");
-						}
+                Binding<User, String> passwordBinder = binder.forField(repeatPassword)
+                                .withValidator((enteredPassword, valueContext) -> {
 
-						if (!enteredPassword.equals(confirmPassword.getValue())) {
-							return ValidationResult.error("Passwörter stimmen nicht überein!");
-						}
-					}
+                                        if (password.getValue() == "") {
+                                                /*
+                                                 * User has entered no new password, therefore a new
+                                                 * password is not needed
+                                                 */
+                                        } else {
+                                                if (!enteredPassword.equals(password.getValue())) {
+                                                        return ValidationResult
+                                                                        .error("Passwörter stimmen nicht überein!");
+                                                }
+                                        }
 
-					return ValidationResult.ok();
-				}).bind(pwd -> "", (user, pwd) -> {
-					if (pwd != "") {
-						user.setPassword(passwordEncoder.encode(pwd));
-					}
-				});
+                                        return ValidationResult.ok();
+                                }).bind(pwd -> "", (user, pwd) -> {
+                                        if (pwd != "") {
+                                                user.setPassword(passwordEncoder.encode(pwd));
+                                        }
+                                });
+
+                binder.forField(password).withValidator(enteredPassword -> {
+                        if (enteredPassword == "") {
+                                return true;
+                        } else {
+                                passwordBinder.validate();
+                                return enteredPassword.length() >= 8;
+                        }
+                }, "Passwort muss länger als 8 Zeichen sein!").bind(pwd -> "", (user, pwd) -> {
+                        return;
+                });
 
 		/* ########### Listeners ########### */
 
