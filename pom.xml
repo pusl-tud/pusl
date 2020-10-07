@@ -15,7 +15,7 @@
   <properties>
     <java.version>11</java.version>
     <vaadin.version>14.3.5</vaadin.version>
-    <pusl.skipTests>false</pusl.skipTests>
+    <pusl.skipTests>true</pusl.skipTests>
   </properties>
   <dependencies>
     <dependency>
@@ -94,8 +94,8 @@
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>3.141.59</version>
+      <artifactId>selenium-server</artifactId>
+      <version>3.9.1</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>

@@ -462,7 +462,7 @@ public abstract class BaseUIT {
      * @author Leon Chemnitz
      */
     protected WebElement expandShadowDOM(WebElement element) {
-        return (WebElement) ((JavascriptExecutor) driver).executeScript("return arguments[0].shadowRoot", element);
+        return ((WebElement) ((JavascriptExecutor) driver).executeScript("return arguments[0].shadowRoot", element));
     }
 
     /**
