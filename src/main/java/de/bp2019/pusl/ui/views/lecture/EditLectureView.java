@@ -107,7 +107,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 verticalTabs.setWidth("100%");
 
                 ExerciseComposer exercises = new ExerciseComposer(exerciseSchemeService);
-                verticalTabs.addTab("Einzelleistungen", exercises);
+                verticalTabs.addTab("Leistungen", exercises);
 
                 PerformanceSchemeComposer performanceSchemes = new PerformanceSchemeComposer();
                 verticalTabs.addTab("Berechnungsregeln", performanceSchemes);
