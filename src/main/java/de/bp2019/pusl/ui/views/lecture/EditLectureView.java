@@ -3,6 +3,7 @@ package de.bp2019.pusl.ui.views.lecture;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -33,7 +34,7 @@ import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.service.dataproviders.HiwiDataProvider;
 import de.bp2019.pusl.ui.components.ExerciseComposer;
 import de.bp2019.pusl.ui.components.PerformanceSchemeComposer;
-import de.bp2019.pusl.ui.components.VerticalTabs;
+import de.bp2019.pusl.ui.components.tabs.VerticalTabs;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.dialogs.SuccessDialog;
 import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
@@ -101,7 +102,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 institutes.setItemLabelGenerator(Institute::getName);
                 formLayout.add(institutes, 1);
 
-                VerticalTabs verticalTabs = new VerticalTabs();
+                VerticalTabs<Component> verticalTabs = new VerticalTabs<>();
                 verticalTabs.setId("vtabs");
                 verticalTabs.setHeight("25em");
                 verticalTabs.setWidth("100%");

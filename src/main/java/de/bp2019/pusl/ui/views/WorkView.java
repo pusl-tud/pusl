@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -40,7 +41,7 @@ import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.service.dataproviders.FilteringGradeDataProvider;
 import de.bp2019.pusl.ui.components.GradeComposer;
-import de.bp2019.pusl.ui.components.VerticalTabs;
+import de.bp2019.pusl.ui.components.tabs.VerticalTabs;
 import de.bp2019.pusl.ui.dialogs.EditGradeDialog;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.dialogs.SuccessDialog;
@@ -90,7 +91,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         gradeComposer.setWidthFull();
         add(gradeComposer);
 
-        VerticalTabs verticalTabs = new VerticalTabs();
+        VerticalTabs<Component> verticalTabs = new VerticalTabs<>();
         verticalTabs.setId("vtabs");
         verticalTabs.setHeight("30em");
         verticalTabs.setWidthFull();
