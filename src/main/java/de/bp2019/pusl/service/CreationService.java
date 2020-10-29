@@ -4,12 +4,12 @@ import java.util.HashSet;
 
 import javax.annotation.PostConstruct;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.enums.UserType;
-import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
 
@@ -23,6 +23,7 @@ import de.bp2019.pusl.repository.UserRepository;
  */
 @Service
 public class CreationService {
+    
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -35,7 +36,7 @@ public class CreationService {
             admin.setEmailAddress("admin");
             admin.setPassword(passwordEncoder.encode("admin"));
             admin.setType(UserType.SUPERADMIN);
-            admin.setInstitutes(new HashSet<Institute>());
+            admin.setInstitutes(new HashSet<ObjectId>());
             userRepository.save(admin);
         }
     }

@@ -5,7 +5,10 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -122,5 +125,16 @@ public final class Utils {
      */
     public static boolean isMatrNumber(int m) {
         return isMatrNumber(Integer.toString(m));
+    }
+
+    public static <T> Stream<List<T>> batches(List<T> source, int length) {
+        if (length <= 0)
+            throw new IllegalArgumentException("length = " + length);
+        int size = source.size();
+        if (size <= 0)
+            return Stream.empty();
+        int fullChunks = (size - 1) / length;
+        return IntStream.range(0, fullChunks + 1).mapToObj(
+            n -> source.subList(n * length, n == fullChunks ? size : (n + 1) * length));
     }
 }

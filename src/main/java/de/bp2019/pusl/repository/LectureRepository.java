@@ -8,7 +8,6 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.Lecture;
 
 /**
@@ -18,8 +17,8 @@ import de.bp2019.pusl.model.Lecture;
  */
 public interface LectureRepository extends MongoRepository<Lecture, String> {
     Optional<Lecture> findByName(String name);
-    Stream<Lecture> findByInstitutesIn(Set<Institute> institutes, Pageable pageable);
-    Stream<Lecture> findByInstitutesInAndHasAccessIn(Set<Institute> institutes, ObjectId user, Pageable pageable);
-    int countByInstitutesIn(Set<Institute> institutes);
-    int countByInstitutesInAndHasAccessIn(Set<Institute> institutes, ObjectId user);
+    Stream<Lecture> findByInstitutesIn(Set<ObjectId> institutes, Pageable pageable);
+    Stream<Lecture> findByInstitutesInAndHasAccessIn(Set<ObjectId> institutes, ObjectId user, Pageable pageable);
+    int countByInstitutesIn(Set<ObjectId> institutes);
+    int countByInstitutesInAndHasAccessIn(Set<ObjectId> institutes, ObjectId user);
 }

@@ -131,7 +131,7 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
 
         binder.forField(institutes)
                 .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(), "Bitte mind. ein Institut angeben")
-                .bind(ExerciseScheme::getInstitutes, ExerciseScheme::setInstitutes);
+                .bind(instituteService::getInstitutesFromObject, instituteService::setInstitutesToObject);
 
         binder.forField(defaultValueNumeric).withValidator(value -> {
             if (!tokenBased.getValue()) {

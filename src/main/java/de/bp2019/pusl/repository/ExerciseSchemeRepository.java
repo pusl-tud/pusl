@@ -4,11 +4,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import de.bp2019.pusl.model.ExerciseScheme;
-import de.bp2019.pusl.model.Institute;
 
 /**
  * Repository for access of {@link ExerciseScheme}s
@@ -17,6 +17,6 @@ import de.bp2019.pusl.model.Institute;
  */
 public interface ExerciseSchemeRepository extends MongoRepository<ExerciseScheme, String> {
     Optional<ExerciseScheme> findByName(String name);
-    Stream<ExerciseScheme> findByInstitutesIn(Set<Institute> institutes, Pageable pageable);
-    int countByInstitutesIn(Set<Institute> institutes);
+    Stream<ExerciseScheme> findByInstitutesIn(Set<ObjectId> institutes, Pageable pageable);
+    int countByInstitutesIn(Set<ObjectId> institutes);
 }

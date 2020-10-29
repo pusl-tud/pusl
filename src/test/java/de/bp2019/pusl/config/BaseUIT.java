@@ -15,6 +15,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -54,6 +56,7 @@ import de.bp2019.pusl.ui.views.LoginView;
  * @author Leon Chemnitz
  */
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@TestInstance(Lifecycle.PER_CLASS)
 public abstract class BaseUIT {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseUIT.class);
@@ -92,20 +95,51 @@ public abstract class BaseUIT {
     protected WebDriverWait wait;
 
     @BeforeAll
-    public static void startService() throws Exception {
+    public void startService() throws Exception {
         LOGGER.info("Starting Browserstack local");
         bsLocal = new Local();
 
+        String BROWSERSTACK_USERNAME = System.getenv("BROWSERSTACK_USERNAME");
+        if (BROWSERSTACK_USERNAME == null) {
+            LOGGER.error("No environment variable set for BROWSERSTACK_USERNAME!");
+        }
+
+        String BROWSERSTACK_ACCESS_KEY = System.getenv("BROWSERSTACK_ACCESS_KEY");
+        if (BROWSERSTACK_ACCESS_KEY == null) {
+            LOGGER.error("No environment variable set for BROWSERSTACK_ACCESS_KEY!");
+        }
+
         HashMap<String, String> bsLocalArgs = new HashMap<String, String>();
-        bsLocalArgs.put("key", "w6qjjbMbyCMWmjsTXdWY");
+        bsLocalArgs.put("key", BROWSERSTACK_ACCESS_KEY);
 
         bsLocal.start(bsLocalArgs);
+
+        String URL = "https://" + BROWSERSTACK_USERNAME + ":" + BROWSERSTACK_ACCESS_KEY
+                + "@hub-cloud.browserstack.com/wd/hub";
+
+        // Input capabilities
+        DesiredCapabilities caps = new DesiredCapabilities();
+        caps.setCapability("browserstack.local", "true");
+        caps.setCapability("browserstack.local", "true");
+        caps.setCapability("os", "Windows");
+        caps.setCapability("os_version", "10");
+        caps.setCapability("browser", "Chrome");
+        caps.setCapability("browser_version", "80");
+        caps.setCapability("name", this.getClass().getSimpleName());
+
+        driver = new RemoteWebDriver(new URL(URL), caps);
     }
 
     @AfterAll
-    public static void stopService() throws Exception {
+    public void stopService() throws Exception {
+
+        if (driver != null) {
+            LOGGER.info("Stopping Chromedriver");
+            driver.quit();
+        }
+
         LOGGER.info("Stopping BSLocal");
-        
+
         bsLocal.stop();
     }
 
@@ -117,55 +151,16 @@ public abstract class BaseUIT {
      */
     @BeforeEach
     public void setUp() throws Exception {
+
         LOGGER.info("Starting Webdriver");
 
         baseUrl = testProperties.getBaseUrl() + port + "/";
-
-        // ChromeOptions options = new ChromeOptions();
-        // options.addArguments("--no-sandbox");
-        // options.addArguments("--window-size=1920,1080");
-        // options.addArguments("--start-maximized");
-        // if (testProperties.isHeadlessUiTests()) {
-        // options.addArguments("--headless");
-        // }
-        // options.setExperimentalOption("useAutomationExtension", false);
-        // options.addArguments("disable-infobars");
-        // options.addArguments("--disable-extensions");
-        // options.addArguments("--disable-gpu");
-        // options.addArguments("--disable-dev-shm-usage");
 
         userRepository.deleteAll();
         instituteRepository.deleteAll();
         exerciseSchemeRepository.deleteAll();
         lectureRepository.deleteAll();
         gradeRepository.deleteAll();
-
-        String BROWSERSTACK_USERNAME = System.getenv("BROWSERSTACK_USERNAME");
-        if(BROWSERSTACK_USERNAME == null){
-            LOGGER.error("No environment variable set for BROWSERSTACK_USERNAME!");
-        }
-
-        String BROWSERSTACK_ACCESS_KEY = System.getenv("BROWSERSTACK_ACCESS_KEY");
-        if(BROWSERSTACK_ACCESS_KEY == null){
-            LOGGER.error("No environment variable set for BROWSERSTACK_ACCESS_KEY!");
-        }
-
-        String URL = "https://" + BROWSERSTACK_USERNAME + ":" + BROWSERSTACK_ACCESS_KEY + "@hub-cloud.browserstack.com/wd/hub";
-
-        // Input capabilities
-        DesiredCapabilities caps = new DesiredCapabilities();
-        caps.setCapability("browserstack.local", "true");
-        // caps.setCapability("browserstack.localIdentifier",
-        //System.getenv("BROWSERSTACK_LOCAL_IDENTIFIER"));
-
-        caps.setCapability("browserstack.local", "true");
-        caps.setCapability("os", "Windows");
-        caps.setCapability("os_version", "10");
-        caps.setCapability("browser", "Chrome");
-        caps.setCapability("browser_version", "80");
-        caps.setCapability("name", this.getClass().getSimpleName());
-
-        driver = new RemoteWebDriver(new URL(URL), caps);
 
         driver.get(baseUrl);
 
@@ -182,16 +177,12 @@ public abstract class BaseUIT {
      */
     @AfterEach
     public void tearDown() throws Exception {
+        logout();
         userRepository.deleteAll();
         instituteRepository.deleteAll();
         exerciseSchemeRepository.deleteAll();
         lectureRepository.deleteAll();
         gradeRepository.deleteAll();
-
-        if (driver != null) {
-            LOGGER.info("Stopping Chromedriver");
-            driver.quit();
-        }
     }
 
     /**
@@ -326,10 +317,12 @@ public abstract class BaseUIT {
      * @throws InterruptedException
      */
     protected void logout() throws InterruptedException {
-        LOGGER.info("logging out");
-        goToURL(PuslProperties.ROOT_ROUTE);
-        findButtonContainingText("logout").click();
-        waitForURL(LoginView.ROUTE);
+        if (driver.getCurrentUrl() != PuslProperties.ROOT_ROUTE + "/login") {
+            LOGGER.info("logging out");
+            goToURL(PuslProperties.ROOT_ROUTE);
+            findButtonContainingText("logout").click();
+            waitForURL(LoginView.ROUTE);
+        }
     }
 
     /**
@@ -388,14 +381,32 @@ public abstract class BaseUIT {
         driver.findElement(By.xpath("//multiselect-combo-box[@id='" + id + "']")).click();
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//vaadin-combo-box-overlay")));
-        WebElement shadowRoot1 = expandShadowDOM(driver.findElement(By.xpath("//vaadin-combo-box-overlay")));
-        WebElement shadowRoot2 = expandShadowDOM(shadowRoot1.findElement(By.id("content")));
-        List<WebElement> listItems = shadowRoot2.findElements(By.tagName("vaadin-combo-box-item"));
+
+        WebElement baseElement = driver.findElement(By.xpath("//vaadin-combo-box-overlay"));
+        List<WebElement> listItems = (List<WebElement>) ((JavascriptExecutor) driver).executeScript(
+                "return arguments[0].shadowRoot.querySelector('#content').shadowRoot.querySelectorAll('vaadin-combo-box-item')",
+                baseElement);
+
+        LOGGER.info(listItems.toString());
+
         textList.forEach(selectionText -> {
+            LOGGER.info("for text: " + selectionText);
             for (WebElement element : listItems) {
+                LOGGER.info("list item");
                 try {
-                    WebElement div = expandShadowDOM(element).findElement(By.tagName("div"));
-                    div.findElement(By.xpath(".//span[contains(text(),'" + selectionText + "')]")).click();
+                    // WebElement div = expandShadowDOM(element).findElement(By.tagName("div"));
+                    String textContent = (String) ((JavascriptExecutor) driver).executeScript(
+                            "arguments[0].shadowRoot.querySelector('div').querySelector('span').textContent", element);
+
+                    LOGGER.info("text content: " + textContent);
+
+                    if (textContent.equals(selectionText)) {
+                        ((JavascriptExecutor) driver).executeScript(
+                                "arguments[0].shadowRoot.querySelector('div').querySelector('span').click()", element);
+                    }
+
+                    // div.findElement(By.xpath(".//span[contains(text(),'" + selectionText +
+                    // "')]")).click();
                 } catch (Exception e) {
                     continue;
                 }
@@ -418,14 +429,17 @@ public abstract class BaseUIT {
     }
 
     /**
-     * Clear a Vaadin TextField based on its CSS id
+     * Clear a Vaadin TextField based on its CSS id Sorry for the JS but Vaadin made
+     * me do it...
      * 
      * @param id
      * @author Leon Chemnitz
      */
     protected void clearFieldById(String id) {
-        WebElement shadowRoot = expandShadowDOM(findElementById(id));
-        shadowRoot.findElement(By.tagName("input")).clear();
+        WebElement element = findElementById(id);
+
+        ((JavascriptExecutor) driver).executeScript("arguments[0].shadowRoot.querySelector('input').value = ''",
+                element);
     }
 
     /**

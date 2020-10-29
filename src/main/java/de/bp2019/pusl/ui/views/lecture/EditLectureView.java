@@ -138,7 +138,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 binder.forField(institutes)
                                 .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
                                                 "Bitte mind. ein Institut angeben")
-                                .bind(Lecture::getInstitutes, Lecture::setInstitutes);
+                                .bind(instituteService::getInstitutesFromObject, instituteService::setInstitutesToObject);
 
                 binder.bind(hasAccess, lecture -> userService.getByIds(lecture.getHasAccess()), (lecture, items) -> {
                         lecture.setHasAccess(items.stream().map(u -> u.getId()).collect(Collectors.toSet()));
@@ -154,7 +154,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 performanceSchemes.addValueChangeListener(event -> LOGGER.debug("performanceSchemes changed " + event.getValue().size()));
 
                 institutes.addValueChangeListener(event -> {
-                        hiwiDataProvider.setFilter(event.getValue());
+                        hiwiDataProvider.setFilter(event.getValue().stream().map(Institute::getId).collect(Collectors.toSet()));
                         hiwiDataProvider.refreshAll();
                 });
 

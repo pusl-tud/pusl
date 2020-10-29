@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import de.bp2019.pusl.enums.UserType;
-import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
 
 /**
@@ -22,10 +21,10 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findByEmailAddress(String emailAddress);
     List<User> findByType(UserType type);
     Set<User> findAllById(Set<ObjectId> ids);
-    Stream<User> findByInstitutesIn(Set<Institute> institutes, Pageable pageable);
+    Stream<User> findByInstitutesIn(Set<ObjectId> institutes, Pageable pageable);
     Stream<User> findByType(UserType type, Pageable pageable);
-    Stream<User> findByInstitutesInAndType(Set<Institute> institutes, UserType type, Pageable pageable);
-    int countByInstitutesIn(Set<Institute> institutes);
+    Stream<User> findByInstitutesInAndType(Set<ObjectId> institutes, UserType type, Pageable pageable);
+    int countByInstitutesIn(Set<ObjectId> institutes);
     int countByType(UserType type);
-    int countByInstitutesInAndType(Set<Institute> institutes, UserType type);
+    int countByInstitutesInAndType(Set<ObjectId> institutes, UserType type);
 }

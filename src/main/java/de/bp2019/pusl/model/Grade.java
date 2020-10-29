@@ -2,7 +2,10 @@ package de.bp2019.pusl.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -140,4 +143,21 @@ public class Grade {
 				Arrays.asList("lecture", "lectureEmb", "exercise", "matrNumber", "gradedBy", "grade", "handIn", "lastModified"));
 	}
 
+	@JsonIgnore
+	public static String getNameOfGradedBy(Grade grade) {
+		if(grade.getGradedBy() != null && grade.getGradedBy().getFullName() != null){
+			return grade.getGradedBy().getFullName();
+		}
+
+		return "nich gesetzt";
+	}
+
+	@JsonIgnore
+	public static String getLastModifiedFormatted(Grade grade) {
+		if(grade.getLastModified() != null){
+			return grade.getLastModified().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+		}
+
+		return "nich gesetzt";
+	}	
 }

@@ -11,6 +11,7 @@ import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.spring.annotation.UIScope;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,14 +31,14 @@ import de.bp2019.pusl.ui.views.lecture.EditLectureView;
 @Service
 @UIScope
 public class HiwiDataProvider extends AbstractDataProvider<User, String>
-        implements ConfigurableFilterDataProvider<User, String, Set<Institute>> {
+        implements ConfigurableFilterDataProvider<User, String, Set<ObjectId>> {
 
     private static final long serialVersionUID = 2275857103540285108L;
 
     @Autowired
     UserService userService;
 
-    private Set<Institute> filter;
+    private Set<ObjectId> filter;
 
     @PostConstruct
     public void init() {
@@ -60,7 +61,7 @@ public class HiwiDataProvider extends AbstractDataProvider<User, String>
     }
 
     @Override
-    public void setFilter(Set<Institute> filter) {
+    public void setFilter(Set<ObjectId> filter) {
         this.filter = filter;
     }
 

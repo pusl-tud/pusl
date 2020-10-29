@@ -164,7 +164,7 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                 binder.forField(institutes)
                                 .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
                                                 "Bitte mind. ein Institut angeben")
-                                .bind(User::getInstitutes, User::setInstitutes);
+                                .bind(instituteService::getInstitutesFromObject, instituteService::setInstitutesToObject);
 
                 binder.forField(userType).withValidator(ut -> ut != null, "Bitte Nutzer Typ wählen").bind(User::getType,
                                 User::setType);

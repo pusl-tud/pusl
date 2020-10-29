@@ -16,6 +16,7 @@ import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.service.ExerciseSchemeService;
+import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.ui.dialogs.ConfirmDeletionDialog;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.dialogs.SuccessDialog;
@@ -39,11 +40,13 @@ public class ManageExerciseSchemesView extends BaseView implements AccessibleByA
     public static final String ROUTE = "admin/exerciseSchemes";
 
     private ExerciseSchemeService exerciseSchemeService;
+    private InstituteService instituteService;
 
     public ManageExerciseSchemesView() {
         super("Übungsschemas");
 
         this.exerciseSchemeService = Service.get(ExerciseSchemeService.class);
+        this.instituteService = Service.get(InstituteService.class);
 
         /* -- Create Components -- */
 
@@ -93,7 +96,7 @@ public class ManageExerciseSchemesView extends BaseView implements AccessibleByA
      * @author Luca Dinies
      */
     private Text createInstitutesTag(ExerciseScheme exerciseScheme) {
-        Optional<String> text = exerciseScheme.getInstitutes().stream().map(Institute::getName)
+        Optional<String> text = instituteService.getInstitutesFromObject(exerciseScheme).stream().map(Institute::getName)
                 .sorted(String.CASE_INSENSITIVE_ORDER).reduce((i1, i2) -> i1 + ", " + i2);
 
         if (text.isPresent()) {

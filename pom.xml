@@ -15,7 +15,7 @@
   <properties>
     <java.version>11</java.version>
     <vaadin.version>14.3.5</vaadin.version>
-    <pusl.skipTests>false</pusl.skipTests>
+    <pusl.skipTests>true</pusl.skipTests>
   </properties>
   <dependencies>
     <dependency>
@@ -47,7 +47,7 @@
       <groupId>com.hilerio</groupId>
       <artifactId>ace-widget</artifactId>
       <version>1.4-Beta</version>
-   </dependency>
+    </dependency>
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>

@@ -23,7 +23,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.enums.UserType;
-import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.util.LimitOffsetPageRequest;
@@ -233,14 +232,14 @@ public class UserService extends AbstractDataProvider<User, String> {
      * @return num of hiwis
      * @author Leon Chemnitz
      */
-    public int sizeHiwis(Query<User, String> query, Set<Institute> institutes) {
+    public int sizeHiwis(Query<User, String> query, Set<ObjectId> institutes) {
         User currentUser = authenticationService.currentUser();
 
         switch (currentUser.getType()) {
             case SUPERADMIN:
                 return (int) userRepository.countByInstitutesInAndType(institutes, UserType.HIWI);
             case ADMIN:
-                Set<Institute> intersection = Sets.intersection(institutes, currentUser.getInstitutes());
+                Set<ObjectId> intersection = Sets.intersection(institutes, currentUser.getInstitutes());
                 return (int) userRepository.countByInstitutesInAndType(intersection, UserType.HIWI);
             default:
                 return 0;
@@ -289,7 +288,7 @@ public class UserService extends AbstractDataProvider<User, String> {
      * @return stream of fetched users
      * @author Leon Chemnitz
      */
-    public Stream<User> fetchHiwis(Query<User, String> query, Set<Institute> institutes) {
+    public Stream<User> fetchHiwis(Query<User, String> query, Set<ObjectId> institutes) {
         Pageable pageable = new LimitOffsetPageRequest(query.getLimit(), query.getOffset());
         User currentUser = authenticationService.currentUser();
 
@@ -297,7 +296,7 @@ public class UserService extends AbstractDataProvider<User, String> {
             case SUPERADMIN:
                 return userRepository.findByInstitutesInAndType(institutes, UserType.HIWI, pageable);
             case ADMIN:
-                Set<Institute> intersection = Sets.intersection(institutes, currentUser.getInstitutes());
+                Set<ObjectId> intersection = Sets.intersection(institutes, currentUser.getInstitutes());
                 return userRepository.findByInstitutesInAndType(intersection, UserType.HIWI, pageable);
             default:
                 return Stream.empty();

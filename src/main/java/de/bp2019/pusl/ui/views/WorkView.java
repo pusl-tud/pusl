@@ -320,11 +320,10 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         excelExporter.addColumn("Note", Grade::getValue);
         excelExporter.addColumn("Veranstaltung", grade -> grade.getLecture().getName());
         excelExporter.addColumn("Übung", grade -> grade.getExercise().getName());
-        excelExporter.addColumn("Eingetragen von", grade -> grade.getGradedBy().getFullName());
+        excelExporter.addColumn("Eingetragen von", Grade::getNameOfGradedBy);
         excelExporter.addColumn("Abgegeben am",
                 grade -> grade.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM. uuuu")));
-        excelExporter.addColumn("Zuletzt verändert",
-                grade -> grade.getLastModified().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        excelExporter.addColumn("Zuletzt verändert", Grade::getLastModifiedFormatted);
 
         return excelExporter;
     }

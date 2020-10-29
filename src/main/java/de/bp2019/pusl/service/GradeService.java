@@ -13,6 +13,7 @@ import com.vaadin.flow.data.provider.AbstractDataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.provider.SortDirection;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,6 @@ import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.ExerciseScheme;
 import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.GradeFilter;
-import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.GradeRepository;
@@ -139,7 +139,7 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
      * @author Leon Chemnitz
      */
     private boolean userIsAuthorized(Grade grade) {
-        Set<Institute> institutes = grade.getLecture().getInstitutes();
+        Set<ObjectId> institutes = grade.getLecture().getInstitutes();
         User currentUser = authenticationService.currentUser();
 
         switch (currentUser.getType()) {

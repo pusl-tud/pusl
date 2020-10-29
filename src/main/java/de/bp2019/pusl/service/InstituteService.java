@@ -1,6 +1,8 @@
 package de.bp2019.pusl.service;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
+import de.bp2019.pusl.model.Interfaces.BelongsToInstitutes;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.util.LimitOffsetPageRequest;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
@@ -37,7 +40,7 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
 
     @Autowired
     InstituteRepository instituteRepository;
-    
+
     @Autowired
     AuthenticationService authenticationService;
 
@@ -60,12 +63,13 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
             throw new DataNotFoundException();
         } else {
             LOGGER.info("found in database");
-            
+
             Institute institute = foundInstitute.get();
-            LOGGER.debug(institute.toString());            
+            LOGGER.debug(institute.toString());
             User currentUser = authenticationService.currentUser();
 
-            if (currentUser.getType() == UserType.SUPERADMIN || (currentUser.getType() == UserType.ADMIN && currentUser.getInstitutes().contains(institute))) {
+            if (currentUser.getType() == UserType.SUPERADMIN || (currentUser.getType() == UserType.ADMIN
+                    && currentUser.getInstitutes().contains(institute.getId()))) {
                 LOGGER.info("returned because user is authorized");
                 return institute;
             } else {
@@ -142,7 +146,7 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
      * {@link Institute}.
      * 
      * @param name name to check
-     * @param id id of current User
+     * @param id   id of current User
      * @return true if available
      * @author Leon Chemnitz
      */
@@ -200,8 +204,22 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
         if (currentUser.getType() == UserType.SUPERADMIN) {
             return instituteRepository.findAll(pageable).stream();
         }
-        return instituteRepository.findByIdIn(
-                currentUser.getInstitutes().stream().map(Institute::getId).collect(Collectors.toList()),
-                pageable);
+        return instituteRepository.findByIdIn(currentUser.getInstitutes(), pageable);
+    }
+
+    public Set<Institute> getInstitutesFromObject(BelongsToInstitutes object) {
+        if (object == null || object.getInstitutes() == null) {
+            return new HashSet<>();
+        }
+
+        LOGGER.info(object.getInstitutes().toString());
+        Set<Institute> institutes = instituteRepository.findAllByIdIn(object.getInstitutes());
+        LOGGER.info(institutes.toString());
+        return institutes;
+    }
+
+    public void setInstitutesToObject(BelongsToInstitutes object, Set<Institute> institutes) {
+        Set<ObjectId> ids = institutes.stream().map(Institute::getId).collect(Collectors.toSet());
+        object.setInstitutes(ids);
     }
 }

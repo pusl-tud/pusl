@@ -54,7 +54,8 @@ public final class EditGradeDialog {
                 + grade.getLastModified().format(DateTimeFormatter.ofPattern("dd. MM. uuuu | HH:mm")));
         lastModified.getStyle().set("margin-top", "0");
         info.add(lastModified);
-        String userName = grade.getGradedBy().getFullName();
+        
+        String userName = Grade.getNameOfGradedBy(grade);
         Label gradedBy = new Label("von: " + userName);
         gradedBy.getStyle().set("margin-top", "0");
         info.add(gradedBy);

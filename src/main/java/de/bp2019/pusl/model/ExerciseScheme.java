@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -12,6 +14,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import de.bp2019.pusl.model.Interfaces.BelongsToInstitutes;
+
 /**
  * Model of an ExerciseScheme. Used in {@link Exercise}
  * Is a Database Entity
@@ -19,7 +23,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author Leon Chemnitz
  */
 @Document
-public class ExerciseScheme {
+public class ExerciseScheme implements BelongsToInstitutes{
 
 	@Id
 	private ObjectId id;
@@ -28,7 +32,7 @@ public class ExerciseScheme {
 	private double defaultValueNumeric;
 	private Token defaultValueToken;
 	private Set<Token> tokens;
-	private Set<Institute> institutes;
+	private Set<ObjectId> institutes;
 	private Set<User> hasAccess;
 
 	public ExerciseScheme() {
@@ -40,7 +44,7 @@ public class ExerciseScheme {
 	}
 
 	public ExerciseScheme(String name, boolean isNumeric, double defaultValueNumeric, Token defaultValueToken,
-			Set<Token> tokens, Set<Institute> institutes, Set<User> hasAccess) {
+			Set<Token> tokens, Set<ObjectId> institutes, Set<User> hasAccess) {
 		this.name = name;
 		this.isNumeric = isNumeric;
 		this.defaultValueNumeric = defaultValueNumeric;
@@ -66,6 +70,7 @@ public class ExerciseScheme {
 		this.name = name;
 	}
 
+	@JsonProperty(value="isNumeric")
 	public boolean isNumeric() {
 		return isNumeric;
 	}
@@ -74,11 +79,11 @@ public class ExerciseScheme {
 		this.isNumeric = isNumeric;
 	}
 
-	public Set<Institute> getInstitutes() {
+	public Set<ObjectId> getInstitutes() {
 		return institutes;
 	}
 
-	public void setInstitutes(Set<Institute> institutes) {
+	public void setInstitutes(Set<ObjectId> institutes) {
 		this.institutes = institutes;
 	}
 

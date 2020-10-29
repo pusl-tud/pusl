@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -17,6 +19,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import de.bp2019.pusl.enums.UserType;
+import de.bp2019.pusl.model.Interfaces.BelongsToInstitutes;
 
 /**
  * Model of a User. Implements {@link UserDetails} to be used with Spring
@@ -25,7 +28,7 @@ import de.bp2019.pusl.enums.UserType;
  * @author Leon Chemnitz
  */
 @Document
-public class User implements UserDetails {
+public class User implements UserDetails, BelongsToInstitutes {
 	private static final long serialVersionUID = 1535517480345333837L;
 
 	@Id
@@ -39,7 +42,7 @@ public class User implements UserDetails {
 
 	private String password;
 
-	private Set<Institute> institutes;
+	private Set<ObjectId> institutes;
 
 	private UserType type;
 
@@ -52,7 +55,7 @@ public class User implements UserDetails {
 		type = UserType.HIWI;
 	}
 
-	public User(String firstName, String lastName, String emailAddress, String password, Set<Institute> institutes,
+	public User(String firstName, String lastName, String emailAddress, String password, Set<ObjectId> institutes,
 			UserType type) {
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -63,6 +66,7 @@ public class User implements UserDetails {
 	}
 
 	@Override
+	@JsonIgnore
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return Arrays.asList(new SimpleGrantedAuthority(type.toString()));
 	}
@@ -74,6 +78,7 @@ public class User implements UserDetails {
 	 * @return Full name of the found User. Empty String if no user is found
 	 * @author Leon Chemnitz
 	 */
+	@JsonIgnore
 	public String getFullName() {
 		/* initial admin has no name */
 		if (this.firstName == null || this.firstName.equals("")) {
@@ -84,26 +89,31 @@ public class User implements UserDetails {
 	}
 
 	@Override
+	@JsonIgnore
 	public String getUsername() {
 		return getEmailAddress();
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isAccountNonExpired() {
 		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isAccountNonLocked() {
 		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isCredentialsNonExpired() {
 		return true;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isEnabled() {
 		return true;
 	}
@@ -149,11 +159,11 @@ public class User implements UserDetails {
 		this.password = password;
 	}
 
-	public Set<Institute> getInstitutes() {
+	public Set<ObjectId> getInstitutes() {
 		return institutes;
 	}
 
-	public void setInstitutes(Set<Institute> institutes) {
+	public void setInstitutes(Set<ObjectId> institutes) {
 		this.institutes = institutes;
 	}
 

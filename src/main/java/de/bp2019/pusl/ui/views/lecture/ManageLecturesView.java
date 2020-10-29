@@ -15,6 +15,7 @@ import com.vaadin.flow.router.Route;
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.Lecture;
+import de.bp2019.pusl.service.InstituteService;
 import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.ui.dialogs.ConfirmDeletionDialog;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
@@ -41,11 +42,13 @@ public class ManageLecturesView extends BaseView implements AccessibleByAdmin {
     public static final String ROUTE = "admin/lectures";
 
     private LectureService lectureService;
+    private InstituteService instituteService;
 
     public ManageLecturesView() {
         super("Veranstaltungen");
 
         this.lectureService = Service.get(LectureService.class);
+        this.instituteService = Service.get(InstituteService.class);
 
         /* -- Create Components -- */
 
@@ -94,7 +97,7 @@ public class ManageLecturesView extends BaseView implements AccessibleByAdmin {
      * @return institutes tag
      */
     private Text createInstitutesTag(Lecture lecture) {
-        Optional<String> text = lecture.getInstitutes().stream().map(Institute::getName)
+        Optional<String> text = instituteService.getInstitutesFromObject(lecture).stream().map(Institute::getName)
                 .sorted(String.CASE_INSENSITIVE_ORDER).reduce((i1, i2) -> i1 + ", " + i2);
 
         if (text.isPresent()) {

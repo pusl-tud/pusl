@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -15,20 +18,22 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import de.bp2019.pusl.model.Interfaces.BelongsToInstitutes;
+
 /**
  * Model of a Lecture. Is a Database Entity
  * 
  * @author Leon Chemnitz
  */
 @Document
-public class Lecture {
+public class Lecture implements BelongsToInstitutes{
 
     @Id
     private ObjectId id;
 
     private String name;
 
-    private Set<Institute> institutes;
+    private Set<ObjectId> institutes;
 
     private Set<ObjectId> hasAccess;
 
@@ -40,13 +45,13 @@ public class Lecture {
 
     public Lecture() {
         this.lastModified = Instant.now();
-		this.institutes = new HashSet<>();
-		this.hasAccess = new HashSet<>();
-		this.exercises = new ArrayList<>();
-		this.performanceSchemes = new ArrayList<>();
+        this.institutes = new HashSet<>();
+        this.hasAccess = new HashSet<>();
+        this.exercises = new ArrayList<>();
+        this.performanceSchemes = new ArrayList<>();
     }
 
-    public Lecture(String name, Set<Institute> institutes, Set<ObjectId> hasAccess, List<Exercise> exercises,
+    public Lecture(String name, Set<ObjectId> institutes, Set<ObjectId> hasAccess, List<Exercise> exercises,
             List<PerformanceScheme> performanceSchemes) {
         this.name = name;
         this.institutes = institutes;
@@ -54,6 +59,11 @@ public class Lecture {
         this.hasAccess = hasAccess;
         this.performanceSchemes = performanceSchemes;
         this.lastModified = Instant.now();
+    }
+
+    @JsonIgnore
+    public Optional<Exercise> getExerciseById(ObjectId id) {
+        return exercises.stream().filter(exercise -> exercise.getId().equals(id)).findFirst();
     }
 
     public ObjectId getId() {
@@ -72,11 +82,11 @@ public class Lecture {
         this.name = name;
     }
 
-    public Set<Institute> getInstitutes() {
+    public Set<ObjectId> getInstitutes() {
         return institutes;
     }
 
-    public void setInstitutes(Set<Institute> institutes) {
+    public void setInstitutes(Set<ObjectId> institutes) {
         this.institutes = institutes;
     }
 
@@ -112,19 +122,19 @@ public class Lecture {
         this.lastModified = lastModified;
     }
 
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-	}
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
 
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(id).toHashCode();
-	}
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(id).toHashCode();
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		return EqualsBuilder.reflectionEquals(this, o,
-				Arrays.asList("name", "institutes", "hasAccess", "exercises", "performanceSchemes", "lastModified"));
-	}
+    @Override
+    public boolean equals(Object o) {
+        return EqualsBuilder.reflectionEquals(this, o,
+                Arrays.asList("name", "institutes", "hasAccess", "exercises", "performanceSchemes", "lastModified"));
+    }
 }

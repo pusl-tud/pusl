@@ -11,6 +11,8 @@ out
 .settings/**
 package-lock.json
 package.json
+webpack.config.json
+webpack.generated.js
 
 
 ### STS ###

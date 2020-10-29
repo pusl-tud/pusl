@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.vaadin.flow.component.UI;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import de.bp2019.pusl.enums.UserType;
-import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.ui.views.LoginView;
@@ -123,7 +123,7 @@ public class AuthenticationService {
      * @return Institutes associated with current user
      * @author Leon Chemnitz
      */
-    public Set<Institute> currentUserInstitutes() {
+    public Set<ObjectId> currentUserInstitutes() {
         return currentUser().getInstitutes();
     }
 

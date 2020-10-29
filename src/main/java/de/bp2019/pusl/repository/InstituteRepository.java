@@ -1,7 +1,7 @@
 package de.bp2019.pusl.repository;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.bson.types.ObjectId;
@@ -17,5 +17,6 @@ import de.bp2019.pusl.model.Institute;
  */
 public interface InstituteRepository extends MongoRepository<Institute, String> {
     Optional<Institute> findByName(String name);
-    Stream<Institute> findByIdIn(List<ObjectId> ids, Pageable pageable);
+    Stream<Institute> findByIdIn(Set<ObjectId> ids, Pageable pageable);
+    Set<Institute> findAllByIdIn(Set<ObjectId> ids);
 }

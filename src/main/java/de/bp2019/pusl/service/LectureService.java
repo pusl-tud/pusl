@@ -1,5 +1,6 @@
 package de.bp2019.pusl.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -40,6 +41,11 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
     @Autowired
     AuthenticationService authenticationService;
 
+
+    public List<Lecture> getAll(){
+        return lectureRepository.findAll();
+    }
+
     /**
      * Get a {@link Lecture} based on its Id. Only return {@link Lecture}s the
      * active User is authenticated to see.
@@ -71,6 +77,21 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
                 throw new UnauthorizedException();
             }
         }
+    }
+
+    /**
+     * Get a {@link Lecture} based on its Id. Only return {@link Lecture}s the
+     * active User is authenticated to see.
+     *
+     * @param id to search for
+     * @return found {@link Lecture} with maching Id
+     * @author Leon Chemnitz
+     * @throws DataNotFoundException if entity not found in database
+     * @throws UnauthorizedException if user not authorized to access
+     */
+    public Lecture getById(ObjectId id) throws DataNotFoundException, UnauthorizedException {
+        if(id == null) throw new DataNotFoundException();
+        return getById(id.toString());
     }
 
     /**
