@@ -74,7 +74,7 @@ public class ExerciseComposer extends CustomField<List<Exercise>> {
 
         nameTextField = new TextField();
         nameTextField.setId("new-exercise-name");
-        nameTextField.setPlaceholder("Prüfung");
+        nameTextField.setPlaceholder("Leistung");
         nameTextField.setValueChangeMode(ValueChangeMode.EAGER);
         formLayout.add(nameTextField, 1);
 

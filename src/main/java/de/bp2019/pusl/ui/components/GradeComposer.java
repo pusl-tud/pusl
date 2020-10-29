@@ -88,7 +88,7 @@ public class GradeComposer extends CustomField<GradeFilter> {
         exercise = new ComboBox<>();
         exercise.getElement().setAttribute("theme", "small");
         exercise.setItemLabelGenerator(Exercise::getName);
-        exercise.setLabel("Übung");
+        exercise.setLabel("Leistung");
         exercise.setClearButtonVisible(true);
         exercise.setEnabled(false);
         layout.add(exercise, 1);

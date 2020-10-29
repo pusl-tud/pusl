@@ -57,7 +57,7 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
  * @author Luca Dinies, Leon Chemnitz
  **/
 
-@PageTitle(PuslProperties.NAME + " | Noten")
+@PageTitle(PuslProperties.NAME + " | Einzelleistungen")
 @Route(value = WorkView.ROUTE, layout = MainAppView.class)
 public class WorkView extends BaseView implements HasUrlParameter<String> {
 
@@ -77,7 +77,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
     private GradeFilter filter;
 
     public WorkView() {
-        super("Noten");
+        super("Einzelleistungen");
 
         this.filteringGradeDataProvider = Service.get(FilteringGradeDataProvider.class);
         this.lectureService = Service.get(LectureService.class);
@@ -111,7 +111,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         createGrade.add(handInDatePicker, 1);
 
         Button createGradeButton = new Button();
-        createGradeButton.setText("Note eintragen");
+        createGradeButton.setText("Einzelleistung eintragen");
         createGradeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         createGrade.add(createGradeButton, 1);
 
@@ -164,7 +164,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         grid.addColumn(Grade::getMatrNumber).setKey("matrNumber").setHeader("Matr. Nr.").setAutoWidth(true);
         grid.addColumn(item -> item.getLecture().getName()).setKey("lecture").setHeader("Veranstaltung")
                 .setAutoWidth(true);
-        grid.addColumn(item -> item.getExercise().getName()).setKey("exercise").setHeader("Übung").setAutoWidth(true);
+        grid.addColumn(item -> item.getExercise().getName()).setKey("exercise").setHeader("Leistung").setAutoWidth(true);
         grid.addColumn(item -> {
                 if( item.getHandIn() != null){
                     return item.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM. uuuu"));
@@ -207,10 +207,10 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             try {
                 gradeService.save(grade);
                 filteringGradeDataProvider.refreshAll();
-                SuccessDialog.open("Note erfolgreich gespeichert");
+                SuccessDialog.open("Einzelleistung erfolgreich gespeichert");
             } catch (UnauthorizedException e) {
                 LOGGER.info("current User unauthorized to save Grade");
-                ErrorDialog.open("nicht authoriziert um Note zu speichern");
+                ErrorDialog.open("nicht authoriziert um Einzelleistung zu speichern");
             }
         });
 
@@ -304,7 +304,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             filteringGradeDataProvider.refreshAll();
         } catch (UnauthorizedException e) {
             UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
-            ErrorDialog.open("Nicht authorisiert um Noten zu bearbeiten!");
+            ErrorDialog.open("Nicht authorisiert um Einzelleistung zu bearbeiten!");
         }
 
         if (parametersMap.get("martrNumber") != null) {
@@ -318,9 +318,9 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         excelExporter.setDataProvider(filteringGradeDataProvider);
         excelExporter.addColumn("Matr.Nummer", Grade::getMatrNumber);
-        excelExporter.addColumn("Note", Grade::getValue);
+        excelExporter.addColumn("Bewertung", Grade::getValue);
         excelExporter.addColumn("Veranstaltung", grade -> grade.getLecture().getName());
-        excelExporter.addColumn("Übung", grade -> grade.getExercise().getName());
+        excelExporter.addColumn("Leistung", grade -> grade.getExercise().getName());
         excelExporter.addColumn("Eingetragen von", Grade::getNameOfGradedBy);
         excelExporter.addColumn("Abgegeben am",
                 grade -> grade.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM. uuuu")));

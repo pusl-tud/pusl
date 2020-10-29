@@ -108,10 +108,10 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 verticalTabs.setWidth("100%");
 
                 ExerciseComposer exercises = new ExerciseComposer(exerciseSchemeService);
-                verticalTabs.addTab("Prüfungen", exercises);
+                verticalTabs.addTab("Leistungen", exercises);
 
                 PerformanceSchemeComposer performanceSchemes = new PerformanceSchemeComposer();
-                verticalTabs.addTab("Leistungen", performanceSchemes);
+                verticalTabs.addTab("Berechnungsregeln", performanceSchemes);
 
                 MultiselectComboBox<User> hasAccess = new MultiselectComboBox<>();
                 hasAccess.setWidth("100%");
