@@ -95,7 +95,7 @@ public class GradeComposer extends CustomField<GradeFilter> {
 
         numeric = new NumberField();
         numeric.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        numeric.setLabel("Note");
+        numeric.setLabel("Bewertung");
         numeric.setEnabled(false);
         layout.add(numeric, 1);
 
