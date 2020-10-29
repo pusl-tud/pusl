@@ -31,7 +31,7 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
  *
  * @author Luca Dinies
  **/
-@PageTitle(PuslProperties.NAME + " | Übungsschemas")
+@PageTitle(PuslProperties.NAME + " | Leistungsschemas")
 @Route(value = ManageExerciseSchemesView.ROUTE, layout = MainAppView.class)
 public class ManageExerciseSchemesView extends BaseView implements AccessibleByAdmin {
 
@@ -43,7 +43,7 @@ public class ManageExerciseSchemesView extends BaseView implements AccessibleByA
     private InstituteService instituteService;
 
     public ManageExerciseSchemesView() {
-        super("Übungsschemas");
+        super("Leistungsschemas");
 
         this.exerciseSchemeService = Service.get(ExerciseSchemeService.class);
         this.instituteService = Service.get(InstituteService.class);
@@ -61,7 +61,7 @@ public class ManageExerciseSchemesView extends BaseView implements AccessibleByA
 
         add(grid);
 
-        Button newExerciseSchemeButton = new Button("Neues Übungsschema");
+        Button newExerciseSchemeButton = new Button("Neues Leistungsschema");
         newExerciseSchemeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         add(newExerciseSchemeButton);
@@ -122,7 +122,7 @@ public class ManageExerciseSchemesView extends BaseView implements AccessibleByA
                     SuccessDialog.open(exerciseScheme.getName() + " erfolgreich gelöscht");
                 } catch (UnauthorizedException e) {
                     UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
-                    ErrorDialog.open("Nicht authorisiert um Übungsschema zu löschen!");
+                    ErrorDialog.open("Nicht authorisiert um Leistungsschema zu löschen!");
                 }
             });
         });

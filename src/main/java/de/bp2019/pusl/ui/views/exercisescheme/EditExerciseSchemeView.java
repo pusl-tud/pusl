@@ -48,7 +48,7 @@ import de.bp2019.pusl.util.exceptions.UnauthorizedException;
  *
  **/
 
-@PageTitle(PuslProperties.NAME + " | Übungsschema bearbeiten")
+@PageTitle(PuslProperties.NAME + " | Leistungsschema bearbeiten")
 @Route(value = EditExerciseSchemeView.ROUTE, layout = MainAppView.class)
 public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<String>, AccessibleByAdmin {
 
@@ -68,7 +68,7 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
     private NumberField defaultValueNumeric;
 
     public EditExerciseSchemeView() {
-        super("Übungsschema bearbeiten");
+        super("Leistungsschema bearbeiten");
 
         this.exerciseSchemeService = Service.get(ExerciseSchemeService.class);
         this.instituteService = Service.get(InstituteService.class);
@@ -194,10 +194,10 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
                 try {
                     exerciseSchemeService.save(exerciseScheme);
                     UI.getCurrent().navigate(ManageExerciseSchemesView.ROUTE);
-                    SuccessDialog.open("Übungsschema erfolgreich gespeichert");
+                    SuccessDialog.open("Leistungsschema erfolgreich gespeichert");
                 } catch (UnauthorizedException e) {
                     LOGGER.error("unauthorized to edit ExerciseScheme");
-                    ErrorDialog.open("nicht authorisiert um Übungsschema zu speichern!");
+                    ErrorDialog.open("nicht authorisiert um Leistungsschema zu speichern!");
                 }
             } else {
                 BinderValidationStatus<ExerciseScheme> validate = binder.validate();
@@ -229,11 +229,11 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
             } catch (UnauthorizedException e) {
                 event.rerouteTo(PuslProperties.ROOT_ROUTE);
                 UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
-                ErrorDialog.open("Nicht authorisiert um Übungsschema zu bearbeiten!");
+                ErrorDialog.open("Nicht authorisiert um Leistungsschema zu bearbeiten!");
             } catch (DataNotFoundException e) {
                 event.rerouteTo(PuslProperties.ROOT_ROUTE);
                 UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
-                ErrorDialog.open("Übungsschema nicht in Datenbank gefunden!");
+                ErrorDialog.open("Leistungsschema nicht in Datenbank gefunden!");
             }
         }
     }

@@ -83,7 +83,7 @@ public class MainAppView extends AppLayout {
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(false);
 
-        content.add(generateMenuButton("Noten", new Icon(VaadinIcon.HOME), PuslProperties.ROOT_ROUTE));
+        content.add(generateMenuButton("Einzelleistungen", new Icon(VaadinIcon.HOME), PuslProperties.ROOT_ROUTE));
 
         if (currentUser.getType() != UserType.HIWI) {
             content.add(generateMenuButton("Export", new Icon(VaadinIcon.DOWNLOAD), ExportView.ROUTE));
@@ -96,7 +96,7 @@ public class MainAppView extends AppLayout {
             content.add(generateMenuButton("Nutzer", new Icon(VaadinIcon.USERS), ManageUsersView.ROUTE));
             content.add(
                     generateMenuButton("Veranstaltungen", new Icon(VaadinIcon.ACADEMY_CAP), ManageLecturesView.ROUTE));
-            content.add(generateMenuButton("Übungsschemas", new Icon(VaadinIcon.NOTEBOOK),
+            content.add(generateMenuButton("Leistungsschemas", new Icon(VaadinIcon.NOTEBOOK),
                     ManageExerciseSchemesView.ROUTE));
 
             if (currentUser.getType() == UserType.SUPERADMIN) {
