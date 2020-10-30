@@ -93,7 +93,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         VerticalTabs<Component> verticalTabs = new VerticalTabs<>();
         verticalTabs.setId("vtabs");
-        verticalTabs.setHeight("30em");
+        verticalTabs.setComponentHeight("30em");
         verticalTabs.setWidthFull();
         add(verticalTabs);
 
