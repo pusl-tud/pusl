@@ -3,6 +3,7 @@ package de.bp2019.pusl.ui.views.user;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -138,6 +139,7 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                 form.add(repeatPassword, 1);
 
                 Button save = new Button("Speichern");
+                save.addClickShortcut(Key.ENTER);
                 save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
                 VerticalLayout actions = new VerticalLayout();

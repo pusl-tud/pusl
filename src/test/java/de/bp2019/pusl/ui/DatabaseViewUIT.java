@@ -1,7 +1,5 @@
 package de.bp2019.pusl.ui;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,29 +48,6 @@ public class DatabaseViewUIT extends BaseUIT {
         LOGGER.info("Testing access as HIWI");
         login(UserType.HIWI);
         goToURLandWaitForRedirect(DatabaseView.ROUTE, PuslProperties.ROOT_ROUTE);
-    }
-
-    /**
-     * @throws Exception
-     * @author Luca Dinies, Leon Chemnitz
-     */
-    @Test
-    public void testRefill() throws Exception {
-        LOGGER.info("Testing Grade Refill button");
-        login(UserType.SUPERADMIN);
-
-        goToURL(DatabaseView.ROUTE);
-
-        findButtonContainingText("Institute, Veranstaltungen & Übungsschemas generieren").click();
-        findElementById("numUsers").sendKeys("3");
-        findButtonContainingText("Nutzer generieren").click();
-        findElementById("numGrades").sendKeys("50");
-        findButtonContainingText("Noten generieren").click();
-
-        waitSeconds(10);
-        goToURL(PuslProperties.ROOT_ROUTE);
-
-        assertEquals(50, gradeRepository.count());
     }
 
 }

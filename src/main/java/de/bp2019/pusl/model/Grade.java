@@ -41,6 +41,7 @@ public class Grade {
 	@Indexed(name= "grade_matr", unique = false)
 	private String matrNumber;
 
+	// TODO: Durch ObjectID ersetzen
 	private User gradedBy;
 
 	private String value;
@@ -53,12 +54,13 @@ public class Grade {
 		lastModified = LocalDateTime.now();
 	}
 
-	public Grade(Lecture lecture, Exercise exercise, String matrNumber, String value, LocalDate handIn) {
+	public Grade(Lecture lecture, Exercise exercise, String matrNumber, String value, LocalDate handIn, User gradedBy) {
 		this.lecture = lecture;
 		this.exercise = exercise;
 		this.matrNumber = matrNumber;
 		this.value = value;
 		this.handIn = handIn;
+		this.gradedBy = gradedBy;
 
 		lastModified = LocalDateTime.now();
 	}

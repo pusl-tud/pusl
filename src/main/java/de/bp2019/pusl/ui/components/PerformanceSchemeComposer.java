@@ -58,7 +58,7 @@ public class PerformanceSchemeComposer extends CustomField<List<PerformanceSchem
         nameField.setId("performance-name");
         formLayout.add(nameField);
 
-        Button createButton = new Button("Leistung hinzufügen", new Icon(VaadinIcon.PLUS_CIRCLE));
+        Button createButton = new Button("Berechnungsregel hinzufügen", new Icon(VaadinIcon.PLUS_CIRCLE));
         createButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
         createButton.setId("create-performance");
 

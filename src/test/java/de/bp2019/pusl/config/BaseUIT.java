@@ -94,9 +94,15 @@ public abstract class BaseUIT {
     protected String baseUrl;
     protected WebDriverWait wait;
 
+    /**
+     * Starts Webdriver and connects to Browserstack
+     * 
+     * @throws Exception
+     * @author Leon Chemnitz
+     */
     @BeforeAll
-    public void startService() throws Exception {
-        LOGGER.info("Starting Browserstack local");
+    public void setupTestSuite() throws Exception {
+        LOGGER.info("Starting BSLocal");
         bsLocal = new Local();
 
         String BROWSERSTACK_USERNAME = System.getenv("BROWSERSTACK_USERNAME");
@@ -131,7 +137,7 @@ public abstract class BaseUIT {
     }
 
     @AfterAll
-    public void stopService() throws Exception {
+    public void tearDownTestSuite() throws Exception {
 
         if (driver != null) {
             LOGGER.info("Stopping Chromedriver");
@@ -144,15 +150,13 @@ public abstract class BaseUIT {
     }
 
     /**
-     * Initializes TestDatabase and starts Webdriver
+     * Initializes TestDatabase and navigates to base URL
      * 
-     * @throws Exception when no supported OS is detected
      * @author Leon Chemnitz
      */
     @BeforeEach
-    public void setUp() throws Exception {
-
-        LOGGER.info("Starting Webdriver");
+    public void setUpTest() {
+        LOGGER.info("setting Test environment");
 
         baseUrl = testProperties.getBaseUrl() + port + "/";
 
@@ -176,7 +180,7 @@ public abstract class BaseUIT {
      * @author Leon Chemnitz
      */
     @AfterEach
-    public void tearDown() throws Exception {
+    public void tearDownTest() throws Exception {
         logout();
         userRepository.deleteAll();
         instituteRepository.deleteAll();
@@ -236,6 +240,14 @@ public abstract class BaseUIT {
         } catch (Exception e) {
             assertTrue(e.toString(), false);
         }
+
+        
+        try{
+            wait.until(ExpectedConditions.elementToBeClickable(findElementById("pwa-closeip")));
+            findElementById("pwa-closeip").click();
+        } catch(Exception e){
+            //eine Super Lösung <3
+        }
     }
 
     /**
@@ -285,6 +297,13 @@ public abstract class BaseUIT {
 
         waitForURL(PuslProperties.ROOT_ROUTE);
 
+        try{
+            wait.until(ExpectedConditions.elementToBeClickable(findElementById("pwa-closeip")));
+            findElementById("pwa-closeip").click();
+        } catch(Exception e){
+            //eine Super Lösung <3
+        }
+
         return user;
     }
 
@@ -317,7 +336,7 @@ public abstract class BaseUIT {
      * @throws InterruptedException
      */
     protected void logout() throws InterruptedException {
-        if (driver.getCurrentUrl() != PuslProperties.ROOT_ROUTE + "/login") {
+        if (!driver.getCurrentUrl().equals(baseUrl + "login")) {
             LOGGER.info("logging out");
             goToURL(PuslProperties.ROOT_ROUTE);
             findButtonContainingText("logout").click();
@@ -359,7 +378,10 @@ public abstract class BaseUIT {
     }
 
     protected void findSelectByIdAndSelectByText(String id, String selectionText) {
-        driver.findElement(By.xpath("//vaadin-select[@id='" + id + "']")).click();
+        WebElement element = driver.findElement(By.xpath("//vaadin-select[@id='" + id + "']"));
+
+        ((JavascriptExecutor) driver)
+                .executeScript("arguments[0].shadowRoot.querySelector('vaadin-select-text-field').click()", element);
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//vaadin-select-overlay")));
         driver.findElement(By.xpath("//vaadin-select-overlay//vaadin-item[text()='" + selectionText + "']")).click();
@@ -376,8 +398,9 @@ public abstract class BaseUIT {
      * @param id
      * @param textList
      * @author Leon Chemnitz
+     * @throws InterruptedException
      */
-    protected void findMSCBByIdAndSelectByTexts(String id, List<String> textList) {
+    protected void findMSCBByIdAndSelectByTexts(String id, List<String> textList) throws InterruptedException {
         driver.findElement(By.xpath("//multiselect-combo-box[@id='" + id + "']")).click();
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//vaadin-combo-box-overlay")));
@@ -387,26 +410,15 @@ public abstract class BaseUIT {
                 "return arguments[0].shadowRoot.querySelector('#content').shadowRoot.querySelectorAll('vaadin-combo-box-item')",
                 baseElement);
 
-        LOGGER.info(listItems.toString());
-
         textList.forEach(selectionText -> {
-            LOGGER.info("for text: " + selectionText);
             for (WebElement element : listItems) {
-                LOGGER.info("list item");
                 try {
-                    // WebElement div = expandShadowDOM(element).findElement(By.tagName("div"));
-                    String textContent = (String) ((JavascriptExecutor) driver).executeScript(
-                            "arguments[0].shadowRoot.querySelector('div').querySelector('span').textContent", element);
-
-                    LOGGER.info("text content: " + textContent);
-
-                    if (textContent.equals(selectionText)) {
-                        ((JavascriptExecutor) driver).executeScript(
-                                "arguments[0].shadowRoot.querySelector('div').querySelector('span').click()", element);
+                    if (element.getText().equals(selectionText)) {
+                        WebElement el = (WebElement) ((JavascriptExecutor) driver)
+                                .executeScript("return arguments[0].shadowRoot.querySelector('span')", element);
+                        wait.until(ExpectedConditions.elementToBeClickable(el));
+                        el.click();
                     }
-
-                    // div.findElement(By.xpath(".//span[contains(text(),'" + selectionText +
-                    // "')]")).click();
                 } catch (Exception e) {
                     continue;
                 }
@@ -415,6 +427,10 @@ public abstract class BaseUIT {
         });
         driver.findElement(By.xpath("//multiselect-combo-box[@id='" + id + "']")).sendKeys(Keys.ENTER);
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//vaadin-combo-box-overlay")));
+    }
+
+    protected void sendShortcut(CharSequence... keysToSend) {
+        driver.findElement(By.tagName("body")).sendKeys(keysToSend);
     }
 
     /**

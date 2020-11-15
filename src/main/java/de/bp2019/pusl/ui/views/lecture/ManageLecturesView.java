@@ -2,6 +2,8 @@ package de.bp2019.pusl.ui.views.lecture;
 
 import java.util.Optional;
 
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -64,6 +66,7 @@ public class ManageLecturesView extends BaseView implements AccessibleByAdmin {
         add(grid);
 
         Button newLectureButton = new Button("Neue Veranstaltung");
+        newLectureButton.addClickShortcut(Key.KEY_N,KeyModifier.CONTROL, KeyModifier.ALT);
         newLectureButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         add(newLectureButton);

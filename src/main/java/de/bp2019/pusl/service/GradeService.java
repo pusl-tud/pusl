@@ -61,7 +61,7 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
     MongoTemplate mongoTemplate;
 
     /**
-     * Save one Grade
+     * Save one {@link Grade}
      *
      * @param grade to persist
      * @author Leon Chemnitz
@@ -74,13 +74,32 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
         if (userIsAuthorized(grade)) {
             gradeRepository.save(grade);
         } else {
-            LOGGER.error("user is not authorized to access Grade!");
+            LOGGER.error("user is not authorized to save Grade!");
             throw new UnauthorizedException();
         }
     }
 
     /**
-     * Delete one Grade
+     * Save multiple {@link Grade}
+     *
+     * @param grades to persist
+     * @author Leon Chemnitz
+     * @throws UnauthorizedException if user not authorized to access
+     */
+    public void save(Iterable<Grade> grades) throws UnauthorizedException {
+        LOGGER.info("saving grades");
+        LOGGER.debug(grades.toString());
+
+        if (userIsAuthorized(grades)) {
+            gradeRepository.saveAll(grades);
+        } else {
+            LOGGER.error("user is not authorized to save Grades!");
+            throw new UnauthorizedException();
+        }
+    }
+
+    /**
+     * Delete one {@link Grade}
      *
      * @param grade to delete
      * @author Leon Chemnitz
@@ -93,7 +112,7 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
         if (userIsAuthorized(grade)) {
             gradeRepository.delete(grade);
         } else {
-            LOGGER.error("user is not authorized to access Grade!");
+            LOGGER.error("user is not authorized to delete Grade!");
             throw new UnauthorizedException();
         }
     }
@@ -129,6 +148,22 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
                 throw new UnauthorizedException();
             }
         }
+    }
+
+    /**
+     * Check if current user is authorized to access the {@link Grade}s
+     * 
+     * @param grades entities to check
+     * @return true if authorized
+     * @author Leon Chemnitz
+     */
+    private boolean userIsAuthorized(Iterable<Grade> grades) {
+        for (Grade grade : grades) {
+            if (!userIsAuthorized(grade)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

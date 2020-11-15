@@ -66,8 +66,7 @@ public class GradeComposer extends CustomField<GradeFilter> {
         authenticationService = Service.get(AuthenticationService.class);
 
         FormLayout layout = new FormLayout();
-        layout.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2),
-                new ResponsiveStep("5em", 3), new ResponsiveStep("5em", 4));
+        layout.setResponsiveSteps(new ResponsiveStep("5em", 6));
         layout.setWidthFull();
 
         matrNumber = new IntegerField();
@@ -83,7 +82,7 @@ public class GradeComposer extends CustomField<GradeFilter> {
         lecture.setDataProvider(lectureService);
         lecture.setLabel("Veranstaltung");
         lecture.setClearButtonVisible(true);
-        layout.add(lecture, 1);
+        layout.add(lecture, 2);
 
         exercise = new ComboBox<>();
         exercise.getElement().setAttribute("theme", "small");
@@ -91,7 +90,7 @@ public class GradeComposer extends CustomField<GradeFilter> {
         exercise.setLabel("Leistung");
         exercise.setClearButtonVisible(true);
         exercise.setEnabled(false);
-        layout.add(exercise, 1);
+        layout.add(exercise, 2);
 
         numeric = new NumberField();
         numeric.addThemeVariants(TextFieldVariant.LUMO_SMALL);

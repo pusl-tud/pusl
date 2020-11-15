@@ -3,6 +3,7 @@ package de.bp2019.pusl.ui.dialogs;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -46,7 +47,7 @@ public final class EditGradeDialog {
 
         VerticalLayout info = new VerticalLayout();
 
-        Label title = new Label("Note bearbeiten");
+        Label title = new Label("Einzelleistung bearbeiten");
         title.getStyle().set("font-size", "1.5em");
         info.add(title);
 
@@ -85,6 +86,7 @@ public final class EditGradeDialog {
         form.add(handIn, 1);
 
         Button save = new Button("speichern");
+		save.addClickShortcut(Key.ENTER);
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
         form.add(save, 1);
 
@@ -98,14 +100,14 @@ public final class EditGradeDialog {
                     Grade toDelete = gradeService.getById(grade.getId().toString());
 
                     gradeService.delete(toDelete);
-                    SuccessDialog.open("Note erfolgreich gelöscht");
+                    SuccessDialog.open("Einzelleistung erfolgreich gelöscht");
                     callback.run();
                 } catch (DataNotFoundException e) {
                     LOGGER.error("Grade not found in Database");
-                    ErrorDialog.open("zu bearbeitende Note wurde nicht in Datenbank gefunden");
+                    ErrorDialog.open("zu bearbeitende Einzelleistung wurde nicht in Datenbank gefunden");
                 } catch (UnauthorizedException e) {
                     LOGGER.error("unauthorized to save Grade");
-                    ErrorDialog.open("Nicht authorisiert um Note zu bearbeiten!");
+                    ErrorDialog.open("Nicht authorisiert um Einzelleistung zu bearbeiten!");
                 } finally {
                     dialog.close();
                 }
@@ -120,11 +122,11 @@ public final class EditGradeDialog {
                 modified = gradeService.getById(grade.getId().toString());
             } catch (DataNotFoundException e) {
                 LOGGER.error("Grade not found in Database");
-                ErrorDialog.open("zu bearbeitende Note wurde nicht in Datenbank gefunden");
+                ErrorDialog.open("zu bearbeitende Einzelleistung wurde nicht in Datenbank gefunden");
                 return;
             } catch (UnauthorizedException e) {
                 LOGGER.error("unauthorized to save Grade");
-                ErrorDialog.open("Nicht authorisiert um Note zu bearbeiten!");
+                ErrorDialog.open("Nicht authorisiert um Einzelleistung zu bearbeiten!");
                 return;
             }
 
@@ -148,7 +150,7 @@ public final class EditGradeDialog {
                 callback.run();
             } catch (UnauthorizedException e) {
                 LOGGER.error("unauthorized to save Grade");
-                ErrorDialog.open("Nicht authorisiert um Note zu bearbeiten!");
+                ErrorDialog.open("Nicht authorisiert um Einzelleistung zu bearbeiten!");
             } finally {
                 dialog.close();
             }

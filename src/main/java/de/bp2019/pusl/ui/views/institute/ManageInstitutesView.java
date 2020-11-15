@@ -1,5 +1,7 @@
 package de.bp2019.pusl.ui.views.institute;
 
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -53,7 +55,8 @@ public class ManageInstitutesView extends BaseView implements AccessibleBySupera
 
         add(grid);
 
-        Button newInstituteButton = new Button("Neues Institut");
+        Button newInstituteButton = new Button("Neues Institut");        
+        newInstituteButton.addClickShortcut(Key.KEY_N,KeyModifier.CONTROL, KeyModifier.ALT);
         newInstituteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         add(newInstituteButton);

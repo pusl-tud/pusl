@@ -4,13 +4,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -64,7 +65,7 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
     /** empty if new institute is being created */
     private Optional<ObjectId> exerciseSchemeId = Optional.empty();
 
-    private ComboBox<Token> defaultValueToken;
+    private Select<Token> defaultValueToken;
     private NumberField defaultValueNumeric;
 
     public EditExerciseSchemeView() {
@@ -96,11 +97,10 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         defaultValueNumeric.setLabel("Standard Note");
         defaultValueNumeric.setId("default-value-numeric");
 
-        defaultValueToken = new ComboBox<>();
+        defaultValueToken = new Select<>();
         defaultValueToken.setLabel("Standard Token");
         defaultValueToken.setId("default-value-token");
         defaultValueToken.setItemLabelGenerator(Token::getName);
-        defaultValueToken.setClearButtonVisible(false);
         defaultValueToken.setVisible(false);
 
         Checkbox tokenBased = new Checkbox("Token basiert");
@@ -120,7 +120,7 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         add(form);
 
         Button save = new Button("Speichern");
-        save.setId("save");
+        save.addClickShortcut(Key.ENTER);
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         add(save);

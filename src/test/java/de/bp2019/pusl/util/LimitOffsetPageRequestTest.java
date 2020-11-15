@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  * @author Leon Chemnitz
  */
 public class LimitOffsetPageRequestTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelUtilTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LimitOffsetPageRequestTest.class);
 
     /**
      * @author Leon Chemnitz

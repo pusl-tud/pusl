@@ -65,6 +65,10 @@ public abstract class BaseTabs<T extends Component> extends Component implements
         }
         Tab tab = new Tab(title);
 
+        if(getId().isPresent()){
+            tab.setId(getId().get() + "-" + title.toLowerCase());
+        }
+
         titleToPages.put(title, component);
         titleToTabs.put(title, tab);
         tabsComponent.add(tab);
@@ -136,12 +140,17 @@ public abstract class BaseTabs<T extends Component> extends Component implements
         createTabsComponent();
     }
 
+    public void setComponentHeight(String height) {
+        setHeight(height);
+        tabsComponent.setHeight(height);
+    }
+
     private void createTabsComponent() {
         tabsComponent = new Tabs();
         tabsComponent.getStyle().set("margin", "0");
         tabsComponent.setOrientation(orientation);
 
-        add(tabsComponent);
+        ((HasComponents) layout).add(tabsComponent);
 
         tabsComponent.addSelectedChangeListener(event -> {
             var selectedTab = tabsComponent.getSelectedTab();
