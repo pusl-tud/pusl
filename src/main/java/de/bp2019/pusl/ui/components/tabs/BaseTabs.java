@@ -65,6 +65,10 @@ public abstract class BaseTabs<T extends Component> extends Component implements
         }
         Tab tab = new Tab(title);
 
+        if(getId().isPresent()){
+            tab.setId(getId().get() + "-" + title.toLowerCase());
+        }
+
         titleToPages.put(title, component);
         titleToTabs.put(title, tab);
         tabsComponent.add(tab);

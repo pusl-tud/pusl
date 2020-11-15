@@ -2,6 +2,8 @@ package de.bp2019.pusl.ui.views.exercisescheme;
 
 import java.util.Optional;
 
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -62,6 +64,7 @@ public class ManageExerciseSchemesView extends BaseView implements AccessibleByA
         add(grid);
 
         Button newExerciseSchemeButton = new Button("Neues Leistungsschema");
+        newExerciseSchemeButton.addClickShortcut(Key.KEY_N,KeyModifier.CONTROL, KeyModifier.ALT);
         newExerciseSchemeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         add(newExerciseSchemeButton);

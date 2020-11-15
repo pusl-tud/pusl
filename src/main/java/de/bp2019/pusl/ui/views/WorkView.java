@@ -1,5 +1,6 @@
 package de.bp2019.pusl.ui.views;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,7 +18,10 @@ import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Location;
@@ -36,6 +40,7 @@ import de.bp2019.pusl.model.Exercise;
 import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.GradeFilter;
 import de.bp2019.pusl.model.Lecture;
+import de.bp2019.pusl.model.TUCanEntity;
 import de.bp2019.pusl.service.AuthenticationService;
 import de.bp2019.pusl.service.GradeService;
 import de.bp2019.pusl.service.LectureService;
@@ -44,8 +49,10 @@ import de.bp2019.pusl.ui.components.GradeComposer;
 import de.bp2019.pusl.ui.components.tabs.VerticalTabs;
 import de.bp2019.pusl.ui.dialogs.EditGradeDialog;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
+import de.bp2019.pusl.ui.dialogs.ImportGradesDialog;
 import de.bp2019.pusl.ui.dialogs.SuccessDialog;
 import de.bp2019.pusl.util.ExcelExporter;
+import de.bp2019.pusl.util.ImportUtil;
 import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.Utils;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
@@ -99,6 +106,8 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         /* ########### create Grade ########### */
 
+        VerticalLayout createGradeVerticalLayout = new VerticalLayout();
+
         FormLayout createGrade = new FormLayout();
         createGrade.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2));
         createGrade.setWidth("100%");
@@ -115,7 +124,21 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         createGradeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         createGrade.add(createGradeButton, 1);
 
-        verticalTabs.addTab("Eintragen", createGrade);
+        createGradeVerticalLayout.add(createGrade);
+
+        MemoryBuffer uploadBuffer = new MemoryBuffer();
+
+        Upload upload = new Upload(uploadBuffer);
+        upload.setDropLabel(new Span("TUCan-Liste hier abelegen"));
+        upload.setUploadButton(new Button("TUCan-Liste hochladen"));
+        upload.setAcceptedFileTypes(ImportUtil.ACCEPTED_TYPES);
+        upload.setWidth("96%");
+        upload.setHeight("12em");
+        upload.getStyle().set("marginLeft", "1em");
+
+        createGradeVerticalLayout.add(upload);
+
+        verticalTabs.addTab("Eintragen", createGradeVerticalLayout);
 
         /* ########### show Grades ########### */
 
@@ -139,9 +162,10 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         showGradesHeader.add(endDateFilter, 1);
 
         ExcelExporter<Grade> excelExporter = createExcelExporter();
-        VaadinSession.getCurrent().setAttribute(Authentication.class, SecurityContextHolder.getContext().getAuthentication());
+        VaadinSession.getCurrent().setAttribute(Authentication.class,
+                SecurityContextHolder.getContext().getAuthentication());
         Anchor download = new Anchor(new StreamResource("noten.xlsx", (stream, session) -> {
-            excelExporter.createResource(stream,session);
+            excelExporter.createResource(stream, session);
         }), "");
         download.getElement().setAttribute("download", true);
         Button downloadButton = new Button("Download Excel");
@@ -164,15 +188,15 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         grid.addColumn(Grade::getMatrNumber).setKey("matrNumber").setHeader("Matr. Nr.").setAutoWidth(true);
         grid.addColumn(item -> item.getLecture().getName()).setKey("lecture").setHeader("Veranstaltung")
                 .setAutoWidth(true);
-        grid.addColumn(item -> item.getExercise().getName()).setKey("exercise").setHeader("Leistung").setAutoWidth(true);
+        grid.addColumn(item -> item.getExercise().getName()).setKey("exercise").setHeader("Leistung")
+                .setAutoWidth(true);
         grid.addColumn(item -> {
-                if( item.getHandIn() != null){
-                    return item.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM. uuuu"));
-                } else{
-                    return "";
-                }
-            }).setKey("handIn")
-                .setHeader("Abgabedatum").setAutoWidth(true);
+            if (item.getHandIn() != null) {
+                return item.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM. uuuu"));
+            } else {
+                return "";
+            }
+        }).setKey("handIn").setHeader("Abgabedatum").setAutoWidth(true);
         grid.addColumn(Grade::getValue).setHeader("Note").setAutoWidth(true);
         grid.setSortableColumns("matrNumber", "handIn");
 
@@ -267,6 +291,15 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             filteringGradeDataProvider.refreshAll();
         });
 
+        upload.addSucceededListener(event -> {
+            try {
+                List<TUCanEntity> entities = ImportUtil.readUpload(uploadBuffer.getInputStream(), event.getFileName());
+                ImportGradesDialog.open(entities, filteringGradeDataProvider);
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage());
+                ErrorDialog.open("Fehler beim öffnen der Datei");
+            }
+        });
     }
 
     @Override

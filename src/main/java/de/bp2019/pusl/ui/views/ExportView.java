@@ -24,14 +24,14 @@ import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Lecture;
 import de.bp2019.pusl.model.Performance;
 import de.bp2019.pusl.model.PerformanceScheme;
+import de.bp2019.pusl.model.TUCanEntity;
 import de.bp2019.pusl.service.CalculationService;
 import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.interfaces.AccessibleByWimi;
 import de.bp2019.pusl.util.ExcelExporter;
-import de.bp2019.pusl.util.ExcelUtil;
+import de.bp2019.pusl.util.ImportUtil;
 import de.bp2019.pusl.util.Service;
-import de.bp2019.pusl.util.Utils;
 
 /**
  * View to calculate and list the {@link Performance}s and export them as a
@@ -62,7 +62,7 @@ public class ExportView extends BaseView implements AccessibleByWimi {
     private Grid<Performance> grid;
 
     public ExportView() {
-        super("Noten exportieren");
+        super("Export");
 
         this.calculationService = Service.get(CalculationService.class);
         this.lectureService = Service.get(LectureService.class);
@@ -94,9 +94,10 @@ public class ExportView extends BaseView implements AccessibleByWimi {
         /* ######## Upload Component and Calculate Button ######## */
 
         Upload upload = new Upload(uploadBuffer);        
-        upload.setDropLabel(new Span("Excelliste hier abelegen"));
-        upload.setUploadButton(new Button("Matrikelnummern hochladen"));
-        upload.setAcceptedFileTypes(".xlsx");
+        upload.setDropLabel(new Span("TUCan-Liste hier abelegen"));
+        upload.setUploadButton(new Button("TUCan-Liste hochladen"));
+        upload.setAcceptedFileTypes(ImportUtil.ACCEPTED_TYPES);
+        upload.setMaxFiles(1);        
         upload.setWidth("96%");
 
         add(upload);
@@ -105,6 +106,7 @@ public class ExportView extends BaseView implements AccessibleByWimi {
 
         grid = new Grid<>();
         grid.addThemeVariants(GridVariant.LUMO_COMPACT);
+        grid.setHeight("20em");
         grid.setDataProvider(performanceDataProvider);
 
         grid.addColumn(Performance::getMatriculationNumber).setHeader("Matrikel-Nummer").setAutoWidth(true);        
@@ -125,7 +127,6 @@ public class ExportView extends BaseView implements AccessibleByWimi {
         downloadButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         download.add(downloadButton);
         download.setWidthFull();
-
         add(download);
 
         /* ######## Listeners ######## */
@@ -170,7 +171,10 @@ public class ExportView extends BaseView implements AccessibleByWimi {
         List<String> matrNumbers = new ArrayList<String>();
         try {
             if (uploadBuffer.getInputStream().available() > 0) {
-                matrNumbers = ExcelUtil.readColumnToList(uploadBuffer.getInputStream(), 0);
+                matrNumbers = ImportUtil.readUpload(uploadBuffer.getInputStream(), uploadBuffer.getFileName())
+                .stream()
+                .map(TUCanEntity::getMatrNumber)
+                .collect(Collectors.toList());
             }
 
             uploadBuffer.getInputStream().close();
@@ -179,14 +183,7 @@ public class ExportView extends BaseView implements AccessibleByWimi {
             LOGGER.error(e.toString());
         }
 
-        matrNumbers = matrNumbers.stream().distinct().map(m -> {
-            String subStrings[] = m.split("\\.");
-            if(subStrings.length == 2){
-                return subStrings[0];
-            }else{
-                return "";
-            }
-        }).filter(Utils::isMatrNumber).collect(Collectors.toList());
+        matrNumbers = matrNumbers.stream().distinct().collect(Collectors.toList());
 
         LOGGER.debug("read matrNumbers " + matrNumbers.toString());
 

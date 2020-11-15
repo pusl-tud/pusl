@@ -17,6 +17,7 @@ import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.repository.UserRepository;
 import de.bp2019.pusl.ui.views.AccountView;
 import de.bp2019.pusl.ui.views.user.ManageUsersView;
+import de.bp2019.pusl.util.Utils;
 
 /**
  * UI test for {@link AccountView}
@@ -80,38 +81,39 @@ public class AccountViewUIT extends BaseUIT {
     public void testSaveSuccess() throws Exception {
         LOGGER.info("Testing save success");
 
-        for(UserType type: UserType.values()){
-            User oldUser = login(type);
-            ObjectId id = oldUser.getId();
-            String password = oldUser.getPassword();
-            String email = oldUser.getEmailAddress();
+        UserType type = Utils.randomValueFromEnum(UserType.class);
 
-            goToURL(AccountView.ROUTE);
-        
-            String firstName = RandomStringUtils.randomAlphanumeric(14);
-            LOGGER.info("first name: " + firstName);
-            String lastName = RandomStringUtils.randomAlphanumeric(14);
-            LOGGER.info("last name: " + lastName);
-    
-            clearFieldById("firstName");
-            findElementById("firstName").sendKeys(firstName);
-            clearFieldById("lastName");
-            findElementById("lastName").sendKeys(lastName);
-    
-            findButtonContainingText("Änderungen speichern").click();
-    
-            waitForURL(PuslProperties.ROOT_ROUTE);
-    
-            User foundUser = userRepository.findById(id.toString()).get();
-            LOGGER.info("New User: " + foundUser.toString());
-    
-            assertEquals(firstName, foundUser.getFirstName());
-            assertEquals(lastName, foundUser.getLastName());
-            assertEquals(email, foundUser.getEmailAddress());
-            assertEquals(password, foundUser.getPassword());
+        User oldUser = login(type);
+        ObjectId id = oldUser.getId();
+        String password = oldUser.getPassword();
+        String email = oldUser.getEmailAddress();
 
-            logout();
-        }
+        goToURL(AccountView.ROUTE);
+
+        String firstName = RandomStringUtils.randomAlphanumeric(14);
+        LOGGER.info("first name: " + firstName);
+        String lastName = RandomStringUtils.randomAlphanumeric(14);
+        LOGGER.info("last name: " + lastName);
+
+        clearFieldById("firstName");
+        findElementById("firstName").sendKeys(firstName);
+        clearFieldById("lastName");
+        findElementById("lastName").sendKeys(lastName);
+
+        findButtonContainingText("Änderungen speichern").click();
+
+        waitForURL(PuslProperties.ROOT_ROUTE);
+
+        User foundUser = userRepository.findById(id.toString()).get();
+        LOGGER.info("New User: " + foundUser.toString());
+
+        assertEquals(firstName, foundUser.getFirstName());
+        assertEquals(lastName, foundUser.getLastName());
+        assertEquals(email, foundUser.getEmailAddress());
+        assertEquals(password, foundUser.getPassword());
+
+        logout();
+
     }
 
     /**

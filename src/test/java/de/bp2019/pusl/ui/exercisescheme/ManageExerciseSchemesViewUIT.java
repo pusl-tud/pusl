@@ -63,7 +63,7 @@ public class ManageExerciseSchemesViewUIT extends BaseUIT {
 
         goToURL(ManageExerciseSchemesView.ROUTE);
 
-        findButtonContainingText("Neues Übungsschema").click();
+        findButtonContainingText("Neues Leistungsschema").click();
 
         waitForURL(EditExerciseSchemeView.ROUTE + "/new");
     }

@@ -1,5 +1,7 @@
 package de.bp2019.pusl.ui.views;
 
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -33,6 +35,8 @@ import de.bp2019.pusl.util.Service;
  * @author Leon Chemnitz
  */
 @CssImport("./styles/global.css")
+
+@CssImport(value = "./styles/global.css", themeFor = "vaadin-grid")
 @Viewport("width=device-width, minimum-scale=0.5, initial-scale=1, user-scalable=yes, viewport-fit=cover")
 @PWA(name = PuslProperties.NAME, shortName = PuslProperties.NAME, iconPath = "icons/icon-192.png")
 public class MainAppView extends AppLayout {
@@ -83,28 +87,29 @@ public class MainAppView extends AppLayout {
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(false);
 
-        content.add(generateMenuButton("Einzelleistungen", new Icon(VaadinIcon.HOME), PuslProperties.ROOT_ROUTE));
+        content.add(generateMenuButton("Einzelleistungen", new Icon(VaadinIcon.HOME), PuslProperties.ROOT_ROUTE,
+                Key.KEY_L));
 
         if (currentUser.getType() != UserType.HIWI) {
-            content.add(generateMenuButton("Export", new Icon(VaadinIcon.DOWNLOAD), ExportView.ROUTE));
+            content.add(generateMenuButton("Export", new Icon(VaadinIcon.DOWNLOAD), ExportView.ROUTE, Key.KEY_E));
         }
-        content.add(generateMenuButton("Mein Account", new Icon(VaadinIcon.USER), AccountView.ROUTE));
+        content.add(generateMenuButton("Mein Account", new Icon(VaadinIcon.USER), AccountView.ROUTE, Key.KEY_A));
 
         if (currentUser.getType().ordinal() <= UserType.ADMIN.ordinal()) {
             content.add(generateSeperator());
             content.add(generateSectionLabel("Admin"));
-            content.add(generateMenuButton("Nutzer", new Icon(VaadinIcon.USERS), ManageUsersView.ROUTE));
-            content.add(
-                    generateMenuButton("Veranstaltungen", new Icon(VaadinIcon.ACADEMY_CAP), ManageLecturesView.ROUTE));
+            content.add(generateMenuButton("Nutzer", new Icon(VaadinIcon.USERS), ManageUsersView.ROUTE, Key.KEY_U));
+            content.add(generateMenuButton("Veranstaltungen", new Icon(VaadinIcon.ACADEMY_CAP),
+                    ManageLecturesView.ROUTE, Key.KEY_V));
             content.add(generateMenuButton("Leistungsschemas", new Icon(VaadinIcon.NOTEBOOK),
-                    ManageExerciseSchemesView.ROUTE));
+                    ManageExerciseSchemesView.ROUTE, Key.KEY_S));
 
             if (currentUser.getType() == UserType.SUPERADMIN) {
                 content.add(generateSeperator());
                 content.add(generateSectionLabel("Global"));
                 content.add(
-                        generateMenuButton("Institute", new Icon(VaadinIcon.WORKPLACE), ManageInstitutesView.ROUTE));
-                content.add(generateMenuButton("Datenbank", new Icon(VaadinIcon.DATABASE), DatabaseView.ROUTE));
+                        generateMenuButton("Institute", new Icon(VaadinIcon.WORKPLACE), ManageInstitutesView.ROUTE, Key.KEY_I));
+                content.add(generateMenuButton("Datenbank", new Icon(VaadinIcon.DATABASE), DatabaseView.ROUTE, Key.KEY_D));
             }
         }
 
@@ -120,13 +125,17 @@ public class MainAppView extends AppLayout {
      * 
      * @author Leon Chemnitz
      */
-    private Button generateMenuButton(String buttonText, Icon icon, String url) {
+    private Button generateMenuButton(String buttonText, Icon icon, String url, Key shortcut) {
         Button button;
 
         if (icon != null) {
             button = new Button(buttonText, icon);
         } else {
             button = new Button(buttonText);
+        }
+
+        if (shortcut != null) {
+            button.addClickShortcut(shortcut, KeyModifier.CONTROL, KeyModifier.ALT);
         }
 
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);

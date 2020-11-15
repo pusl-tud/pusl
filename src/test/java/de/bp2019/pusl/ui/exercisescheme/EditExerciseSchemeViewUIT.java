@@ -42,21 +42,21 @@ public class EditExerciseSchemeViewUIT extends BaseUIT {
 
         goToURL(EditExerciseSchemeView.ROUTE + "/new");
 
-        String name = RandomStringUtils.random(16, true, true);
-        findElementById("name").sendKeys(name);
-        findMSCBByIdAndSelectByTexts("institutes", Arrays.asList(institute.getName()));
         findElementById("token-based").click();
 
         String tokenName = RandomStringUtils.randomAlphanumeric(16);
         findElementById("token-name").sendKeys(tokenName);
         findElementById("add-token").click();
 
-        Thread.sleep(500);
-        findElementById("default-value-token").sendKeys(tokenName);
-        findElementById("default-value-token").sendKeys(Keys.ENTER);
-        Thread.sleep(500);
+        findSelectByIdAndSelectByText("default-value-token", tokenName);
+        
+        findMSCBByIdAndSelectByTexts("institutes", Arrays.asList(institute.getName()));
 
-        findElementById("save").click();
+        String name = RandomStringUtils.random(16, true, true);
+        findElementById("name").sendKeys(name);
+
+        sendShortcut(Keys.ENTER);
+
         waitForURL(ManageExerciseSchemesView.ROUTE);
 
         ExerciseScheme exerciseScheme = exerciseSchemeRepository.findAll().get(0);

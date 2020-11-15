@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -126,6 +127,7 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 add(formLayout);
 
                 Button save = new Button("Speichern");
+                save.addClickShortcut(Key.ENTER);
                 save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
                 add(save);

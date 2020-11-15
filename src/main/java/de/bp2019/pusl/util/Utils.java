@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -136,5 +137,10 @@ public final class Utils {
         int fullChunks = (size - 1) / length;
         return IntStream.range(0, fullChunks + 1).mapToObj(
             n -> source.subList(n * length, n == fullChunks ? size : (n + 1) * length));
+    }
+
+    public static <E extends Enum<?>> E randomValueFromEnum(Class<E> e) {
+        int pick = new Random().nextInt(e.getEnumConstants().length);
+        return e.getEnumConstants()[pick];
     }
 }

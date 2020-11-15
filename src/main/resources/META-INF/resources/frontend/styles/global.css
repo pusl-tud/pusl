@@ -5,3 +5,13 @@ html {
   --lumo-primary-color-10pct: rgba(185, 15, 34, 0.1);
   --lumo-primary-color: #B90F22;
 }
+
+.background-red {
+  background: rgb(255, 48, 48);
+  height: 2em;
+}
+
+.background-yellow {
+  background: rgb(255, 255, 78);
+  height: 2em;
+}
