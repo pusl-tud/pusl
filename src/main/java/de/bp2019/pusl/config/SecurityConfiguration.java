@@ -2,6 +2,7 @@ package de.bp2019.pusl.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -20,6 +21,7 @@ import de.bp2019.pusl.util.SecurityUtils;
  */
 @EnableWebSecurity
 @Configuration
+@EnableScheduling
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Bean

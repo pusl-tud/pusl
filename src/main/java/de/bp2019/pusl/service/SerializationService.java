@@ -170,6 +170,8 @@ public class SerializationService {
 
     public class ObjectIdSerializer extends StdSerializer<ObjectId> {
 
+        private static final long serialVersionUID = -947430384568704517L;
+
         public ObjectIdSerializer() {
             this(null);
         }
@@ -188,6 +190,8 @@ public class SerializationService {
     }
 
     public class ObjectIdDeserializer extends StdDeserializer<ObjectId> {
+
+        private static final long serialVersionUID = -4134098516454782521L;
 
         public ObjectIdDeserializer() {
             this(null);

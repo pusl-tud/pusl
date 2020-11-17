@@ -5,6 +5,8 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,7 @@ import de.bp2019.pusl.ui.interfaces.AccessibleByAdmin;
 import de.bp2019.pusl.ui.interfaces.AccessibleBySuperadmin;
 import de.bp2019.pusl.ui.interfaces.AccessibleByWimi;
 import de.bp2019.pusl.ui.views.LoginView;
+import de.bp2019.pusl.ui.views.PasswordResetView;
 import de.bp2019.pusl.util.SecurityUtils;
 import de.bp2019.pusl.util.Utils;
 
@@ -28,6 +31,9 @@ import de.bp2019.pusl.util.Utils;
 @Component
 @Scope("session")
 public class RouteProtectionConfig implements VaadinServiceInitListener {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RouteProtectionConfig.class);
+
 
     private static final long serialVersionUID = 1L;
 
@@ -51,7 +57,7 @@ public class RouteProtectionConfig implements VaadinServiceInitListener {
     private void beforeEnter(BeforeEnterEvent event) {
         UserType userType = authenticationService.currentUserType();
 
-        boolean userIsOnLoginView = LoginView.class.equals(event.getNavigationTarget());
+        boolean userIsOnLoginView = LoginView.class.equals(event.getNavigationTarget()) || PasswordResetView.class.equals(event.getNavigationTarget());
 
         if (!userIsOnLoginView && !SecurityUtils.isUserLoggedIn()) {
             /* User is not logged in and not on Login page -> reroute to login page */
