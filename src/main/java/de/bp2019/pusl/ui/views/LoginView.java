@@ -56,6 +56,11 @@ public class LoginView extends VerticalLayout {
 		login.setOpened(true);
 		add(login);
 
+		login.addForgotPasswordListener(e -> {
+			login.close();
+			UI.getCurrent().navigate(PasswordResetView.class);
+		});
+
 		login.addLoginListener(e -> {
 			try {
 				/*
