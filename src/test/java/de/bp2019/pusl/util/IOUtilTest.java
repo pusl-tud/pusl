@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Leon Chemnitz
  */
-public class ImportUtilTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportUtilTest.class);
+public class IOUtilTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IOUtilTest.class);
 
     // /**
     //  * @author Leon Chemnitz

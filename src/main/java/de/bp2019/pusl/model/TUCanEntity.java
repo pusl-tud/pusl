@@ -5,12 +5,12 @@ import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 
 public class TUCanEntity {
-    private String number;
-    private String matrNumber;
-    private String firstName;
-    private String middleName;
-    private String lastName;
-    private String grade;
+    public String number;
+    public String matrNumber;
+    public String firstName;
+    public String middleName;
+    public String lastName;
+    public String grade;
 
     /**
      * Sets up the processors used for the examples. There are 10 CSV columns, so 10
@@ -20,8 +20,7 @@ public class TUCanEntity {
      * @return the cell processors
      */
     public static CellProcessor[] getCSVProcessors() {
-        final CellProcessor[] processors = new CellProcessor[] {
-                new Optional(), // number
+        final CellProcessor[] processors = new CellProcessor[] { new Optional(), // number
                 new NotNull(), // matrNumber
                 new Optional(), // firstName
                 new Optional(), // middleName
@@ -33,7 +32,29 @@ public class TUCanEntity {
     }
 
     public static String[] getMapping() {
-        return new String[] { "number", "matrNumber", "firstName", "middleName", "lastName", "grade"};
+        return new String[] { "number", "matrNumber", "firstName", "middleName", "lastName", "grade" };
+    }
+
+    public static String[] getHeaders() {
+        return new String[] { "Nummer", "Matrikelnummer", "Vorname", "Mittelname", "Name", "Bewertung" };
+    }
+
+    public static TUCanEntity fromPerformance(Performance performance) {
+        TUCanEntity entity = new TUCanEntity();
+        
+        entity.matrNumber = performance.getMatriculationNumber();
+        entity.grade = performance.getGrade();
+
+        return entity;
+    }
+
+    public static TUCanEntity fromGrade(Grade grade) {
+        TUCanEntity entity = new TUCanEntity();
+        
+        entity.matrNumber = grade.getMatrNumber();
+        entity.grade = grade.getValue();
+
+        return entity;
     }
 
     public String getNumber() {

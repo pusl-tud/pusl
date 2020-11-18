@@ -20,6 +20,7 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.router.BeforeEvent;
@@ -30,6 +31,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.StreamResourceWriter;
 import com.vaadin.flow.server.VaadinSession;
 
 import org.springframework.security.core.Authentication;
@@ -51,8 +53,7 @@ import de.bp2019.pusl.ui.dialogs.EditGradeDialog;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.dialogs.ImportGradesDialog;
 import de.bp2019.pusl.ui.dialogs.SuccessDialog;
-import de.bp2019.pusl.util.ExcelExporter;
-import de.bp2019.pusl.util.ImportUtil;
+import de.bp2019.pusl.util.IOUtil;
 import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.Utils;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
@@ -82,6 +83,11 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
     private Grid<Grade> grid;
 
     private GradeFilter filter;
+
+    private Anchor download;
+    private Button downloadButton;
+
+    private Select<String> extensionSelect;
 
     public WorkView() {
         super("Einzelleistungen");
@@ -131,7 +137,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         Upload upload = new Upload(uploadBuffer);
         upload.setDropLabel(new Span("TUCan-Liste hier abelegen"));
         upload.setUploadButton(new Button("TUCan-Liste hochladen"));
-        upload.setAcceptedFileTypes(ImportUtil.ACCEPTED_TYPES);
+        upload.setAcceptedFileTypes(IOUtil.ACCEPTED_TYPES);
         upload.setWidth("96%");
         upload.setHeight("12em");
         upload.getStyle().set("marginLeft", "1em");
@@ -145,36 +151,42 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         VerticalLayout showGrades = new VerticalLayout();
 
         FormLayout showGradesHeader = new FormLayout();
-        showGradesHeader.setResponsiveSteps(new ResponsiveStep("5em", 1), new ResponsiveStep("5em", 2),
-                new ResponsiveStep("5em", 3));
+        showGradesHeader.setResponsiveSteps(new ResponsiveStep("5em", 9));
         showGradesHeader.setWidthFull();
 
         DatePicker startDateFilter = new DatePicker();
         startDateFilter.setLabel("Start");
         startDateFilter.setClearButtonVisible(true);
         startDateFilter.getElement().setAttribute("theme", "small");
-        showGradesHeader.add(startDateFilter, 1);
+        showGradesHeader.add(startDateFilter, 3);
 
         DatePicker endDateFilter = new DatePicker();
         endDateFilter.setClearButtonVisible(true);
         endDateFilter.setLabel("End");
         endDateFilter.getElement().setAttribute("theme", "small");
-        showGradesHeader.add(endDateFilter, 1);
+        showGradesHeader.add(endDateFilter, 3);
 
-        ExcelExporter<Grade> excelExporter = createExcelExporter();
         VaadinSession.getCurrent().setAttribute(Authentication.class,
-                SecurityContextHolder.getContext().getAuthentication());
-        Anchor download = new Anchor(new StreamResource("noten.xlsx", (stream, session) -> {
-            excelExporter.createResource(stream, session);
-        }), "");
+        SecurityContextHolder.getContext().getAuthentication());
+
+        download = new Anchor("", "");
+
         download.getElement().setAttribute("download", true);
-        Button downloadButton = new Button("Download Excel");
+        downloadButton = new Button("Download");
+
         downloadButton.setWidthFull();
         downloadButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         download.add(downloadButton);
-        download.setWidthFull();
 
-        showGradesHeader.add(download, 1);
+        download.setWidthFull();
+        showGradesHeader.add(download, 2);
+
+        extensionSelect = new Select<>(IOUtil.ACCEPTED_TYPES);
+        extensionSelect.setEmptySelectionAllowed(false);
+        extensionSelect.setValue(IOUtil.ACCEPTED_TYPES[0]);
+        refreshStreamResource();
+        showGradesHeader.add(extensionSelect, 1);
+
         showGrades.add(showGradesHeader);
 
         grid = new Grid<>(Grade.class);
@@ -293,12 +305,16 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
 
         upload.addSucceededListener(event -> {
             try {
-                List<TUCanEntity> entities = ImportUtil.readUpload(uploadBuffer.getInputStream(), event.getFileName());
+                List<TUCanEntity> entities = IOUtil.readUpload(uploadBuffer.getInputStream(), event.getFileName());
                 ImportGradesDialog.open(entities, filteringGradeDataProvider);
             } catch (IOException e) {
                 LOGGER.error(e.getMessage());
                 ErrorDialog.open("Fehler beim öffnen der Datei");
             }
+        });
+
+        extensionSelect.addValueChangeListener( e -> {
+            refreshStreamResource();
         });
     }
 
@@ -346,19 +362,36 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         }
     }
 
-    private ExcelExporter<Grade> createExcelExporter() {
-        ExcelExporter<Grade> excelExporter = new ExcelExporter<>();
+    private void refreshStreamResource() {
+        String extension = extensionSelect.getValue();
 
-        excelExporter.setDataProvider(filteringGradeDataProvider);
-        excelExporter.addColumn("Matr.Nummer", Grade::getMatrNumber);
-        excelExporter.addColumn("Bewertung", Grade::getValue);
-        excelExporter.addColumn("Veranstaltung", grade -> grade.getLecture().getName());
-        excelExporter.addColumn("Leistung", grade -> grade.getExercise().getName());
-        excelExporter.addColumn("Eingetragen von", Grade::getNameOfGradedBy);
-        excelExporter.addColumn("Abgegeben am",
-                grade -> grade.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM. uuuu")));
-        excelExporter.addColumn("Zuletzt verändert", Grade::getLastModifiedFormatted);
+        StreamResourceWriter resourceWriter;
+        if (extension.equals(".csv")) {
+            resourceWriter = IOUtil.createCSVResourceWriter(filteringGradeDataProvider);
+        } else {
+            resourceWriter = IOUtil.createExcelResourceWriter(filteringGradeDataProvider);
+        }
 
-        return excelExporter;
+        String fileName = "einzelleistungen_" + LocalDate.now();
+        download.setHref(new StreamResource(fileName + extension, resourceWriter));
     }
+
+    // private Exporter<Grade> createExcelExporter() {
+    // Exporter<Grade> excelExporter = new Exporter<>();
+
+    // excelExporter.setDataProvider(filteringGradeDataProvider);
+    // excelExporter.addColumn("Matr.Nummer", Grade::getMatrNumber);
+    // excelExporter.addColumn("Bewertung", Grade::getValue);
+    // excelExporter.addColumn("Veranstaltung", grade ->
+    // grade.getLecture().getName());
+    // excelExporter.addColumn("Leistung", grade -> grade.getExercise().getName());
+    // excelExporter.addColumn("Eingetragen von", Grade::getNameOfGradedBy);
+    // excelExporter.addColumn("Abgegeben am",
+    // grade -> grade.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM.
+    // uuuu")));
+    // excelExporter.addColumn("Zuletzt verändert",
+    // Grade::getLastModifiedFormatted);
+
+    // return excelExporter;
+    // }
 }
