@@ -1,6 +1,7 @@
 package de.bp2019.pusl.ui.views;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,6 +9,7 @@ import java.util.stream.Collectors;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Anchor;
@@ -19,6 +21,7 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.StreamResourceWriter;
 
 import de.bp2019.pusl.config.PuslProperties;
 import de.bp2019.pusl.model.Lecture;
@@ -29,15 +32,14 @@ import de.bp2019.pusl.service.CalculationService;
 import de.bp2019.pusl.service.LectureService;
 import de.bp2019.pusl.ui.dialogs.ErrorDialog;
 import de.bp2019.pusl.ui.interfaces.AccessibleByWimi;
-import de.bp2019.pusl.util.ExcelExporter;
-import de.bp2019.pusl.util.ImportUtil;
+import de.bp2019.pusl.util.IOUtil;
 import de.bp2019.pusl.util.Service;
 
 /**
  * View to calculate and list the {@link Performance}s and export them as a
  * Excelsheet;
  *
- * @author Luca Dinies
+ * @author Leon Chemnitz, Luca Dinies
  **/
 
 @PageTitle(PuslProperties.NAME + " | Export")
@@ -58,8 +60,12 @@ public class ExportView extends BaseView implements AccessibleByWimi {
     private Select<Lecture> lectureSelect;
     private Select<PerformanceScheme> performanceSchemeSelect;
 
-    private ExcelExporter<Performance> exporter;
     private Grid<Performance> grid;
+
+    private Anchor download;
+    private Button downloadButton;
+
+    private Select<String> extensionSelect;
 
     public ExportView() {
         super("Export");
@@ -93,11 +99,11 @@ public class ExportView extends BaseView implements AccessibleByWimi {
 
         /* ######## Upload Component and Calculate Button ######## */
 
-        Upload upload = new Upload(uploadBuffer);        
+        Upload upload = new Upload(uploadBuffer);
         upload.setDropLabel(new Span("TUCan-Liste hier abelegen"));
         upload.setUploadButton(new Button("TUCan-Liste hochladen"));
-        upload.setAcceptedFileTypes(ImportUtil.ACCEPTED_TYPES);
-        upload.setMaxFiles(1);        
+        upload.setAcceptedFileTypes(IOUtil.ACCEPTED_TYPES);
+        upload.setMaxFiles(1);
         upload.setWidth("96%");
 
         add(upload);
@@ -108,27 +114,34 @@ public class ExportView extends BaseView implements AccessibleByWimi {
         grid.addThemeVariants(GridVariant.LUMO_COMPACT);
         grid.setHeight("20em");
         grid.setDataProvider(performanceDataProvider);
-
+    
         grid.addColumn(Performance::getMatriculationNumber).setHeader("Matrikel-Nummer").setAutoWidth(true);        
         grid.addColumn(Performance::getGrade).setKey("performance").setHeader("");
 
         add(grid);
 
-        exporter = new ExcelExporter<Performance>();
-        exporter.setDataProvider(performanceDataProvider);
-        exporter.addColumn("Matr.Nummer", Performance::getMatriculationNumber);
+        FormLayout downloadLayout = new FormLayout();
+        downloadLayout.setResponsiveSteps(new ResponsiveStep("2em", 4));
 
-        Anchor download = new Anchor(
-                new StreamResource("leistungen.xlsx", (stream, session) -> exporter.createResource(stream, session)),
-                "");
+        download = new Anchor("", "");
+
         download.getElement().setAttribute("download", true);
-        Button downloadButton = new Button("Download Excel");
+        downloadButton = new Button("Download");
+
         downloadButton.setWidthFull();
+        downloadButton.setEnabled(false);
         downloadButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         download.add(downloadButton);
-        download.setWidthFull();
-        add(download);
 
+        download.setWidthFull();
+        downloadLayout.add(download, 3);
+
+        extensionSelect = new Select<>(IOUtil.ACCEPTED_TYPES);
+        extensionSelect.setEmptySelectionAllowed(false);
+        extensionSelect.setValue(IOUtil.ACCEPTED_TYPES[0]);
+        downloadLayout.add(extensionSelect, 1);
+
+        add(downloadLayout);
         /* ######## Listeners ######## */
 
         lectureSelect.addValueChangeListener(event -> {
@@ -140,6 +153,12 @@ public class ExportView extends BaseView implements AccessibleByWimi {
                     performanceSchemeSelect.setEnabled(true);
                 }
             }
+
+            refreshStreamResource();
+        });
+
+        extensionSelect.addValueChangeListener( e -> {
+            refreshStreamResource();
         });
 
         upload.addSucceededListener(event -> {
@@ -147,34 +166,52 @@ public class ExportView extends BaseView implements AccessibleByWimi {
         });
 
         performanceSchemeSelect.addValueChangeListener(event -> {
+            refreshStreamResource();
             refreshGrid();
         });
 
+    }
+
+    private void refreshStreamResource() {
+        PerformanceScheme performanceScheme = performanceSchemeSelect.getValue();
+        Lecture lecture = lectureSelect.getValue();
+        String extension = extensionSelect.getValue();
+
+        StreamResourceWriter resourceWriter;
+        if (extension.equals(".csv")) {
+            resourceWriter = IOUtil.createCSVResourceWriter(performanceList);
+        } else {
+            resourceWriter = IOUtil.createExcelResourceWriter(performanceList);
+        }
+
+        if (performanceScheme != null && lecture != null) {
+            downloadButton.setEnabled(true);
+            download.setEnabled(true);
+
+            String fileName = lecture.getName().toLowerCase().replace(' ', '-') + "_"
+                    + performanceSchemeSelect.getValue().getName().toLowerCase() + "_" + LocalDate.now();
+            download.setHref(new StreamResource(fileName + extension, resourceWriter));
+        } else {
+            download.setEnabled(false);
+            downloadButton.setEnabled(false);
+        }
     }
 
     private void refreshGrid() {
         Lecture lecture = lectureSelect.getValue();
         PerformanceScheme performanceScheme = performanceSchemeSelect.getValue();
 
-        exporter.removeAllColumns();
-
-        exporter.addColumn("Matr.Nummer", Performance::getMatriculationNumber);
-
-        if(performanceScheme != null){
+        if (performanceScheme != null) {
             grid.getColumnByKey("performance").setHeader(performanceScheme.getName());
-            exporter.addColumn(performanceScheme.getName(), Performance::getGrade);
-        }else{
+        } else {
             grid.getColumnByKey("performance").setHeader("");
         }
-
 
         List<String> matrNumbers = new ArrayList<String>();
         try {
             if (uploadBuffer.getInputStream().available() > 0) {
-                matrNumbers = ImportUtil.readUpload(uploadBuffer.getInputStream(), uploadBuffer.getFileName())
-                .stream()
-                .map(TUCanEntity::getMatrNumber)
-                .collect(Collectors.toList());
+                matrNumbers = IOUtil.readUpload(uploadBuffer.getInputStream(), uploadBuffer.getFileName()).stream()
+                        .map(TUCanEntity::getMatrNumber).collect(Collectors.toList());
             }
 
             uploadBuffer.getInputStream().close();
@@ -193,9 +230,10 @@ public class ExportView extends BaseView implements AccessibleByWimi {
         } else {
             performanceList.clear();
             performanceList.addAll(
+
                     matrNumbers.stream().map(matr -> new Performance(matr, null, "")).collect(Collectors.toList()));
         }
-        LOGGER.info(performanceList.toString());
+        LOGGER.debug(performanceList.toString());
         performanceDataProvider.refreshAll();
     }
 }
