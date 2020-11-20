@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * UnitTest for {@link LimitOffsetPageRequest}
+ * 
  * @author Leon Chemnitz
  */
 public class LimitOffsetPageRequestTest {

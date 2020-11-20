@@ -88,28 +88,29 @@ public class MainAppView extends AppLayout {
         content.setSpacing(false);
 
         content.add(generateMenuButton("Einzelleistungen", new Icon(VaadinIcon.HOME), PuslProperties.ROOT_ROUTE,
-                Key.KEY_L));
+                "grades-menu-button", Key.KEY_L));
 
         if (currentUser.getType() != UserType.HIWI) {
-            content.add(generateMenuButton("Export", new Icon(VaadinIcon.DOWNLOAD), ExportView.ROUTE, Key.KEY_E));
+            content.add(generateMenuButton("Export", new Icon(VaadinIcon.DOWNLOAD), ExportView.ROUTE,"export-menu-button",  Key.KEY_E));
         }
-        content.add(generateMenuButton("Mein Account", new Icon(VaadinIcon.USER), AccountView.ROUTE, Key.KEY_A));
+        content.add(generateMenuButton("Mein Account", new Icon(VaadinIcon.USER), AccountView.ROUTE,"account-menu-button", Key.KEY_A));
 
         if (currentUser.getType().ordinal() <= UserType.ADMIN.ordinal()) {
             content.add(generateSeperator());
             content.add(generateSectionLabel("Admin"));
-            content.add(generateMenuButton("Nutzer", new Icon(VaadinIcon.USERS), ManageUsersView.ROUTE, Key.KEY_U));
+            content.add(generateMenuButton("Nutzer", new Icon(VaadinIcon.USERS), ManageUsersView.ROUTE,"user-menu-button", Key.KEY_U));
             content.add(generateMenuButton("Veranstaltungen", new Icon(VaadinIcon.ACADEMY_CAP),
-                    ManageLecturesView.ROUTE, Key.KEY_V));
+                    ManageLecturesView.ROUTE,"lecture-menu-button", Key.KEY_V));
             content.add(generateMenuButton("Leistungsschemas", new Icon(VaadinIcon.NOTEBOOK),
-                    ManageExerciseSchemesView.ROUTE, Key.KEY_S));
+                    ManageExerciseSchemesView.ROUTE,"exercisescheme-menu-button", Key.KEY_S));
 
             if (currentUser.getType() == UserType.SUPERADMIN) {
                 content.add(generateSeperator());
                 content.add(generateSectionLabel("Global"));
+                content.add(generateMenuButton("Institute", new Icon(VaadinIcon.WORKPLACE), ManageInstitutesView.ROUTE,"institute-menu-button",
+                        Key.KEY_I));
                 content.add(
-                        generateMenuButton("Institute", new Icon(VaadinIcon.WORKPLACE), ManageInstitutesView.ROUTE, Key.KEY_I));
-                content.add(generateMenuButton("Datenbank", new Icon(VaadinIcon.DATABASE), DatabaseView.ROUTE, Key.KEY_D));
+                        generateMenuButton("Datenbank", new Icon(VaadinIcon.DATABASE), DatabaseView.ROUTE,"database-menu-button", Key.KEY_D));
             }
         }
 
@@ -125,7 +126,7 @@ public class MainAppView extends AppLayout {
      * 
      * @author Leon Chemnitz
      */
-    private Button generateMenuButton(String buttonText, Icon icon, String url, Key shortcut) {
+    private Button generateMenuButton(String buttonText, Icon icon, String url, String id, Key shortcut) {
         Button button;
 
         if (icon != null) {
@@ -142,6 +143,7 @@ public class MainAppView extends AppLayout {
         button.addClickListener(event -> {
             UI.getCurrent().navigate(url);
         });
+        button.setId(id);
         button.getStyle().set("color", "white");
         button.getStyle().set("margin", "0");
         button.getStyle().set("font-weight", "200");

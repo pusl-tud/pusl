@@ -39,6 +39,12 @@ public class WorkViewUIT extends BaseUIT {
 
     // TODO: implement some negative test examples
 
+
+    // private void goToWorkView() throws InterruptedException {
+    //     findElementById("grades-menu-button").click();
+    //     waitForURL(WorkView.ROUTE);
+    // }
+
     @Test
     public void testSaveGradeNumeric() throws Exception {
         LOGGER.info("Testing save grade");
@@ -276,7 +282,7 @@ public class WorkViewUIT extends BaseUIT {
 
             Thread.sleep(1000);
 
-            Grade foundGrade = gradeRepository.findById(grade.getId().toString()).get();
+            Grade foundGrade = gradeRepository.findById(grade.getId()).get();
 
             LOGGER.info("grade saved was: " + grade);
 
@@ -352,7 +358,7 @@ public class WorkViewUIT extends BaseUIT {
 
         Thread.sleep(1000);
 
-        assertTrue(gradeRepository.findById(grade.getId().toString()).isEmpty());
+        assertTrue(gradeRepository.findById(grade.getId()).isEmpty());
     }
 
     /**

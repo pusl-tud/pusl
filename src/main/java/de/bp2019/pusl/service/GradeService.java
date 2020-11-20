@@ -127,7 +127,7 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
      * @throws DataNotFoundException if entity not found in database
      * @throws UnauthorizedException if user not authorized to access
      */
-    public Grade getById(String id) throws DataNotFoundException, UnauthorizedException {
+    public Grade getById(ObjectId id) throws DataNotFoundException, UnauthorizedException {
         LOGGER.info("checking if grade with id " + id + " is present");
         Optional<Grade> foundGrade = gradeRepository.findById(id);
 

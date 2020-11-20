@@ -55,8 +55,8 @@ import de.bp2019.pusl.ui.views.LoginView;
  * 
  * @author Leon Chemnitz
  */
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @TestInstance(Lifecycle.PER_CLASS)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public abstract class BaseUIT {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseUIT.class);
@@ -131,9 +131,11 @@ public abstract class BaseUIT {
         caps.setCapability("os_version", "10");
         caps.setCapability("browser", "Chrome");
         caps.setCapability("browser_version", "80");
+        caps.setCapability("resolution", "1920x1080");
         caps.setCapability("name", this.getClass().getSimpleName());
 
         driver = new RemoteWebDriver(new URL(URL), caps);
+        driver.manage().window().maximize();
     }
 
     @AfterAll
@@ -169,7 +171,6 @@ public abstract class BaseUIT {
         driver.get(baseUrl);
 
         wait = new WebDriverWait(driver, 10);
-
         waitForPageload();
     }
 
@@ -204,6 +205,8 @@ public abstract class BaseUIT {
         };
 
         wait.until(expectation);
+        wait.until(ExpectedConditions.elementToBeClickable(findElementById("pwa-closeip")));
+        findElementById("pwa-closeip").click();
     }
 
     /**
@@ -239,14 +242,6 @@ public abstract class BaseUIT {
             waitForPageload();
         } catch (Exception e) {
             assertTrue(e.toString(), false);
-        }
-
-        
-        try{
-            wait.until(ExpectedConditions.elementToBeClickable(findElementById("pwa-closeip")));
-            findElementById("pwa-closeip").click();
-        } catch(Exception e){
-            //eine Super Lösung <3
         }
     }
 
@@ -328,6 +323,13 @@ public abstract class BaseUIT {
 
         waitForURL(PuslProperties.ROOT_ROUTE);
 
+        try{
+            wait.until(ExpectedConditions.elementToBeClickable(findElementById("pwa-closeip")));
+            findElementById("pwa-closeip").click();
+        } catch(Exception e){
+            //eine Super Lösung <3
+        }
+
         return user;
     }
 
@@ -406,9 +408,17 @@ public abstract class BaseUIT {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//vaadin-combo-box-overlay")));
 
         WebElement baseElement = driver.findElement(By.xpath("//vaadin-combo-box-overlay"));
-        List<WebElement> listItems = (List<WebElement>) ((JavascriptExecutor) driver).executeScript(
-                "return arguments[0].shadowRoot.querySelector('#content').shadowRoot.querySelectorAll('vaadin-combo-box-item')",
-                baseElement);
+
+        Object rawListItems = ((JavascriptExecutor) driver).executeScript(
+            "return arguments[0].shadowRoot.querySelector('#content').shadowRoot.querySelectorAll('vaadin-combo-box-item')",
+            baseElement);
+
+        if(!(rawListItems instanceof List<?>)){
+            throw new IllegalStateException();
+        }
+
+        @SuppressWarnings("unchecked")
+        List<WebElement> listItems = (List<WebElement>) rawListItems;
 
         textList.forEach(selectionText -> {
             for (WebElement element : listItems) {

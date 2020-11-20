@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.collect.Sets;
@@ -97,7 +96,7 @@ public class UserService extends AbstractDataProvider<User, String> {
      * @throws DataNotFoundException if entity not found in database
      * @throws UnauthorizedException if user not authorized to access
      */
-    public User getById(String id) throws DataNotFoundException, UnauthorizedException {
+    public User getById(ObjectId id) throws DataNotFoundException, UnauthorizedException {
         LOGGER.info("checking if user with id " + id + " is present");
         Optional<User> foundUser = userRepository.findById(id);
 
@@ -127,8 +126,7 @@ public class UserService extends AbstractDataProvider<User, String> {
         }       
         LOGGER.debug("getting Users with IDs: " + ids.toString());
 
-        Iterable<String> idsString = ids.stream().map(ObjectId::toString).collect(Collectors.toList());
-        Iterable<User> users = userRepository.findAllById(idsString);
+        Iterable<User> users = userRepository.findAllById(ids);
 
         Set<User> userSet = new HashSet<>();
 

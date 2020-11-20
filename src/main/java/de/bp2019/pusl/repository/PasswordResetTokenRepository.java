@@ -7,6 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import de.bp2019.pusl.model.PasswordResetToken;
 
-public interface PasswordResetTokenRepository extends MongoRepository<PasswordResetToken, String> {
+public interface PasswordResetTokenRepository extends MongoRepository<PasswordResetToken, ObjectId> {
     Optional<PasswordResetToken> findByUser(ObjectId user);
 }

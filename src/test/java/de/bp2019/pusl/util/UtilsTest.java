@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * UnitTest for {@link Utils}
+ * 
  * @author Leon Chemnitz
  */
 public class UtilsTest {

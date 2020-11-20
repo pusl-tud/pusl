@@ -140,8 +140,12 @@ public class EditInstituteView extends BaseView implements HasUrlParameter<Strin
                         binder.readBean(null);
                 } else {
                         try {
+                                if (!ObjectId.isValid(idParameter)) {
+                                        throw new DataNotFoundException();
+                                }
+
                                 Institute fetchedInstitute;
-                                fetchedInstitute = instituteService.getById(idParameter);
+                                fetchedInstitute = instituteService.getById(new ObjectId(idParameter));
                                 instituteId = Optional.of(fetchedInstitute.getId());
                                 binder.readBean(fetchedInstitute);
                         } catch (UnauthorizedException e) {

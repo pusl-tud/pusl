@@ -15,7 +15,7 @@ import de.bp2019.pusl.model.ExerciseScheme;
  * 
  * @author Leon Chemnitz
  */
-public interface ExerciseSchemeRepository extends MongoRepository<ExerciseScheme, String> {
+public interface ExerciseSchemeRepository extends MongoRepository<ExerciseScheme, ObjectId> {
     Optional<ExerciseScheme> findByName(String name);
     Stream<ExerciseScheme> findByInstitutesIn(Set<ObjectId> institutes, Pageable pageable);
     int countByInstitutesIn(Set<ObjectId> institutes);

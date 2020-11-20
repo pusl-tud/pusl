@@ -141,7 +141,8 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 binder.forField(institutes)
                                 .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
                                                 "Bitte mind. ein Institut angeben")
-                                .bind(instituteService::getInstitutesFromObject, instituteService::setInstitutesToObject);
+                                .bind(instituteService::getInstitutesFromObject,
+                                                instituteService::setInstitutesToObject);
 
                 binder.bind(hasAccess, lecture -> userService.getByIds(lecture.getHasAccess()), (lecture, items) -> {
                         lecture.setHasAccess(items.stream().map(u -> u.getId()).collect(Collectors.toSet()));
@@ -154,10 +155,12 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                 /* ########### Listeners ########### */
 
                 exercises.addValueChangeListener(event -> LOGGER.debug("exercises changed " + event.getValue().size()));
-                performanceSchemes.addValueChangeListener(event -> LOGGER.debug("performanceSchemes changed " + event.getValue().size()));
+                performanceSchemes.addValueChangeListener(
+                                event -> LOGGER.debug("performanceSchemes changed " + event.getValue().size()));
 
                 institutes.addValueChangeListener(event -> {
-                        hiwiDataProvider.setFilter(event.getValue().stream().map(Institute::getId).collect(Collectors.toSet()));
+                        hiwiDataProvider.setFilter(
+                                        event.getValue().stream().map(Institute::getId).collect(Collectors.toSet()));
                         hiwiDataProvider.refreshAll();
                 });
 
@@ -201,6 +204,10 @@ public class EditLectureView extends BaseView implements HasUrlParameter<String>
                         binder.readBean(null);
                 } else {
                         try {
+                                if (!ObjectId.isValid(idParameter)) {
+                                        throw new DataNotFoundException();
+                                }
+
                                 Lecture fetchedLecture;
                                 fetchedLecture = lectureService.getById(idParameter);
                                 lectureId = Optional.of(fetchedLecture.getId());

@@ -15,7 +15,7 @@ import de.bp2019.pusl.model.Institute;
  * 
  * @author Leon Chemnitz
  */
-public interface InstituteRepository extends MongoRepository<Institute, String> {
+public interface InstituteRepository extends MongoRepository<Institute, ObjectId> {
     Optional<Institute> findByName(String name);
     Stream<Institute> findByIdIn(Set<ObjectId> ids, Pageable pageable);
     Set<Institute> findAllByIdIn(Set<ObjectId> ids);

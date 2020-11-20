@@ -54,12 +54,13 @@ public class ManageUsersView extends BaseView implements AccessibleByAdmin {
         add(grid);
 
         Button newUserButton = new Button("Neuer Nutzer");
+        newUserButton.setId("new-user-button");
         newUserButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        newUserButton.addClickListener(event -> UI.getCurrent().navigate(EditUserView.ROUTE + "/new"));
 
         add(newUserButton);
         setHorizontalComponentAlignment(Alignment.END, newUserButton);
 
-        newUserButton.addClickListener(event -> UI.getCurrent().navigate(EditUserView.ROUTE + "/new"));
 
     }
 
