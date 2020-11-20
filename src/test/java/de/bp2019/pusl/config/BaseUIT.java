@@ -96,7 +96,7 @@ public abstract class BaseUIT {
 
     /**
      * Starts Webdriver and connects to Browserstack
-     * 
+     *
      * @throws Exception
      * @author Leon Chemnitz
      */
