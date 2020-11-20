@@ -1,6 +1,7 @@
-package de.bp2019.pusl.ui.lecture;
+package de.bp2019.pusl.ui;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +34,33 @@ import de.bp2019.pusl.ui.views.lecture.ManageLecturesView;
  * 
  * @author Leon Chemnitz
  */
-public class EditLectureViewUIT extends BaseUIT {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EditLectureViewUIT.class);
+public class LectureUIT extends BaseUIT {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LectureUIT.class);
+
+    Institute institute;
+
+    private void goToManageLecturesView() throws InterruptedException {
+        findElementById("veranstaltungen").click();
+        waitForURL(ManageLecturesView.ROUTE);
+    }
+
+    private void goToNewLecture() throws InterruptedException {
+        goToManageLecturesView();
+        findElementById("new-lecture-button").click();
+
+        waitForURL(EditLectureView.ROUTE + "/new");
+    }
+
+    /**
+     * @author Leon Chemnitz
+     */
+    private Lecture addLecture() {
+        Lecture lecture = new Lecture();
+        lecture.setName(RandomStringUtils.randomAlphanumeric(12));
+        lectureRepository.save(lecture);
+
+        return lecture;
+    }
 
     /**
      * @author Leon Chemnitz
@@ -55,8 +80,7 @@ public class EditLectureViewUIT extends BaseUIT {
         exerciseSchemeRepository.save(exerciseScheme);
 
         login(UserType.SUPERADMIN);
-
-        goToURL(EditLectureView.ROUTE + "/new");
+        goToNewLecture();
 
         String name = RandomStringUtils.randomAlphanumeric(16);
         findElementById("lecture-name").sendKeys(name);
@@ -71,9 +95,9 @@ public class EditLectureViewUIT extends BaseUIT {
         findElementById("vtabs-berechnungsregeln").click();
 
         String performanceName = RandomStringUtils.randomAlphabetic(16);
-        
+
         findElementById("performance-name").sendKeys(performanceName);
-       
+
         findElementById("create-performance").click();
 
         sendShortcut(Keys.ENTER);
@@ -93,27 +117,44 @@ public class EditLectureViewUIT extends BaseUIT {
      * @throws Exception
      */
     @Test
-    public void testAccess() throws Exception {
-        LOGGER.info("Testing access");
-
-        LOGGER.info("Testing access as SUPERADMIN");
+    public void testNameButton() throws Exception {
+        LOGGER.info("Testing Lecture name button");
         login(UserType.SUPERADMIN);
-        goToURL(EditLectureView.ROUTE + "/new");
-        logout();
 
-        LOGGER.info("Testing access as ADMIN");
-        login(UserType.ADMIN);
-        goToURL(EditLectureView.ROUTE + "/new");
-        logout();
+        Lecture lecture = addLecture();
 
-        LOGGER.info("Testing access as WIWI");
-        login(UserType.WIMI);
-        goToURLandWaitForRedirect(EditLectureView.ROUTE + "/new", PuslProperties.ROOT_ROUTE);
-        logout();
+        goToManageLecturesView();
 
-        LOGGER.info("Testing access as HIWI");
-        login(UserType.HIWI);
-        goToURLandWaitForRedirect(EditLectureView.ROUTE + "/new", PuslProperties.ROOT_ROUTE);
+        String name = lecture.getName();
+        ObjectId id = lecture.getId();
+
+        findButtonContainingText(name).click();
+
+        waitForURL(EditLectureView.ROUTE + "/" + id.toString());
+    }
+
+    /**
+     * @author Luca Dinies
+     * @throws Exception
+     */
+    @Test
+    public void testDeleteButton() throws Exception {
+        LOGGER.info("Testing Delete ExerciseScheme Button");
+        login(UserType.SUPERADMIN);
+
+        Lecture lecture = addLecture();
+
+        goToManageLecturesView();
+
+        String name = lecture.getName();
+        ObjectId id = lecture.getId();
+
+        /* click delete button */
+        findElementById("delete-" + id.toString()).click();
+
+        acceptConfirmDeletionDialog(name);
+
+        assertTrue(lectureRepository.findById(id).isEmpty());
     }
 
     /**
@@ -205,7 +246,7 @@ public class EditLectureViewUIT extends BaseUIT {
 
         login(UserType.SUPERADMIN);
 
-        goToURL(EditLectureView.ROUTE + "/new");
+        goToNewLecture();
 
         String name = RandomStringUtils.randomAlphanumeric(16);
         findElementById("lecture-name").sendKeys(name);
@@ -220,7 +261,7 @@ public class EditLectureViewUIT extends BaseUIT {
         driver.findElement(By.cssSelector("vaadin-grid-cell-content:nth-child(26)")).click();
 
         findElementById("new-exercise-name").sendKeys(Keys.BACK_SPACE);
-        
+
         String exerciseName2 = RandomStringUtils.randomAlphanumeric(16);
         findElementById("new-exercise-name").sendKeys(exerciseName2);
 
@@ -281,7 +322,7 @@ public class EditLectureViewUIT extends BaseUIT {
 
         login(UserType.SUPERADMIN);
 
-        goToURL(EditLectureView.ROUTE + "/new");
+        goToNewLecture();
 
         findElementById("lecture-name").sendKeys(lecture.getName());
         findMSCBByIdAndSelectByTexts("lecture-institutes", Arrays.asList(institute.getName()));
@@ -295,6 +336,62 @@ public class EditLectureViewUIT extends BaseUIT {
         sendShortcut(Keys.ENTER);
 
         timeoutWrongURL(EditLectureView.ROUTE);
+    }
+
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
+    @Test
+    public void testAccessManageLecturesView() throws Exception {
+        LOGGER.info("Testing access ManageLecturesView");
+
+        LOGGER.info("Testing access as SUPERADMIN");
+        login(UserType.SUPERADMIN);
+        goToURL(ManageLecturesView.ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as ADMIN");
+        login(UserType.ADMIN);
+        goToURL(ManageLecturesView.ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as WIWI");
+        login(UserType.WIMI);
+        goToURLandWaitForRedirect(ManageLecturesView.ROUTE, PuslProperties.ROOT_ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as HIWI");
+        login(UserType.HIWI);
+        goToURLandWaitForRedirect(ManageLecturesView.ROUTE, PuslProperties.ROOT_ROUTE);
+    }
+
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
+    @Test
+    public void testAccessEditLectureView() throws Exception {
+        LOGGER.info("Testing access EditLectureView");
+
+        LOGGER.info("Testing access as SUPERADMIN");
+        login(UserType.SUPERADMIN);
+        goToURL(EditLectureView.ROUTE + "/new");
+        logout();
+
+        LOGGER.info("Testing access as ADMIN");
+        login(UserType.ADMIN);
+        goToURL(EditLectureView.ROUTE + "/new");
+        logout();
+
+        LOGGER.info("Testing access as WIWI");
+        login(UserType.WIMI);
+        goToURLandWaitForRedirect(EditLectureView.ROUTE + "/new", PuslProperties.ROOT_ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as HIWI");
+        login(UserType.HIWI);
+        goToURLandWaitForRedirect(EditLectureView.ROUTE + "/new", PuslProperties.ROOT_ROUTE);
     }
 
 }

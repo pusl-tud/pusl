@@ -1,5 +1,6 @@
 package de.bp2019.pusl.repository;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import de.bp2019.pusl.model.Grade;
@@ -9,5 +10,5 @@ import de.bp2019.pusl.model.Grade;
  * 
  * @author Leon Chemnitz
  */
-public interface GradeRepository extends MongoRepository<Grade, String> {
+public interface GradeRepository extends MongoRepository<Grade, ObjectId> {
 }

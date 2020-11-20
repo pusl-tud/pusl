@@ -171,7 +171,7 @@ public class AccountView extends BaseView {
 					if (!password.getValue().equals("")) {
 						currentUser.setPassword(passwordEncoder.encode(password.getValue()));
 					} else {
-						String oldPassword = userService.getById(currentUser.getId().toString()).getPassword();
+						String oldPassword = userService.getById(currentUser.getId()).getPassword();
 						currentUser.setPassword(oldPassword);
 					}
 

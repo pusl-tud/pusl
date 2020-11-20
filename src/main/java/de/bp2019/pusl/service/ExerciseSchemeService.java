@@ -51,7 +51,7 @@ public class ExerciseSchemeService extends AbstractDataProvider<ExerciseScheme, 
      * @throws DataNotFoundException if entity not found in database
      * @throws UnauthorizedException if user not authorized to access
      */
-    public ExerciseScheme getById(String id) throws DataNotFoundException, UnauthorizedException {
+    public ExerciseScheme getById(ObjectId id) throws DataNotFoundException, UnauthorizedException {
         LOGGER.info("checking if exerciseScheme with id " + id + " is present");
         Optional<ExerciseScheme> foundExerciseScheme = exerciseSchemeRepository.findById(id);
 

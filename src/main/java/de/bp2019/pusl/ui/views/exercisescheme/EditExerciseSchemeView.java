@@ -221,7 +221,7 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
         } else {
             try {
                 ExerciseScheme fetchedExerciseScheme;
-                fetchedExerciseScheme = exerciseSchemeService.getById(idParameter);
+                fetchedExerciseScheme = exerciseSchemeService.getById(new ObjectId(idParameter));
                 exerciseSchemeId = Optional.of(fetchedExerciseScheme.getId());
                 defaultValueToken.setItems(fetchedExerciseScheme.getTokens());
 

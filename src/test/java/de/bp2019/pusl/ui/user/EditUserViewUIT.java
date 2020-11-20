@@ -87,7 +87,7 @@
 //         assertEquals(user.getLastName(), savedUser.getLastName());
 //         assertTrue(passwordEncoder.matches(user.getPassword(), savedUser.getPassword()));
 //         assertEquals(user.getType(), savedUser.getType());
-//         savedUser.getInstitutes().forEach(i -> assertEquals(institute.getName(), i.getName()));
+//         instituteRepository.findAllById(savedUser.getInstitutes()).forEach(i -> assertEquals(institute.getName(), i.getName()));
 //     }
 
 //     /**

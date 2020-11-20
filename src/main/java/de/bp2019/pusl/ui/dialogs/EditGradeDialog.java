@@ -97,7 +97,7 @@ public final class EditGradeDialog {
             ConfirmDeletionDialog.open(grade.getMatrNumber(), () -> {
 
                 try {
-                    Grade toDelete = gradeService.getById(grade.getId().toString());
+                    Grade toDelete = gradeService.getById(grade.getId());
 
                     gradeService.delete(toDelete);
                     SuccessDialog.open("Einzelleistung erfolgreich gelöscht");
@@ -119,7 +119,7 @@ public final class EditGradeDialog {
 
             Grade modified;
             try {
-                modified = gradeService.getById(grade.getId().toString());
+                modified = gradeService.getById(grade.getId());
             } catch (DataNotFoundException e) {
                 LOGGER.error("Grade not found in Database");
                 ErrorDialog.open("zu bearbeitende Einzelleistung wurde nicht in Datenbank gefunden");

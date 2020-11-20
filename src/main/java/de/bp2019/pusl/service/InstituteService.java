@@ -54,7 +54,7 @@ public class InstituteService extends AbstractDataProvider<Institute, String> {
      * @throws UnauthorizedException if user not authorized to access
      * @throws DataNotFoundException if entity not found in database
      */
-    public Institute getById(String id) throws UnauthorizedException, DataNotFoundException {
+    public Institute getById(ObjectId id) throws UnauthorizedException, DataNotFoundException {
         LOGGER.info("checking if institute with id " + id + " is present");
         Optional<Institute> foundInstitute = instituteRepository.findById(id);
 

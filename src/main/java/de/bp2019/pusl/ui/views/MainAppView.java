@@ -142,6 +142,7 @@ public class MainAppView extends AppLayout {
         button.addClickListener(event -> {
             UI.getCurrent().navigate(url);
         });
+        button.setId(buttonText.toLowerCase());
         button.getStyle().set("color", "white");
         button.getStyle().set("margin", "0");
         button.getStyle().set("font-weight", "200");

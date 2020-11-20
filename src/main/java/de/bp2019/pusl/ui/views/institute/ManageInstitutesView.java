@@ -55,7 +55,8 @@ public class ManageInstitutesView extends BaseView implements AccessibleBySupera
 
         add(grid);
 
-        Button newInstituteButton = new Button("Neues Institut");        
+        Button newInstituteButton = new Button("Neues Institut");
+        newInstituteButton.setId("new-institute-button");
         newInstituteButton.addClickShortcut(Key.KEY_N,KeyModifier.CONTROL, KeyModifier.ALT);
         newInstituteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 

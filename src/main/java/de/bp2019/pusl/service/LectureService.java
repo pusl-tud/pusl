@@ -56,7 +56,7 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
      * @throws DataNotFoundException if entity not found in database
      * @throws UnauthorizedException if user not authorized to access
      */
-    public Lecture getById(String id) throws DataNotFoundException, UnauthorizedException {
+    public Lecture getById(ObjectId id) throws DataNotFoundException, UnauthorizedException {
         LOGGER.info("checking if lecture with id " + id + " is present");
         Optional<Lecture> foundLecture = lectureRepository.findById(id);
 
@@ -89,9 +89,9 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
      * @throws DataNotFoundException if entity not found in database
      * @throws UnauthorizedException if user not authorized to access
      */
-    public Lecture getById(ObjectId id) throws DataNotFoundException, UnauthorizedException {
+    public Lecture getById(String id) throws DataNotFoundException, UnauthorizedException {
         if(id == null) throw new DataNotFoundException();
-        return getById(id.toString());
+        return getById(new ObjectId(id));
     }
 
     /**

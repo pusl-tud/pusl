@@ -15,7 +15,7 @@ import de.bp2019.pusl.model.Lecture;
  * 
  * @author Leon Chemnitz
  */
-public interface LectureRepository extends MongoRepository<Lecture, String> {
+public interface LectureRepository extends MongoRepository<Lecture, ObjectId> {
     Optional<Lecture> findByName(String name);
     Stream<Lecture> findByInstitutesIn(Set<ObjectId> institutes, Pageable pageable);
     Stream<Lecture> findByInstitutesInAndHasAccessIn(Set<ObjectId> institutes, ObjectId user, Pageable pageable);

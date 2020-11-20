@@ -276,7 +276,7 @@ public class WorkViewUIT extends BaseUIT {
 
             Thread.sleep(1000);
 
-            Grade foundGrade = gradeRepository.findById(grade.getId().toString()).get();
+            Grade foundGrade = gradeRepository.findById(grade.getId()).get();
 
             LOGGER.info("grade saved was: " + grade);
 
@@ -352,7 +352,7 @@ public class WorkViewUIT extends BaseUIT {
 
         Thread.sleep(1000);
 
-        assertTrue(gradeRepository.findById(grade.getId().toString()).isEmpty());
+        assertTrue(gradeRepository.findById(grade.getId()).isEmpty());
     }
 
     /**

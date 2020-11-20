@@ -66,6 +66,7 @@ public class ManageLecturesView extends BaseView implements AccessibleByAdmin {
         add(grid);
 
         Button newLectureButton = new Button("Neue Veranstaltung");
+        newLectureButton.setId("new-lecture-button");
         newLectureButton.addClickShortcut(Key.KEY_N,KeyModifier.CONTROL, KeyModifier.ALT);
         newLectureButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 

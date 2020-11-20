@@ -104,7 +104,7 @@ public class AccountViewUIT extends BaseUIT {
 
         waitForURL(PuslProperties.ROOT_ROUTE);
 
-        User foundUser = userRepository.findById(id.toString()).get();
+        User foundUser = userRepository.findById(id).get();
         LOGGER.info("New User: " + foundUser.toString());
 
         assertEquals(firstName, foundUser.getFirstName());
@@ -181,7 +181,7 @@ public class AccountViewUIT extends BaseUIT {
 
         waitForURL(PuslProperties.ROOT_ROUTE);
 
-        String encodedPassword = userRepository.findById(user.getId().toString()).get().getPassword();
+        String encodedPassword = userRepository.findById(user.getId()).get().getPassword();
 
         assertTrue(passwordEncoder.matches(password, encodedPassword));
     }

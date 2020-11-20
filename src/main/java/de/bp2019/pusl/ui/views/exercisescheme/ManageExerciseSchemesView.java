@@ -66,6 +66,7 @@ public class ManageExerciseSchemesView extends BaseView implements AccessibleByA
         Button newExerciseSchemeButton = new Button("Neues Leistungsschema");
         newExerciseSchemeButton.addClickShortcut(Key.KEY_N,KeyModifier.CONTROL, KeyModifier.ALT);
         newExerciseSchemeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        newExerciseSchemeButton.setId("new-exercisescheme-button");
 
         add(newExerciseSchemeButton);
         setHorizontalComponentAlignment(Alignment.END, newExerciseSchemeButton);

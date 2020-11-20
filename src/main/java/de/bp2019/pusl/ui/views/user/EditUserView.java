@@ -224,7 +224,7 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                                         if (!password.getValue().equals("")) {
                                                 user.setPassword(passwordEncoder.encode(password.getValue()));
                                         } else {
-                                                String oldPassword = userService.getById(user.getId().toString())
+                                                String oldPassword = userService.getById(user.getId())
                                                                 .getPassword();
                                                 user.setPassword(oldPassword);
                                         }
@@ -260,7 +260,7 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                 } else {
                         try {
                                 User fetchedUser;
-                                fetchedUser = userService.getById(idParameter);
+                                fetchedUser = userService.getById(new ObjectId(idParameter));
                                 userId = Optional.of(fetchedUser.getId());
                                 binder.readBean(fetchedUser);
                         } catch (UnauthorizedException e) {

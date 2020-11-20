@@ -17,7 +17,7 @@ import de.bp2019.pusl.model.User;
  * 
  * @author Leon Chemnitz
  */
-public interface UserRepository extends MongoRepository<User, String> {
+public interface UserRepository extends MongoRepository<User, ObjectId> {
     Optional<User> findByEmailAddress(String emailAddress);
     List<User> findByType(UserType type);
     Set<User> findAllById(Set<ObjectId> ids);
