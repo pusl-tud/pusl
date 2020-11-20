@@ -19,7 +19,7 @@ import de.bp2019.pusl.ui.views.institute.EditInstituteView;
 import de.bp2019.pusl.ui.views.institute.ManageInstitutesView;
 
 /**
- * UI test for {@link EditInstituteView}
+ * UI test for {@link EditInstituteView} and {@link ManageInstitutesView}
  *
  * @author Leon Chemnitz
  */
@@ -32,7 +32,7 @@ public class InstituteUIT extends BaseUIT {
     Institute institute;
 
     private void goToManageInstitutesView() throws InterruptedException {
-        findElementById("institute").click();
+        findElementById("institute-menu-button").click();
         waitForURL(ManageInstitutesView.ROUTE);
     }
 

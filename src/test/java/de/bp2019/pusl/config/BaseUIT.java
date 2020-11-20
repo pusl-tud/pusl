@@ -55,8 +55,8 @@ import de.bp2019.pusl.ui.views.LoginView;
  * 
  * @author Leon Chemnitz
  */
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @TestInstance(Lifecycle.PER_CLASS)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public abstract class BaseUIT {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseUIT.class);
@@ -408,9 +408,17 @@ public abstract class BaseUIT {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//vaadin-combo-box-overlay")));
 
         WebElement baseElement = driver.findElement(By.xpath("//vaadin-combo-box-overlay"));
-        List<WebElement> listItems = (List<WebElement>) ((JavascriptExecutor) driver).executeScript(
-                "return arguments[0].shadowRoot.querySelector('#content').shadowRoot.querySelectorAll('vaadin-combo-box-item')",
-                baseElement);
+
+        Object rawListItems = ((JavascriptExecutor) driver).executeScript(
+            "return arguments[0].shadowRoot.querySelector('#content').shadowRoot.querySelectorAll('vaadin-combo-box-item')",
+            baseElement);
+
+        if(!(rawListItems instanceof List<?>)){
+            throw new IllegalStateException();
+        }
+
+        @SuppressWarnings("unchecked")
+        List<WebElement> listItems = (List<WebElement>) rawListItems;
 
         textList.forEach(selectionText -> {
             for (WebElement element : listItems) {

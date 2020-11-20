@@ -166,7 +166,8 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                 binder.forField(institutes)
                                 .withValidator(selectedInstitutes -> !selectedInstitutes.isEmpty(),
                                                 "Bitte mind. ein Institut angeben")
-                                .bind(instituteService::getInstitutesFromObject, instituteService::setInstitutesToObject);
+                                .bind(instituteService::getInstitutesFromObject,
+                                                instituteService::setInstitutesToObject);
 
                 binder.forField(userType).withValidator(ut -> ut != null, "Bitte Nutzer Typ wählen").bind(User::getType,
                                 User::setType);
@@ -224,8 +225,7 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                                         if (!password.getValue().equals("")) {
                                                 user.setPassword(passwordEncoder.encode(password.getValue()));
                                         } else {
-                                                String oldPassword = userService.getById(user.getId())
-                                                                .getPassword();
+                                                String oldPassword = userService.getById(user.getId()).getPassword();
                                                 user.setPassword(oldPassword);
                                         }
 
@@ -259,6 +259,10 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                         binder.readBean(null);
                 } else {
                         try {
+                                if (!ObjectId.isValid(idParameter)) {
+                                        throw new DataNotFoundException();
+                                }
+
                                 User fetchedUser;
                                 fetchedUser = userService.getById(new ObjectId(idParameter));
                                 userId = Optional.of(fetchedUser.getId());
@@ -270,7 +274,7 @@ public class EditUserView extends BaseView implements HasUrlParameter<String>, A
                         } catch (DataNotFoundException e) {
                                 event.rerouteTo(PuslProperties.ROOT_ROUTE);
                                 UI.getCurrent().navigate(PuslProperties.ROOT_ROUTE);
-                                ErrorDialog.open("Nitzer nicht in Datenbank gefunden!");
+                                ErrorDialog.open("Nutzer nicht in Datenbank gefunden!");
                         }
                 }
         }

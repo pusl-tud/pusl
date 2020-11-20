@@ -20,7 +20,7 @@ import de.bp2019.pusl.model.User;
 public interface UserRepository extends MongoRepository<User, ObjectId> {
     Optional<User> findByEmailAddress(String emailAddress);
     List<User> findByType(UserType type);
-    Set<User> findAllById(Set<ObjectId> ids);
+    Set<User> findAllByIdIn(Set<ObjectId> ids);
     Stream<User> findByInstitutesIn(Set<ObjectId> institutes, Pageable pageable);
     Stream<User> findByType(UserType type, Pageable pageable);
     Stream<User> findByInstitutesInAndType(Set<ObjectId> institutes, UserType type, Pageable pageable);

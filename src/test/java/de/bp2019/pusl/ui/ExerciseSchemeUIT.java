@@ -25,7 +25,7 @@ import de.bp2019.pusl.ui.views.exercisescheme.EditExerciseSchemeView;
 import de.bp2019.pusl.ui.views.exercisescheme.ManageExerciseSchemesView;
 
 /**
- * UI test for {@link ManageExerciseSchemesView}
+ * UI test for {@link EditExerciseSchemeView} and {@link ManageExerciseSchemesView}
  *
  * @author Leon Chemnitz
  */
@@ -44,7 +44,7 @@ public class ExerciseSchemeUIT extends BaseUIT {
     private ExerciseScheme exerciseScheme;
 
     private void goToManageExerciseSchemesView() throws InterruptedException {
-        findElementById("leistungsschemas").click();
+        findElementById("exercisescheme-menu-button").click();
         waitForURL(ManageExerciseSchemesView.ROUTE);
     }
 

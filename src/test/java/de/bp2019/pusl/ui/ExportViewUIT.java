@@ -36,6 +36,11 @@ public class ExportViewUIT extends BaseUIT {
     @Autowired
     LectureRepository lectureRepository;
 
+    private void goToExportView() throws InterruptedException {
+        findElementById("export-menu-button").click();
+        waitForURL(ExportView.ROUTE);
+    }
+
     /**
      * @author Luca Dinies
      */
@@ -67,6 +72,27 @@ public class ExportViewUIT extends BaseUIT {
         return lecture;
     }
 
+        /**
+     * @throws Exception
+     * @author Luca Dinies
+     */
+    @Test
+    public void testLectureInput() throws Exception {
+        LOGGER.info("Testing ExportView");
+
+        Lecture lecture = addLecture();
+
+        login(UserType.SUPERADMIN);
+        goToExportView();
+
+        findSelectByIdAndSelectByText("lecture", lecture.getName());
+        findSelectByIdAndSelectByText("performanceScheme", lecture.getPerformanceSchemes().get(1).getName());
+
+        // TODO: some real implementation...
+        // findButtonContainingText("Download Excel").click();
+
+    }
+
     /**
      * @throws Exception
      * @author Luca Dinies
@@ -95,24 +121,4 @@ public class ExportViewUIT extends BaseUIT {
         goToURLandWaitForRedirect(ExportView.ROUTE, PuslProperties.ROOT_ROUTE);
     }
 
-    /**
-     * @throws Exception
-     * @author Luca Dinies
-     */
-    @Test
-    public void testLectureInput() throws Exception {
-        LOGGER.info("Testing ExportView");
-
-        Lecture lecture = addLecture();
-
-        login(UserType.SUPERADMIN);
-        goToURL(ExportView.ROUTE);
-
-        findSelectByIdAndSelectByText("lecture", lecture.getName());
-        findSelectByIdAndSelectByText("performanceScheme", lecture.getPerformanceSchemes().get(1).getName());
-
-        // TODO: some real implementation...
-        // findButtonContainingText("Download Excel").click();
-
-    }
 }

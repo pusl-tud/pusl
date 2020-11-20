@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 import de.bp2019.pusl.config.TestUtils;
 import de.bp2019.pusl.enums.UserType;
@@ -25,9 +26,11 @@ import de.bp2019.pusl.repository.GradeRepository;
 import de.bp2019.pusl.repository.LectureRepository;
 
 /**
+ * IntegrationTest for {@link CalculationService}
+ * 
  * @author Leon Chemnitz
  */
-@SpringBootTest
+@SpringBootTest(webEnvironment = WebEnvironment.MOCK)
 public class CalculationServiceIT {    
     private static final Logger LOGGER = LoggerFactory.getLogger(CalculationServiceIT.class);
 

@@ -11,6 +11,11 @@ import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.User;
 import de.bp2019.pusl.util.Utils;
 
+/**
+ * UI test for {@link LoginView}
+ * 
+ * @author Leon Chemnitz
+ */
 public class LoginViewUIT extends BaseUIT {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginViewUIT.class);
 

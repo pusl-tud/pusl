@@ -214,12 +214,15 @@ public class EditExerciseSchemeView extends BaseView implements HasUrlParameter<
     public void setParameter(BeforeEvent event, String idParameter) {
         if (idParameter.equals("new")) {
             exerciseSchemeId = Optional.empty();
-            
-            
+
             binder.readBean(new ExerciseScheme());
-            //binder.readBean(null);
+            // binder.readBean(null);
         } else {
             try {
+                if (!ObjectId.isValid(idParameter)) {
+                    throw new DataNotFoundException();
+                }
+
                 ExerciseScheme fetchedExerciseScheme;
                 fetchedExerciseScheme = exerciseSchemeService.getById(new ObjectId(idParameter));
                 exerciseSchemeId = Optional.of(fetchedExerciseScheme.getId());

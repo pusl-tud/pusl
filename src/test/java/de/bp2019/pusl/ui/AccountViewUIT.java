@@ -30,32 +30,9 @@ public class AccountViewUIT extends BaseUIT {
     @Autowired
     UserRepository userRepository;
 
-    /**
-     * @author Leon Chemnitz
-     * @throws Exception
-     */
-    @Test
-    public void testAccess() throws Exception {
-        LOGGER.info("Testing access");
-
-        LOGGER.info("Testing access as SUPERADMIN");
-        login(UserType.SUPERADMIN);
-        goToURL(AccountView.ROUTE);
-        logout();
-
-        LOGGER.info("Testing access as ADMIN");
-        login(UserType.ADMIN);
-        goToURL(AccountView.ROUTE);
-        logout();
-
-        LOGGER.info("Testing access as WIWI");
-        login(UserType.WIMI);
-        goToURL(AccountView.ROUTE);
-        logout();
-
-        LOGGER.info("Testing access as HIWI");
-        login(UserType.HIWI);
-        goToURL(AccountView.ROUTE);
+    private void goToAccountView() throws InterruptedException {
+        findElementById("account-menu-button").click();
+        waitForURL(AccountView.ROUTE);
     }
 
     /**
@@ -67,7 +44,7 @@ public class AccountViewUIT extends BaseUIT {
         LOGGER.info("Testing access");
 
         login(UserType.SUPERADMIN);
-        goToURL(AccountView.ROUTE);
+        goToAccountView();
 
         findButtonContainingText("Änderungen speichern").click();
         timeoutWrongURL(ManageUsersView.ROUTE);
@@ -88,7 +65,7 @@ public class AccountViewUIT extends BaseUIT {
         String password = oldUser.getPassword();
         String email = oldUser.getEmailAddress();
 
-        goToURL(AccountView.ROUTE);
+        goToAccountView();
 
         String firstName = RandomStringUtils.randomAlphanumeric(14);
         LOGGER.info("first name: " + firstName);
@@ -125,7 +102,7 @@ public class AccountViewUIT extends BaseUIT {
         LOGGER.info("Testing access");
 
         login(UserType.SUPERADMIN);
-        goToURL(AccountView.ROUTE);
+        goToAccountView();
 
         String password = RandomStringUtils.random(6, true, true);
 
@@ -146,7 +123,7 @@ public class AccountViewUIT extends BaseUIT {
         LOGGER.info("Testing access");
 
         login(UserType.SUPERADMIN);
-        goToURL(AccountView.ROUTE);
+        goToAccountView();
 
         findElementById("firstName").sendKeys(RandomStringUtils.random(8, true, false));
         findElementById("lastName").sendKeys(RandomStringUtils.random(8, true, false));
@@ -170,7 +147,7 @@ public class AccountViewUIT extends BaseUIT {
         LOGGER.info("Testing access");
 
         User user = login(UserType.SUPERADMIN);
-        goToURL(AccountView.ROUTE);
+        goToAccountView();
 
         String password = RandomStringUtils.random(8, true, true);
 
@@ -186,4 +163,31 @@ public class AccountViewUIT extends BaseUIT {
         assertTrue(passwordEncoder.matches(password, encodedPassword));
     }
 
+    /**
+     * @author Leon Chemnitz
+     * @throws Exception
+     */
+    @Test
+    public void testAccessAccountView() throws Exception {
+        LOGGER.info("Testing access AccountView");
+
+        LOGGER.info("Testing access as SUPERADMIN");
+        login(UserType.SUPERADMIN);
+        goToURL(AccountView.ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as ADMIN");
+        login(UserType.ADMIN);
+        goToURL(AccountView.ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as WIWI");
+        login(UserType.WIMI);
+        goToURL(AccountView.ROUTE);
+        logout();
+
+        LOGGER.info("Testing access as HIWI");
+        login(UserType.HIWI);
+        goToURL(AccountView.ROUTE);
+    }
 }

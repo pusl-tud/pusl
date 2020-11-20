@@ -15,7 +15,7 @@
   <properties>
     <java.version>11</java.version>
     <vaadin.version>14.3.5</vaadin.version>
-    <pusl.skipTests>true</pusl.skipTests>
+    <pusl.skipTests>false</pusl.skipTests>
   </properties>
   <dependencies>
     <dependency>
@@ -172,8 +172,7 @@
             <configuration>
               <includes>
                 <include>**/*Test.java</include>
-                <!-- <include>**/*IT.java</include> -->
-                <include>**/*UIT.java</include>
+                <include>**/*IT.java</include>
               </includes>
               <argLine>${failsafeArgLine}</argLine>
               <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>

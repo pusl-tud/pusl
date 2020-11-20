@@ -30,7 +30,7 @@ import de.bp2019.pusl.ui.views.lecture.EditLectureView;
 import de.bp2019.pusl.ui.views.lecture.ManageLecturesView;
 
 /**
- * UI test for {@link EditLectureView}
+ * UI test for {@link EditLectureView} and {@link ManageLecturesView}
  * 
  * @author Leon Chemnitz
  */
@@ -40,7 +40,7 @@ public class LectureUIT extends BaseUIT {
     Institute institute;
 
     private void goToManageLecturesView() throws InterruptedException {
-        findElementById("veranstaltungen").click();
+        findElementById("lecture-menu-button").click();
         waitForURL(ManageLecturesView.ROUTE);
     }
 

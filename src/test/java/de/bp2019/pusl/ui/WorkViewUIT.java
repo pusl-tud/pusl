@@ -39,6 +39,12 @@ public class WorkViewUIT extends BaseUIT {
 
     // TODO: implement some negative test examples
 
+
+    // private void goToWorkView() throws InterruptedException {
+    //     findElementById("grades-menu-button").click();
+    //     waitForURL(WorkView.ROUTE);
+    // }
+
     @Test
     public void testSaveGradeNumeric() throws Exception {
         LOGGER.info("Testing save grade");
