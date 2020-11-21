@@ -17,6 +17,7 @@ install:
 
 script:
 - mvn install
+- sonar-scanner
 
 services:
 - mongodb
