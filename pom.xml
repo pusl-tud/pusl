@@ -172,7 +172,7 @@
             <configuration>
               <includes>
                 <include>**/*Test.java</include>
-                <!-- <include>**/*IT.java</include> -->
+                <include>**/*IT.java</include>
               </includes>
               <argLine>${failsafeArgLine}</argLine>
               <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
