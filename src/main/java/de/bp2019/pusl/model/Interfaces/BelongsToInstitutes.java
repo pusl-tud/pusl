@@ -1,4 +1,4 @@
-package de.bp2019.pusl.model.Interfaces;
+package de.bp2019.pusl.model.interfaces;
 
 import java.util.Set;
 

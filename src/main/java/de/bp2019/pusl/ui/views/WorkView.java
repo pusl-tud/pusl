@@ -233,7 +233,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
             grade.setValue(filter.getGrade());
             grade.setHandIn(handInDatePicker.getValue());
 
-            grade.setGradedBy(authenticationService.currentUser());
+            grade.setGradedBy(authenticationService.currentUserId());
             grade.setLastModified(LocalDateTime.now());
 
             if (!GradeService.gradeIsValid(grade)) {
@@ -375,23 +375,4 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         String fileName = "einzelleistungen_" + LocalDate.now();
         download.setHref(new StreamResource(fileName + extension, resourceWriter));
     }
-
-    // private Exporter<Grade> createExcelExporter() {
-    // Exporter<Grade> excelExporter = new Exporter<>();
-
-    // excelExporter.setDataProvider(filteringGradeDataProvider);
-    // excelExporter.addColumn("Matr.Nummer", Grade::getMatrNumber);
-    // excelExporter.addColumn("Bewertung", Grade::getValue);
-    // excelExporter.addColumn("Veranstaltung", grade ->
-    // grade.getLecture().getName());
-    // excelExporter.addColumn("Leistung", grade -> grade.getExercise().getName());
-    // excelExporter.addColumn("Eingetragen von", Grade::getNameOfGradedBy);
-    // excelExporter.addColumn("Abgegeben am",
-    // grade -> grade.getHandIn().format(DateTimeFormatter.ofPattern("dd. MM.
-    // uuuu")));
-    // excelExporter.addColumn("Zuletzt verändert",
-    // Grade::getLastModifiedFormatted);
-
-    // return excelExporter;
-    // }
 }

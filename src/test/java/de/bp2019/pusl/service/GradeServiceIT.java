@@ -259,16 +259,16 @@ public class GradeServiceIT {
 
         LOGGER.info("testing institute matching");
 
-        grade1 = new Grade(lecture1, exercise11, "", "", LocalDate.now(), admin);
+        grade1 = new Grade(lecture1, exercise11, "", "", LocalDate.now(), admin.getId());
         gradeRepository.save(grade1);
 
-        grade2 = new Grade(lecture1, exercise12, "", "", LocalDate.now(), admin);
+        grade2 = new Grade(lecture1, exercise12, "", "", LocalDate.now(), admin.getId());
         gradeRepository.save(grade2);
 
-        grade3 = new Grade(lecture2, exercise21, "", "", LocalDate.now(), admin);
+        grade3 = new Grade(lecture2, exercise21, "", "", LocalDate.now(), admin.getId());
         gradeRepository.save(grade3);
 
-        grade4 = new Grade(lecture2, exercise22, "", "", LocalDate.now(), admin);
+        grade4 = new Grade(lecture2, exercise22, "", "", LocalDate.now(), admin.getId());
         gradeRepository.save(grade4);
 
         

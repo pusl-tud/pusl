@@ -300,4 +300,27 @@ public class UserService extends AbstractDataProvider<User, String> {
                 return Stream.empty();
         }
     }
+
+    /**
+     * Get the full name of a {@link User} by its ID
+     * 
+     * @param id of User
+     * @return full name of {@link User}
+     * @author Leon Chemnitz
+     */
+	public  String getNameOfUser(ObjectId id) {
+        final String NOT_FOUND_STRING = "nich gesetzt"; 
+        
+        if(id == null){
+            return NOT_FOUND_STRING; 
+        }
+
+        Optional<User> maybeUser = userRepository.findById(id);
+
+		if(maybeUser.isPresent() && maybeUser.get().getFullName() != null){
+			return maybeUser.get().getFullName();
+        }
+        
+		return NOT_FOUND_STRING;
+	}
 }

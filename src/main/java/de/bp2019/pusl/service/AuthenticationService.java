@@ -101,6 +101,14 @@ public class AuthenticationService {
     }
 
     /**
+     * @return Id of current user
+     * @author Leon Chemnitz
+     */
+    public ObjectId currentUserId(){
+        return currentUser().getId();
+    }
+
+    /**
      * Returns the Full name of the currently logged in User. Returns the users
      * email address if no firstname is set
      * 

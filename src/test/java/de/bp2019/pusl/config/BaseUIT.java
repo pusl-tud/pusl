@@ -391,6 +391,16 @@ public abstract class BaseUIT {
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//vaadin-select-overlay")));
     }
 
+    
+    protected void findComboBoxByIdAndSelectByText(String id, String selectionText) throws InterruptedException {
+        WebElement element = findElementById(id);
+
+        element.sendKeys(selectionText);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//vaadin-combo-box-overlay")));
+        Thread.sleep(2000); //Yeah I know this is bad but I'm just sick of dealing with vaadins custom elements in selenium...
+        element.sendKeys(Keys.RETURN);
+    }
+
     /**
      * Find a Multiselect-combo-box by its CSS ID and select its fields based on a
      * List of texts

@@ -41,8 +41,7 @@ public class Grade {
 	@Indexed(name= "grade_matr", unique = false)
 	private String matrNumber;
 
-	// TODO: Durch ObjectID ersetzen
-	private User gradedBy;
+	private ObjectId gradedBy;
 
 	private String value;
 	
@@ -54,7 +53,7 @@ public class Grade {
 		lastModified = LocalDateTime.now();
 	}
 
-	public Grade(Lecture lecture, Exercise exercise, String matrNumber, String value, LocalDate handIn, User gradedBy) {
+	public Grade(Lecture lecture, Exercise exercise, String matrNumber, String value, LocalDate handIn, ObjectId gradedBy) {
 		this.lecture = lecture;
 		this.exercise = exercise;
 		this.matrNumber = matrNumber;
@@ -105,11 +104,11 @@ public class Grade {
 		this.id = id;
 	}
 
-	public User getGradedBy() {
+	public ObjectId getGradedBy() {
 		return gradedBy;
 	}
 
-	public void setGradedBy(User gradedBy) {
+	public void setGradedBy(ObjectId gradedBy) {
 		this.gradedBy = gradedBy;
 	}
 
@@ -145,14 +144,6 @@ public class Grade {
 				Arrays.asList("lecture", "lectureEmb", "exercise", "matrNumber", "gradedBy", "grade", "handIn", "lastModified"));
 	}
 
-	@JsonIgnore
-	public static String getNameOfGradedBy(Grade grade) {
-		if(grade.getGradedBy() != null && grade.getGradedBy().getFullName() != null){
-			return grade.getGradedBy().getFullName();
-		}
-
-		return "nich gesetzt";
-	}
 
 	@JsonIgnore
 	public static String getLastModifiedFormatted(Grade grade) {

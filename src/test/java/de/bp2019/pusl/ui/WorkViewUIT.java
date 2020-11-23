@@ -14,6 +14,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,23 +90,15 @@ public class WorkViewUIT extends BaseUIT {
             login(user);
             findElementById("work-view-gc-matrNumber").sendKeys(matrNumber);
 
-            WebElement lectureComboBox = findElementById("work-view-gc-lecture");
-            lectureComboBox.sendKeys(lecture.getName());
-            Thread.sleep(2000);
-            lectureComboBox.sendKeys(Keys.RETURN);
-            Thread.sleep(1000);
+            findComboBoxByIdAndSelectByText("work-view-gc-lecture", lecture.getName());
 
-            WebElement exerciseComboBox = findElementById("work-view-gc-exercise");
-            exerciseComboBox.sendKeys(exercise.getName());
-            Thread.sleep(1000);
-            exerciseComboBox.sendKeys(Keys.RETURN);
-            Thread.sleep(1000);
+            findComboBoxByIdAndSelectByText("work-view-gc-exercise", exercise.getName());
 
             findElementById("work-view-gc-numeric").sendKeys(value);
 
             findButtonContainingText("eintragen").click();
 
-            Thread.sleep(1000);
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//vaadin-dialog-overlay")));
 
             Grade grade = gradeRepository.findAll().get(0);
 
@@ -115,7 +108,7 @@ public class WorkViewUIT extends BaseUIT {
             assertEquals(lecture, grade.getLecture());
             assertEquals(exercise, grade.getExercise());
             assertEquals(Double.valueOf(value), Double.valueOf(grade.getValue()));
-            assertEquals(user, grade.getGradedBy());
+            assertEquals(user.getId(), grade.getGradedBy());
 
             gradeRepository.deleteAll();
             lectureRepository.deleteAll();
@@ -178,27 +171,15 @@ public class WorkViewUIT extends BaseUIT {
         login(user);
         findElementById("work-view-gc-matrNumber").sendKeys(matrNumber);
 
-        WebElement lectureComboBox = findElementById("work-view-gc-lecture");
-        lectureComboBox.sendKeys(lecture.getName());
-        Thread.sleep(2000);
-        lectureComboBox.sendKeys(Keys.RETURN);
-        Thread.sleep(1000);
-
-        WebElement exerciseComboBox = findElementById("work-view-gc-exercise");
-        exerciseComboBox.sendKeys(exercise.getName());
-        Thread.sleep(1000);
-        exerciseComboBox.sendKeys(Keys.RETURN);
-        Thread.sleep(1000);
-
-        WebElement tokenComboBox = findElementById("work-view-gc-token");
-        tokenComboBox.sendKeys(token2.getName());
-        Thread.sleep(1000);
-        tokenComboBox.sendKeys(Keys.RETURN);
-        Thread.sleep(1000);
+        findComboBoxByIdAndSelectByText("work-view-gc-lecture", lecture.getName());
+        
+        findComboBoxByIdAndSelectByText("work-view-gc-exercise", exercise.getName());
+        
+        findComboBoxByIdAndSelectByText("work-view-gc-token", token2.getName());
 
         findButtonContainingText("eintragen").click();
 
-        Thread.sleep(1000);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//vaadin-dialog-overlay")));
 
         Grade grade = gradeRepository.findAll().get(0);
 
@@ -208,7 +189,7 @@ public class WorkViewUIT extends BaseUIT {
         assertEquals(lecture, grade.getLecture());
         assertEquals(exercise, grade.getExercise());
         assertEquals(token2.getName(), grade.getValue());
-        assertEquals(user, grade.getGradedBy());
+        assertEquals(user.getId(), grade.getGradedBy());
 
         gradeRepository.deleteAll();
         lectureRepository.deleteAll();
@@ -258,20 +239,19 @@ public class WorkViewUIT extends BaseUIT {
             grade.setLecture(lecture);
             grade.setExercise(exercise);
             grade.setValue(value);
-            grade.setGradedBy(user);
+            grade.setGradedBy(user.getId());
             grade.setHandIn(LocalDate.now());
             gradeRepository.save(grade);
 
             login(user);
 
             findElementById("vtabs-einsehen").click();
-            Thread.sleep(1000);
 
             Actions actions = new Actions(driver);
             WebElement gridItem = driver.findElement(By.tagName("vaadin-grid-cell-content"));
             actions.doubleClick(gridItem).perform();
 
-            Thread.sleep(1000);
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.id("dialog-gc-numeric")));
 
             String newValue = RandomStringUtils.randomNumeric(2);
 
@@ -280,7 +260,7 @@ public class WorkViewUIT extends BaseUIT {
 
             findButtonContainingText("speichern").click();
 
-            Thread.sleep(1000);
+            wait.until(ExpectedConditions.invisibilityOf(findButtonContainingText("speichern")));
 
             Grade foundGrade = gradeRepository.findById(grade.getId()).get();
 
@@ -336,27 +316,22 @@ public class WorkViewUIT extends BaseUIT {
         grade.setLecture(lecture);
         grade.setExercise(exercise);
         grade.setValue(value);
-        grade.setGradedBy(user);
+        grade.setGradedBy(user.getId());
         grade.setHandIn(LocalDate.now());
         gradeRepository.save(grade);
 
         login(user);
 
         findElementById("vtabs-einsehen").click();
-        Thread.sleep(1000);
 
         Actions actions = new Actions(driver);
         WebElement gridItem = driver.findElement(By.tagName("vaadin-grid-cell-content"));
         actions.doubleClick(gridItem).perform();
 
-        Thread.sleep(1000);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("dialog-delete-button")));
+        findElementById("dialog-delete-button").click();
 
-        findButtonContainingText("löschen").click();
-
-        Thread.sleep(1000);
         acceptConfirmDeletionDialog("2920560");
-
-        Thread.sleep(1000);
 
         assertTrue(gradeRepository.findById(grade.getId()).isEmpty());
     }

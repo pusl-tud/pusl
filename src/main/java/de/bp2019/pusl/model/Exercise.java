@@ -23,7 +23,7 @@ public class Exercise {
 		if(o == null) return;
 		
 		this.id = o.getId();
-		this.name = new String(o.getName());
+		this.name = o.getName();
 		this.scheme = o.getScheme();
 		this.assignableByHIWI = o.isAssignableByHIWI(); 
 	}

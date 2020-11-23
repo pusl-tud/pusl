@@ -19,7 +19,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import de.bp2019.pusl.enums.UserType;
-import de.bp2019.pusl.model.Interfaces.BelongsToInstitutes;
+import de.bp2019.pusl.model.interfaces.BelongsToInstitutes;
 
 /**
  * Model of a User. Implements {@link UserDetails} to be used with Spring

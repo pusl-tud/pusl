@@ -37,7 +37,7 @@ class MongoConfig extends AbstractMongoClientConfiguration {
   @Override
   public MongoClient mongoClient() {
     String address = mongoProperties.getAddress();
-    int port = Integer.valueOf(mongoProperties.getPort());
+    int port = Integer.parseInt(mongoProperties.getPort());
     String username = mongoProperties.getUsername();
     String password = mongoProperties.getPassword();
     String adminDB = mongoProperties.getAdminDb();

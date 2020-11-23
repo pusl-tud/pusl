@@ -13,24 +13,26 @@ public class TUCanEntity {
     public String grade;
 
     /**
-     * Sets up the processors used for the examples. There are 10 CSV columns, so 10
-     * processors are defined. Empty columns are read as null (hence the NotNull()
-     * for mandatory columns).
+     * get CellProcessors for CSV Processing
      * 
      * @return the cell processors
+     * @author Leon Chemnitz
      */
     public static CellProcessor[] getCSVProcessors() {
-        final CellProcessor[] processors = new CellProcessor[] { new Optional(), // number
+        return new CellProcessor[] { new Optional(), // number
                 new NotNull(), // matrNumber
                 new Optional(), // firstName
                 new Optional(), // middleName
                 new Optional(), // lastName
                 new NotNull() // grade
         };
-
-        return processors;
     }
 
+    /**
+     * 
+     * @return
+     * @author Leon Chemnitz
+     */
     public static String[] getMapping() {
         return new String[] { "number", "matrNumber", "firstName", "middleName", "lastName", "grade" };
     }

@@ -27,10 +27,10 @@ public abstract class BaseTabs<T extends Component> extends Component implements
     private Orientation orientation;
     private Component layout;
 
-    private Map<String, T> titleToPages = new HashMap<String, T>();
-    private Map<String, Tab> titleToTabs = new HashMap<String, Tab>();
+    private Map<String, T> titleToPages = new HashMap<>();
+    private Map<String, Tab> titleToTabs = new HashMap<>();
     private Tabs tabsComponent;
-    private Set<T> pages = new HashSet<T>();
+    private Set<T> pages = new HashSet<>();
 
     public BaseTabs(Orientation orientation) {
         this.orientation = orientation;

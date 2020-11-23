@@ -25,7 +25,7 @@ public class Token {
 
     public Token(Token o){
         this.id = o.getId();
-        this.name = new String(o.getName());
+        this.name = o.getName();
         this.assignableByHIWI = o.getAssignableByHIWI();
     }
 

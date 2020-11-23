@@ -175,7 +175,7 @@ public final class ImportGradesDialog {
                 dialog.close();
             } else if (correctGradeEntities.size() == correctMatrEntities.size()) {
                 List<Grade> grades = correctGradeEntities.stream().map(entity -> new Grade(lecture, exercise,
-                        entity.getMatrNumber(), entity.getGrade(), handIn, authService.currentUser()))
+                        entity.getMatrNumber(), entity.getGrade(), handIn, authService.currentUserId()))
                         .collect(Collectors.toList());
                 try {
                     gradeService.save(grades);
@@ -223,7 +223,7 @@ public final class ImportGradesDialog {
 
                 importAllButton.addClickListener(clickEvent -> {
                     List<Grade> grades = correctGradeEntities.stream().map(entity -> new Grade(lecture, exercise,
-                            entity.getMatrNumber(), entity.getGrade(), handIn, authService.currentUser()))
+                            entity.getMatrNumber(), entity.getGrade(), handIn, authService.currentUserId()))
                             .collect(Collectors.toList());
                     try {
                         gradeService.save(grades);
@@ -240,7 +240,7 @@ public final class ImportGradesDialog {
 
                 importCorrectButton.addClickListener(clickEvent -> {
                     List<Grade> grades = correctMatrEntities.stream().map(entity -> new Grade(lecture, exercise,
-                            entity.getMatrNumber(), entity.getGrade(), handIn, authService.currentUser()))
+                            entity.getMatrNumber(), entity.getGrade(), handIn, authService.currentUserId()))
                             .collect(Collectors.toList());
                     try {
                         gradeService.save(grades);

@@ -20,6 +20,7 @@ import de.bp2019.pusl.model.Grade;
 import de.bp2019.pusl.model.GradeFilter;
 import de.bp2019.pusl.service.AuthenticationService;
 import de.bp2019.pusl.service.GradeService;
+import de.bp2019.pusl.service.UserService;
 import de.bp2019.pusl.ui.components.GradeComposer;
 import de.bp2019.pusl.util.Service;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;
@@ -40,8 +41,8 @@ public final class EditGradeDialog {
         LOGGER.debug(grade.toString());
 
         AuthenticationService authenticationService = Service.get(AuthenticationService.class);
-
         GradeService gradeService = Service.get(GradeService.class);
+        UserService userService = Service.get(UserService.class);
 
         Dialog dialog = new Dialog();
 
@@ -56,7 +57,7 @@ public final class EditGradeDialog {
         lastModified.getStyle().set("margin-top", "0");
         info.add(lastModified);
         
-        String userName = Grade.getNameOfGradedBy(grade);
+        String userName = userService.getNameOfUser(grade.getGradedBy());
         Label gradedBy = new Label("von: " + userName);
         gradedBy.getStyle().set("margin-top", "0");
         info.add(gradedBy);
@@ -74,6 +75,7 @@ public final class EditGradeDialog {
         form.add(gradeComposer, 4);
 
         Button delete = new Button("löschen");
+        delete.setId("dialog-delete-button");
         delete.addThemeVariants(ButtonVariant.LUMO_SMALL);
         form.add(delete, 1);
 
@@ -138,7 +140,7 @@ public final class EditGradeDialog {
             modified.setHandIn(handIn.getValue());
 
             modified.setLastModified(LocalDateTime.now());
-            modified.setGradedBy(authenticationService.currentUser());
+            modified.setGradedBy(authenticationService.currentUserId());
 
             if (!GradeService.gradeIsValid(modified)) {
                 return;

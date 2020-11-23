@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import de.bp2019.pusl.enums.UserType;
 import de.bp2019.pusl.model.Institute;
 import de.bp2019.pusl.model.User;
-import de.bp2019.pusl.model.Interfaces.BelongsToInstitutes;
+import de.bp2019.pusl.model.interfaces.BelongsToInstitutes;
 import de.bp2019.pusl.repository.InstituteRepository;
 import de.bp2019.pusl.util.LimitOffsetPageRequest;
 import de.bp2019.pusl.util.exceptions.DataNotFoundException;

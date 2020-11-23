@@ -136,19 +136,4 @@ public class CalculationService {
 
         return report;
     }
-
-    // public void checkPerformanceScheme(PerformanceScheme performanceScheme)
-    // throws JSException {
-    // Context cx = Context.enter();
-    // Scriptable scope = cx.initStandardObjects();
-
-    // cx.evaluateString(scope, performanceScheme.getCalculationRule(), "pusl", 1,
-    // null);
-
-    // Object fObj = scope.get("calculate", scope);
-
-    // if (!(fObj instanceof Function)) {
-    // throw new JSException();
-    // }
-    // }
 }

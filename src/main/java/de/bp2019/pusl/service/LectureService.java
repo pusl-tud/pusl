@@ -90,7 +90,7 @@ public class LectureService extends AbstractDataProvider<Lecture, String> {
      * @throws UnauthorizedException if user not authorized to access
      */
     public Lecture getById(String id) throws DataNotFoundException, UnauthorizedException {
-        if(id == null) throw new DataNotFoundException();
+        if(id == null || !ObjectId.isValid(id)) throw new DataNotFoundException();
         return getById(new ObjectId(id));
     }
 

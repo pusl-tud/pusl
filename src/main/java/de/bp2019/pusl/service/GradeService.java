@@ -185,7 +185,7 @@ public class GradeService extends AbstractDataProvider<Grade, String> {
                     break;
             case WIMI:
             case ADMIN:
-                if (!currentUser.getInstitutes().containsAll(institutes))
+                if (!Utils.containsAny(currentUser.getInstitutes(), institutes))
                     break;
                 return true;
             case SUPERADMIN:

@@ -18,7 +18,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import de.bp2019.pusl.model.Interfaces.BelongsToInstitutes;
+import de.bp2019.pusl.model.interfaces.BelongsToInstitutes;
 
 /**
  * Model of a Lecture. Is a Database Entity

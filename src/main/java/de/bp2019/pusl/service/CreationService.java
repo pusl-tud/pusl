@@ -4,7 +4,6 @@ import java.util.HashSet;
 
 import javax.annotation.PostConstruct;
 
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,7 +35,7 @@ public class CreationService {
             admin.setEmailAddress("admin");
             admin.setPassword(passwordEncoder.encode("admin"));
             admin.setType(UserType.SUPERADMIN);
-            admin.setInstitutes(new HashSet<ObjectId>());
+            admin.setInstitutes(new HashSet<>());
             userRepository.save(admin);
         }
     }
