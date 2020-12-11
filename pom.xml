@@ -15,7 +15,7 @@
   <properties>
     <java.version>11</java.version>
     <vaadin.version>14.3.5</vaadin.version>
-    <pusl.skipTests>true</pusl.skipTests>
+    <pusl.skipTests>false</pusl.skipTests>
   </properties>
   <dependencies>
     <dependency>
