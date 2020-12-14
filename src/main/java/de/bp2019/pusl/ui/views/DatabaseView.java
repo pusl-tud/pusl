@@ -50,7 +50,6 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
                 MemoryBuffer loadStateUploadBuffer;
                 loadStateUploadBuffer = new MemoryBuffer();
                 Upload loadStateUpload = new Upload(loadStateUploadBuffer);
-                // upload.setDropLabel(new Span("Excelliste hier abelegen"));
                 loadStateUpload.setUploadButton(new Button("Backup hochladen und laden"));
                 loadStateUpload.setAcceptedFileTypes(".pusl");
                 loadStateUpload.setWidth("96%");
@@ -59,11 +58,28 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
                 MemoryBuffer insertStateUploadBuffer;
                 insertStateUploadBuffer = new MemoryBuffer();
                 Upload insertStateUpload = new Upload(insertStateUploadBuffer);
-                // upload.setDropLabel(new Span("Excelliste hier abelegen"));
                 insertStateUpload.setUploadButton(new Button("Backup hochladen und einfügen"));
                 insertStateUpload.setAcceptedFileTypes(".pusl");
                 insertStateUpload.setWidth("96%");
                 add(insertStateUpload);
+
+                Anchor usersDownload = new Anchor(
+                                new StreamResource("USERS.pusl", this.serializationService::serializeUsersOnly), "");
+                usersDownload.getElement().setAttribute("download", true);
+                Button usersDownloadButton = new Button("Nutzer herunterladen");
+                usersDownloadButton.setWidthFull();
+                usersDownloadButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+                usersDownload.add(usersDownloadButton);
+                usersDownload.setWidthFull();
+                layout.add(usersDownload);
+
+                MemoryBuffer replaceUsersUploadBuffer;
+                replaceUsersUploadBuffer = new MemoryBuffer();
+                Upload replaceUsersUpload = new Upload(replaceUsersUploadBuffer);
+                replaceUsersUpload.setUploadButton(new Button("Nutzer ersetzen"));
+                replaceUsersUpload.setAcceptedFileTypes(".pusl");
+                replaceUsersUpload.setWidth("96%");
+                layout.add(replaceUsersUpload);
 
                 add(layout);
 
@@ -72,9 +88,13 @@ public class DatabaseView extends BaseView implements AccessibleBySuperadmin {
                 loadStateUpload.addSucceededListener(event -> {
                         serializationService.loadState(loadStateUploadBuffer.getInputStream());
                 });
-                
+
                 insertStateUpload.addSucceededListener(event -> {
                         serializationService.insertState(insertStateUploadBuffer.getInputStream());
+                });
+
+                replaceUsersUpload.addSucceededListener(event -> {
+                        serializationService.replaceUsers(replaceUsersUploadBuffer.getInputStream());
                 });
         }
 
