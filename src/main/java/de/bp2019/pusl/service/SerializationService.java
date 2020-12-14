@@ -70,7 +70,6 @@ public class SerializationService {
             vaadinSession.unlock();
         }
 
-
         try {
             GZIPOutputStream gos = new GZIPOutputStream(outputStream);
             JsonGenerator generator = getObjectMapper().createGenerator(gos);
@@ -124,29 +123,29 @@ public class SerializationService {
             State state = parser.readValueAs(State.class);
 
             List<Lecture> lectures = state.getLectures();
-            if(lectures != null){
+            if (lectures != null) {
                 lectureRepository.insert(state.getLectures());
             }
 
             List<User> users = (state.getUsers());
-            if(users != null){
+            if (users != null) {
                 userRepository.insert(users);
             }
 
             List<Grade> grades = state.getGrades();
-            if(grades != null) {
+            if (grades != null) {
                 Utils.batches(grades, 1000).forEach(gradesBatch -> {
                     gradeRepository.insert(gradesBatch);
                 });
             }
 
             List<ExerciseScheme> exerciseSchemes = state.getExerciseSchemes();
-            if(exerciseSchemes != null) {
+            if (exerciseSchemes != null) {
                 exerciseSchemeRepository.insert(exerciseSchemes);
             }
 
             List<Institute> institutes = state.getInstitutes();
-            if(institutes != null){
+            if (institutes != null) {
                 instituteRepository.insert(state.getInstitutes());
             }
 
@@ -155,7 +154,50 @@ public class SerializationService {
         }
     }
 
-    private ObjectMapper getObjectMapper(){
+    public void replaceUsers(InputStream inputStream) {
+        LOGGER.debug("replacing users");
+
+        try {
+            GZIPInputStream gis = new GZIPInputStream(inputStream);
+            JsonParser parser = getObjectMapper().createParser(gis);
+
+            State state = parser.readValueAs(State.class);
+
+            List<User> users = (state.getUsers());
+            if (users != null) {
+                userRepository.deleteAll();
+                userRepository.insert(users);
+            }
+
+        } catch (IOException e) {
+            LOGGER.error(e.toString());
+        }
+    }
+
+    public void serializeUsersOnly(OutputStream outputStream, VaadinSession vaadinSession) {
+        if (vaadinSession != null) {
+            vaadinSession.lock();
+            Authentication authentication = vaadinSession.getAttribute(Authentication.class);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            vaadinSession.unlock();
+        }
+
+        try {
+            GZIPOutputStream gos = new GZIPOutputStream(outputStream);
+            JsonGenerator generator = getObjectMapper().createGenerator(gos);
+
+            State state = new State();
+
+            state.setUsers(userRepository.findAll());
+
+            generator.writeObject(state);
+            generator.close();
+        } catch (IOException e) {
+            // TODO: ja genau...
+        }
+    }
+
+    private ObjectMapper getObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
 
         SimpleModule module = new SimpleModule("ObjectIdSerializer", new Version(1, 0, 0, null, null, null));
@@ -206,7 +248,7 @@ public class SerializationService {
 
             ObjectCodec codec = parser.getCodec();
             JsonNode node = codec.readTree(parser);
-            
+
             // try catch block
             JsonNode valueNode = node.get("stringValue");
 
