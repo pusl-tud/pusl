@@ -1,5 +1,7 @@
 package de.bp2019.pusl.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -7,6 +9,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.supercsv.cellprocessor.ift.CellProcessor;
+import org.supercsv.exception.SuperCsvConstraintViolationException;
 import org.supercsv.io.CsvBeanReader;
 import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.ICsvBeanReader;
@@ -97,24 +101,53 @@ public final class IOUtil {
      * @author Leon Chemnitz
      */
     private static List<TUCanEntity> readCSV(InputStream in) throws IOException {
-        ICsvBeanReader beanReader = null;
-        try {
-            beanReader = new CsvBeanReader(new InputStreamReader(in), CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
+        LOGGER.debug("Trying to read CSV");
 
-            beanReader.getHeader(true); // skip past the header (we're defining our own)
+        List<CsvPreference> preferences = Arrays.asList(CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE,
+                CsvPreference.STANDARD_PREFERENCE, CsvPreference.EXCEL_PREFERENCE, CsvPreference.TAB_PREFERENCE);
 
-            List<TUCanEntity> tuCanEntities = new ArrayList<>();
-            TUCanEntity tuCanEntity;
-            while ((tuCanEntity = beanReader.read(TUCanEntity.class, TUCanEntity.getMapping(),
-                    TUCanEntity.getCSVProcessors())) != null) {
-                tuCanEntities.add(tuCanEntity);
-            }
-            return tuCanEntities;
-        } finally {
-            if (beanReader != null) {
-                beanReader.close();
+        List<TUCanEntity> entities = new ArrayList<TUCanEntity>();
+
+        /**
+         * It is necessairy to copy the stream to memory for trying out different csv
+         * preferences
+         */
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        in.transferTo(baos);
+
+        for (CsvPreference p : preferences) {
+            ICsvBeanReader beanReader = null;
+
+            InputStream inCopy = new ByteArrayInputStream(baos.toByteArray());
+
+            try {
+                beanReader = new CsvBeanReader(new InputStreamReader(inCopy), p);
+
+                beanReader.getHeader(true); // skip past the header (we're defining our own)
+
+                List<TUCanEntity> tuCanEntities = new ArrayList<>();
+                TUCanEntity tuCanEntity;
+                while ((tuCanEntity = beanReader.read(TUCanEntity.class, TUCanEntity.getMapping(),
+                        TUCanEntity.getCSVProcessors())) != null) {
+                    tuCanEntities.add(tuCanEntity);
+                }
+                entities.addAll(tuCanEntities);
+                LOGGER.info(tuCanEntities.toString());
+                break;
+            } catch (IllegalArgumentException e) {
+                LOGGER.debug("CSV is not preference " + preferences.indexOf(p));
+            } catch (SuperCsvConstraintViolationException e) {
+                /** format doesnt match TUCanEntity */
+                break;
+            } finally {
+                if (beanReader != null) {
+                    beanReader.close();
+                }
+
             }
         }
+
+        return entities;
     }
 
     public static StreamResourceWriter createCSVResourceWriter(FilteringGradeDataProvider dataProvider) {
@@ -272,7 +305,7 @@ public final class IOUtil {
     private static List<TUCanEntity> checkEntities(List<TUCanEntity> entities) {
         if (entities.size() >= MAX_EXPORT_SIZE) {
             return entities.subList(0, MAX_EXPORT_SIZE - 1);
-        } else{
+        } else {
             return entities;
         }
     }

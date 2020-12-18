@@ -24,7 +24,7 @@ public class TUCanEntity {
                 new Optional(), // firstName
                 new Optional(), // middleName
                 new Optional(), // lastName
-                new NotNull() // grade
+                new Optional() // grade
         };
     }
 
@@ -43,7 +43,7 @@ public class TUCanEntity {
 
     public static TUCanEntity fromPerformance(Performance performance) {
         TUCanEntity entity = new TUCanEntity();
-        
+
         entity.matrNumber = performance.getMatriculationNumber();
         entity.grade = performance.getGrade();
 
@@ -52,7 +52,7 @@ public class TUCanEntity {
 
     public static TUCanEntity fromGrade(Grade grade) {
         TUCanEntity entity = new TUCanEntity();
-        
+
         entity.matrNumber = grade.getMatrNumber();
         entity.grade = grade.getValue();
 

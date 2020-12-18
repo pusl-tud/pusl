@@ -167,7 +167,7 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         showGradesHeader.add(endDateFilter, 3);
 
         VaadinSession.getCurrent().setAttribute(Authentication.class,
-        SecurityContextHolder.getContext().getAuthentication());
+                SecurityContextHolder.getContext().getAuthentication());
 
         download = new Anchor("", "");
 
@@ -306,14 +306,20 @@ public class WorkView extends BaseView implements HasUrlParameter<String> {
         upload.addSucceededListener(event -> {
             try {
                 List<TUCanEntity> entities = IOUtil.readUpload(uploadBuffer.getInputStream(), event.getFileName());
-                ImportGradesDialog.open(entities, filteringGradeDataProvider);
+                if (entities.size() > 0) {
+                    ImportGradesDialog.open(entities, filteringGradeDataProvider);
+                } else {
+                    ErrorDialog.open(
+                            "Fehler in hochgeladener Datei!\nBitte stellen sie sicher, dass das TUCan-Format eingehalten wurde.");
+                }
             } catch (IOException e) {
                 LOGGER.error(e.getMessage());
                 ErrorDialog.open("Fehler beim öffnen der Datei");
             }
+
         });
 
-        extensionSelect.addValueChangeListener( e -> {
+        extensionSelect.addValueChangeListener(e -> {
             refreshStreamResource();
         });
     }

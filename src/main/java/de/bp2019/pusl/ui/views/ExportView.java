@@ -114,8 +114,8 @@ public class ExportView extends BaseView implements AccessibleByWimi {
         grid.addThemeVariants(GridVariant.LUMO_COMPACT);
         grid.setHeight("20em");
         grid.setDataProvider(performanceDataProvider);
-    
-        grid.addColumn(Performance::getMatriculationNumber).setHeader("Matrikel-Nummer").setAutoWidth(true);        
+
+        grid.addColumn(Performance::getMatriculationNumber).setHeader("Matrikel-Nummer").setAutoWidth(true);
         grid.addColumn(Performance::getGrade).setKey("performance").setHeader("");
 
         add(grid);
@@ -157,7 +157,7 @@ public class ExportView extends BaseView implements AccessibleByWimi {
             refreshStreamResource();
         });
 
-        extensionSelect.addValueChangeListener( e -> {
+        extensionSelect.addValueChangeListener(e -> {
             refreshStreamResource();
         });
 

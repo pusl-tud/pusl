@@ -12,16 +12,17 @@ import com.vaadin.flow.component.html.Label;
  * @author Leon Chemnitz
  */
 public final class ErrorDialog {
-    public static void open(String msg){
+    public static void open(String msg) {
         Dialog dialog = new Dialog();
         Label label = new Label(msg);
         label.getStyle().set("font-weight", "600");
         label.getStyle().set("color", "var(--lumo-error-color)");
+        label.getStyle().set("white-space", "pre-line");
         dialog.add(label);
 
         ShortcutRegistration registration = UI.getCurrent().addShortcutListener(() -> dialog.close(), Key.ENTER);
         dialog.addOpenedChangeListener(event -> {
-            if(event.isOpened() == false) {
+            if (event.isOpened() == false) {
                 registration.remove();
             }
         });
